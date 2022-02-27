@@ -1,0 +1,66 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+@model SubmittInfo
+    <link href="bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <div class="modal fade" tabindex="-1" id="SubmittInfoModal" data-keyboard="false" data-backdrop="static">
+        <div class="modal-dialog modal-lg">
+
+            <div class="modal-content">
+                <div class="modal-header">
+
+                    <h4 class="modal-title" id="submittedTitle">
+                        Submitted Orders info
+                    </h4>
+                    <button type="button" class="close" data-dismiss="modal"> <span>X</span></button>
+                </div>
+
+                <div class="modal-body">
+
+                    <form action="Confirm">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Territory Name</th>
+                                    <th>Orders Count</th>
+                                </tr>
+                            <thead>
+                            <tbody>
+                                @if (Model != null)
+                                {
+                                    @foreach (var item in Model.submittedOrdersTerritories)
+                                    {
+                                        <tr>
+                                            <td>
+                                                @Html.DisplayFor(modelItem => item.territorryModel.Name)
+                                            </td>
+                                            <td>
+                                                @Html.DisplayFor(modelItem => item.NumberOfOrders)
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+
+                            </tbody>
+                            @foreach (var order in Model.ordersTosubmit)
+                            {
+                                @*<input class="form-check-input" asp-for="ordersTosubmit.Select(o=>o.OrderNumber)" type="hidden" style="width:100px" />
+                                <input class="form-check-input" asp-for="ordersTosubmit.Select(o=>o.OrderQuantity)" type="hidden" style="width:100px" />
+                                <input class="form-check-input" asp-for="ordersTosubmit.Select(o=>o.PriorityId)" type="hidden" style="width:100px" />*@
+                            }
+                        </table>
+                      
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button id="Cancel" class="btn btn-danger" data-dismiss="modal">Close </button>
+
+                    <button id="Confirm" class="btn btn-block" data-save="modal">Confirm </button>
+                </div>
+
+        </div>
+        </div>
+   </div>

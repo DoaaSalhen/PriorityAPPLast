@@ -1,0 +1,95 @@
+﻿@model PriorityApp.Service.Models.HoldModel
+
+@{
+    ViewData["Title"] = "Edit";
+    Layout = "~/Views/Shared/NiceAdmin/_CSLayout.cshtml";
+}
+<script>
+
+    function checkIfCanDecrease(quotaQuantity, remainingQuantity)
+    {
+        var insertedQuotaValue = document.getElementById("QuotaQuantity").value;
+
+            if (insertedQuotaValue > 0)
+            {
+                if (insertedQuotaValue < quotaQuantity)
+                {
+
+                    var AssignedQuantity =  @Model.QuotaQuantity - @Model.ReminingQuantity;
+                        if (insertedQuotaValue >= AssignedQuantity) {
+                            var decreaseRate = parseFloat(quotaQuantity) - parseFloat(insertedQuotaValue);
+                            alert("you will  decrease your quota by " + decreaseRate);
+                            document.getElementById("ReminingQuantity").value = parseFloat(@Model.ReminingQuantity) - parseFloat(decreaseRate);
+                        }
+                        else
+                        {
+                            alert("you can not decrease your quota to " + insertedQuotaValue + "\n becuase your Assigned Quantity = " + AssignedQuantity);
+                            document.getElementById("QuotaQuantity").value = @Model.QuotaQuantity;
+                            document.getElementById("ReminingQuantity").value = @Model.ReminingQuantity;
+                        }
+
+                }
+                else if (insertedQuotaValue > quotaQuantity)
+                    {
+                    var increasingRate = parseFloat(insertedQuotaValue) - parseFloat(quotaQuantity);
+                    document.getElementById("ReminingQuantity").value = parseFloat(@Model.ReminingQuantity) + parseFloat(increasingRate);
+                        alert("you will to increase your quota by " + increasingRate);
+                    }
+            }
+            else
+            {
+                    alert("Quota can not be negative value");
+                document.getElementById("QuotaQuantity").value = @Model.QuotaQuantity;
+                document.getElementById("ReminingQuantity").value = @Model.ReminingQuantity;
+
+
+            }
+    }
+</script>
+<h1>Edit</h1>
+
+<h4>Hold</h4>
+<style>
+    div{
+        margin-bottom:30px;
+    }
+</style>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="PriorityDate" />
+            <input type="hidden" asp-for="userId" />
+            <div class="form-group">
+                <label asp-for="UserName" class="control-label"></label>
+                <input asp-for="UserName" id="UserName" class="form-control" readonly />
+                <span asp-validation-for="UserName" class="text-danger"></span>
+            </div>
+
+            <div>
+                <label asp-for="QuotaQuantity" class="control-label"></label>
+                <input asp-for="QuotaQuantity" id="QuotaQuantity" class="form-control" onchange="checkIfCanDecrease(@Model.QuotaQuantity,  @Model.ReminingQuantity)" />
+                <span asp-validation-for="QuotaQuantity" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ReminingQuantity" class="control-label"></label>
+                <input asp-for="ReminingQuantity" id="ReminingQuantity" readonly class="form-control" />
+                <span asp-validation-for="ReminingQuantity" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Tolerance" class="control-label"></label>
+                <input asp-for="Tolerance" readonly class="form-control" />
+                <span asp-validation-for="Tolerance" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+

@@ -1,0 +1,61 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+@model PriorityApp.Service.Models.ExportModel
+
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/NiceAdmin/_CSLayout.cshtml";
+
+}
+
+<style>
+
+    table {
+        margin-bottom: 20px;
+    }
+
+    .selectFilter {
+        margin-left: 40px;
+    }
+
+    .searchbtn {
+        margin: 20px 20px 20px 40px;
+        border-radius: 10px;
+        width: 400px;
+    }
+</style>
+<h4>Export Orders</h4>
+@if (Model != null)
+{
+
+
+    <div class="row FormMaindiv">
+        <form asp-action="Export" class="CreateForm" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="row">
+                <div class="col-xs-12 col-sm-6 col-md-6 col-lg-4 selectFilter" style="display:inline-block; margin-bottom:20px;">
+                    <label class="control-label">Priority Date</label>
+                    <input type="date" class="form-select form-select-lg mb-3" id="priorityDateId" name="SelectedpriorityDate" asp-for="SelectedPriorityDate" />
+                    </div>
+                
+                </div>
+            <div class="row">
+                <div class="col-xs-12 col-sm-6 col-md-6 col-lg-4 selectFilter" style="display:inline-block">
+                    <label class="control-label">Order Category</label>
+                    <select id="OrderCategorySelectedId" name="OrderCategorySelectedId" asp-for="OrderCategorySelectedId"
+                            class="form-select form-select-lg mb-3"
+                            asp-items="@(new SelectList(Model.OrderCategoryModels, "Id", "Name"))"></select>
+                   
+                </div>
+            </div>
+            <div class="row">
+                <div class="form-group form-check">
+                    <input type="submit" value="Export" class="btn btn-primary searchbtn" />
+                </div>
+            </div>
+    </form>
+    </div>
+}

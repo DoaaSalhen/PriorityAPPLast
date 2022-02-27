@@ -1,0 +1,18 @@
+﻿body {
+}
+.QoutaInfo {
+     position:fixed;
+    margin-bottom:40px;
+    margin-left:60%;
+}
+#total{
+    width:60px;
+}
+
+#remaining
+{
+    width:60px;
+}
+table{
+    margin-top:40px;
+}

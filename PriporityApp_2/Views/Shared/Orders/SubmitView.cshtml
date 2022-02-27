@@ -1,0 +1,61 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    Layout = "~/Views/Shared/_CSLayout.cshtml";
+}
+@model SubmittInfo
+<link href="bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+
+<h4>Orders To submit</h4>
+
+<form class="form-group" action="Confirm">
+    <table>
+        <thead>
+            <tr>
+                <th>Territory Name</th>
+            </tr>
+        <thead>
+        <tbody>
+            @if (Model != null)
+            {
+                @foreach (var item in Model.submittedOrdersTerritories)
+                {
+                    <tr>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.territorryModel.Name)
+                        </td>
+                    </tr>
+                }
+            }
+            <tr>
+
+                @Html.DisplayFor(modelItem => Model.OrdersCount)
+
+            </tr>
+        </tbody>
+        @for (var index = 0; index < Model.ordersTosubmit.Count(); index++)
+        {
+
+            <tr>
+                <td>
+                    <input class="form-check-input" asp-for="ordersTosubmit[index].OrderNumber" type="hidden" />
+                    <input class="form-check-input" asp-for="ordersTosubmit[index].PriorityId" type="hidden" />
+                    <input class="form-check-input" asp-for="ordersTosubmit[index].WHSavedID" type="hidden" />
+
+                </td>
+                </tr>
+                }
+        </table>
+    <button id="Cancel" class="btn btn-danger" style="margin-left:20px">Close </button>
+
+    <button type="submit" id="Confirm" class="btn btn-success" asp-action="Confirm" asp-controller="OrderComman">Confirm </button>
+</form>
+
+

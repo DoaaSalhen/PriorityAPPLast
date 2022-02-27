@@ -1,0 +1,118 @@
+﻿@model IEnumerable<PriorityApp.Service.Models.OrderModel2>
+
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_SalesLayout.cshtml";
+    int priorityQuantity = 0;
+    int priorityId = 0;
+}
+<script src="/lib/jquery/dist/jquery.js"></script>
+<script>
+    $(document).ready(function () {
+
+        $('#Savebtn').click(function (e) {
+            alert("xxx");
+            var Link = document.getElementById("Savebtn");
+            var originalHref = Link.href;
+            alert(originalHref.value);
+            var searchTextElement = document.getElementById("priorityQuantityInput");
+            alert(searchTextElement.value);
+            @priorityQuantity =document.getElementById("priorityQuantityInput").value;
+            alert(@priorityQuantity);
+            @*e.target.href = originalHref.replace("@priorityQuantity", searchTextElement.value);
+            alert(e.target.href);*@
+
+        });
+    });
+</script>
+<h1>Index</h1>
+
+<div>
+    Toggle column: <a class="toggle-vis" data-column="0">CustomerState</a> - <a class="toggle-vis" data-column="1">ItemId</a> - <a class="toggle-vis" data-column="2">PODNumber</a> - <a class="toggle-vis" data-column="3">PODName</a> - <a class="toggle-vis" data-column="4">PODZoneName</a>
+</div>
+<form asp-action="SaveOrders" method="post">
+    <table id="orders" class="display" style="width:100%;">
+        <thead>
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.PriorityDate)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.CustomerId)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.OrderDocument)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.LineID)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.OrderDate)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Item)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.OrderQuantity)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Priority)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.PriorityQuantity)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.OrginalQuantity)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Territory.Id)
+                </th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.PriorityDate)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.CustomerId)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.OrderDocument)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.LineID)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.OrderDate)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Item.Name)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.OrderQuantity)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Priority.Name)
+                    </td>
+                    <td>
+                       <input type="number" id="priorityQuantityInput" />
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.OrginalQuantity)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Territory.Id)
+                    </td>
+                    <td>
+                        <button id="Savebtn"asp-action="SaveOrders" asp-route-orderNumber="@item.OrderNumber" asp-route-territoryId="@item.Territory.Id" asp-route-priorityQuantity="@priorityQuantity">Save</button> |
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <input type="submit" value="submit"  class="form-group"/>
+</form>

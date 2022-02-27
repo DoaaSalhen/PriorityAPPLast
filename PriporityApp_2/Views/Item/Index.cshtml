@@ -1,0 +1,71 @@
+﻿@model IEnumerable<PriorityApp.Service.Models.MasterModels.ItemModel>
+
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/NiceAdmin/_CSLayout.cshtml";
+
+}
+<div style="background-color:beige; width:1000px">
+    <h1>Index</h1>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <p>
+        <a  asp-action="Create">Create New</a>
+    </p>
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                <th scope="col">
+                    @Html.DisplayNameFor(model => model.QutaCalc)
+                </th>
+                <th scope="col">
+                    @Html.DisplayNameFor(model => model.HMP)
+                </th>
+                <th scope="col">
+                    @Html.DisplayNameFor(model => model.OldItemNumber)
+                </th>
+                <th scope="col">
+                    @Html.DisplayNameFor(model => model.Name)
+                </th>
+                <th scope="col">
+                    @Html.DisplayNameFor(model => model.CreatedDate)
+                </th>
+                <th scope="col">
+                    @Html.DisplayNameFor(model => model.UpdatedDate)
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model != null)
+            {
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.QutaCalc)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.HMP)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.OldItemNumber)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Name)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.CreatedDate)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.UpdatedDate)
+                        </td>
+                        <td>
+                            <a class="far fa-edit btn btn-success" asp-action="Edit" asp-route-id="@item.Id">Edit</a> 
+                            <a class="btn btn-info" asp-action="Details" asp-route-id="@item.Id">Details</a> 
+                            <a class="btn btn-danger" asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                        </td>
+                    </tr>
+                }
+            }
+        </tbody>
+    </table>
+</div>

@@ -1,0 +1,495 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{ }
+@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{ }
+@inject UserManager<AspNetUser> userManager
+
+@model PriorityApp.Service.Models.MasterModels.WarehouseOrderModel
+@{ ViewData["Title"] = "Index";
+                Layout = "~/Views/Shared/NiceAdmin/_CSLayout.cshtml";
+                float holdReminingQuantity = 0; }
+<style>
+    #NOOrdersSpain {
+        margin: auto;
+    }
+
+
+    table {
+        border-collapse: collapse;
+        border-spacing: 0;
+        border: 3px solid #ddd;
+    }
+
+    th, td {
+        text-align: center;
+        padding: 8px;
+        margin: 0px 10px 10px 10px;
+    }
+
+    tr:nth-child(even) {
+        background-color: #f2f2f2
+    }
+
+    table tr {
+        height: 110px;
+    }
+
+    .qty {
+        margin-right: 40px;
+        margin-top: 0px;
+    }
+</style>
+
+<script src="~/DataTable/jquery-3.5.1.js"></script>
+<script src="~/DataTable/jquery.dataTables.min.js"></script>
+<link rel="stylesheet" href="~/DataTable/jquery.dataTables.min.css">
+<script src="/lib/jquery/dist/jquery.js"></script>
+
+
+@*<link rel="stylesheet" href="~/css/newStyleSheet.css">*@
+
+
+
+@if (Model.HoldModel != null)
+{
+
+<script>
+                    var holdReminingQuantity3 = @Model.HoldModel.ReminingQuantity;
+
+</script>}
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('#SubRegionSelectedId').change(function () {
+            var ddlsource = "#SubRegionSelectedId";
+            var items = '';
+            if ($(ddlsource).val() != -1) {
+                var url = '@Url.Content("~/")' + "PriorityTool/CSDeliveryOrder/StateFilter";
+                $.getJSON(url, { id: $(ddlsource).val() }, function (data) {
+                    $('#StateSelectedId').empty();
+                    $.each(data, function (i, state) {
+                        items += "<option value='" + state.value + "'>" + state.text + "</option>";
+                    });
+                    $('#StateSelectedId').html(items);
+                });
+            }
+            else
+            {
+                $('#StateSelectedId').html(items);
+            }
+        });
+
+
+        $('#StateSelectedId').change(function () {
+            var ddlsource = "#StateSelectedId";
+
+            var items = '';
+            if ($(ddlsource).val() != -1) {
+                var url = '@Url.Content("~/")' + "PriorityTool/CSDeliveryOrder/TerritoryFilter";
+                $.getJSON(url, { id: $(ddlsource).val() }, function (data) {
+                    $('#TerritorySelectedId').empty();
+                    $.each(data, function (i, territory) {
+                        items += "<option value='" + territory.value + "'>" + territory.text + "</option>";
+                    });
+                    $('#TerritorySelectedId').html(items);
+                });
+            }
+            else
+            {
+                $('#TerritorySelectedId').html(items);
+
+            }
+
+        });
+
+
+
+    });
+
+
+    var AssignedValuesArray = [];
+    var SavedValuesArray = [];
+    var totalQuantity = 0;
+
+    function QuantityValidation(orderQuantity, radioButtonListId, index, priorityQuantityId, holdReminingQuantity2, savedBefore, savedPriorityQuantity, savedPriorityId)
+    {
+
+        var tempholdReminingQuantity3 = holdReminingQuantity3;
+        var insertedQuantity = priorityQuantityId.value;
+        var selectedPriorityId = radioButtonListId.value;
+        alert(radioButtonListId.value);
+        if (selectedPriorityId != 2) {
+            //var compareResult = compareInsertedQuantityVSOrderQuantity(insertedQuantity, orderQuantity);
+            var compareResult = true;
+            if (compareResult == true)
+            {
+                if (savedBefore == true && SavedValuesArray[index] == undefined)
+                {
+                    if (savedPriorityId == 3)
+                    {
+                        holdReminingQuantity3 = holdReminingQuantity3 + savedPriorityQuantity;
+                        tempholdReminingQuantity3 = tempholdReminingQuantity3 + savedPriorityQuantity;
+                    }
+                        SavedValuesArray[index] = 1;
+                        document.getElementById("remaining").value = tempholdReminingQuantity3;
+                        document.getElementById("calculatedRemainingQuantity").value = tempholdReminingQuantity3;
+                        document.getElementById('test').value = tempholdReminingQuantity3;
+
+                }
+
+                if (selectedPriorityId != 4)
+                {
+                    AssignedValuesArray[index] = insertedQuantity;
+                }
+                else
+                {
+                    AssignedValuesArray[index] = 0;
+
+                 }
+                //alert(SavedValuesArray[index]);
+                totalQuantity = AssignedValuesArray.reduce(function (a, b) { return parseFloat(a) + parseFloat(b); });
+                var totalCheckResult = checkTotalQuantityVsHoldRemainingQuantity(tempholdReminingQuantity3, totalQuantity);
+                if (totalCheckResult == false) {
+                    alert("you do not have enough quantity");
+                    resetIfFalse(index, priorityQuantityId, radioButtonListId, tempholdReminingQuantity3);
+                }
+            }
+            else {
+                alert("please you must insert quantity less than or equal order quantity");
+                resetIfFalse(index, priorityQuantityId, radioButtonListId, holdReminingQuantity2);
+            }
+        }
+        else {
+            alert("please you must select priority");
+            //resetIfFalse(priorityQuantityId, radioButtonListId);
+
+        }
+
+    }
+
+    function resetIfFalse(index, priorityQuantityId, radioButtonListId, holdReminingQuantity3)
+    {
+        priorityQuantityId.value = 0;
+        radioButtonListId.value = 2;
+        AssignedValuesArray[index] = 0;
+        totalQuantity = AssignedValuesArray.reduce(function (a, b) { return parseFloat(a) + parseFloat(b); });
+        document.getElementById("total").value =Math.abs(totalQuantity);
+        checkTotalQuantityVsHoldRemainingQuantity(holdReminingQuantity3, totalQuantity);
+    }
+
+    function compareInsertedQuantityVSOrderQuantity(insertedQuantity, orderQuantity)
+    {
+        if (insertedQuantity <= orderQuantity)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+        function checkTotalQuantityVsHoldRemainingQuantity(holdReminingQuantity2, totalQuantity)
+        {
+
+            holdReminingQuantity2 = holdReminingQuantity2 - totalQuantity;
+
+            document.getElementById("remaining").value = holdReminingQuantity2;
+
+            document.getElementById("total").value = Math.abs(totalQuantity);
+
+            document.getElementById("calculatedRemainingQuantity").value = holdReminingQuantity2;
+            document.getElementById('test').value = holdReminingQuantity2;
+
+
+            if (holdReminingQuantity2 >= 0)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+    }
+    PriorityArr = [];
+    function calculateTotal(index, remainingQuantity,  holdTotalAssignedQuantity, ExtraQuantity)
+    {
+        //var priority = document.getElementById("DDPI" + index);
+        var total = 0;
+        var extraTotal = 0;
+    
+        //alert(remainingQuantity);
+        var DDeles = document.getElementsByClassName("DDPI");
+        var quantityForItems = 0;
+        for (var DDIndex = 0; DDIndex <= DDeles.length; DDIndex++)
+        {
+            var noTotal = 0;
+            if (DDeles[DDIndex].value == 3) {
+                var itemsQuantity = document.getElementsByClassName("PQ" + DDIndex);
+                //alert(itemsQuantity.length);
+                for (i = 0; i < itemsQuantity.length; i++) {
+                    //alert(itemsQuantity[i].value);
+                    total = parseFloat(total) + parseFloat(itemsQuantity[i].value);
+                    if (total > remainingQuantity) {
+                        alert("you donot have enough quantity");
+                        total = total - itemsQuantity[i].value;
+                        itemsQuantity[i].value = 0;
+                    }
+
+                }
+            }
+            else if (DDeles[DDIndex].value == 4)
+            {
+                var itemsQuantity = document.getElementsByClassName("PQ" + DDIndex);
+
+                for (ii = 0; ii < itemsQuantity.length; ii++) {
+                    //alert(itemsQuantity[i].value);
+                    extraTotal = extraTotal + parseFloat(itemsQuantity[ii].value);
+                }
+            }
+            else if (DDeles[DDIndex].value == 2) {
+                for (i = 0; i < itemsQuantity.length; i++) {
+                    //alert(itemsQuantity[i].value);
+                    noTotal = parseFloat(noTotal) + parseFloat(itemsQuantity[i].value);
+                }
+                if (PriorityArr[index] == 3) {
+                    document.getElementById("total").value = holdTotalAssignedQuantity - parseFloat(noTotal);
+                    var tempremaining = remainingQuantity + noTotal;
+                    document.getElementById("remaining").value = tempremaining;
+                    alert("33");
+
+                }
+                else if (PriorityArr[index] == 4)
+                {
+                    document.getElementById("extra").value = ExtraQuantity - noTotal;
+                    alert("44");
+
+                }
+            }
+
+            PriorityArr[index] = DDeles[DDIndex].value;
+
+        }
+        alert(total);
+        document.getElementById("total").value = holdTotalAssignedQuantity + parseFloat(total);
+        var tempremaining = remainingQuantity - total;
+        document.getElementById("remaining").value = tempremaining;
+        document.getElementById("extra").value = ExtraQuantity + extraTotal;
+
+    }
+
+</script>
+<style>
+
+    table {
+        margin-bottom: 20px;
+    }
+</style>
+<script>
+    $(document).ready(function () {
+        var table = $('#example').DataTable({
+            "scrollY": "700px",
+            "scrollX": "700px",
+
+            "paging": false
+        });
+
+        $('a.toggle-vis').on('click', function (e) {
+            e.preventDefault();
+
+            // Get the column API object
+            var column = table.column($(this).attr('data-column'));
+
+            // Toggle the visibility
+            column.visible(!column.visible());
+        });
+    });
+
+</script>
+<style>
+
+    table {
+        margin-bottom: 20px;
+    }
+
+    .selectFilter {
+        margin-left: 40px;
+    }
+
+    .searchbtn {
+        margin: 20px 20px 20px 40px;
+        border-radius: 10px;
+        width: 400px;
+    }
+</style>
+
+<h2>Add Warehouse Quantity</h2>
+<form asp-controller="Warehouse" asp-action="AssignWarehouseOrder" method="post" class="form-horizontal" role="form">
+    <div class="alert-danger" asp-validation-summary="ModelOnly"></div>
+    <div class="form-group">
+        <div class="form-row">
+            <div class="col-xs-12 col-sm-6 col-md-6 col-lg-4 selectFilter" style="display:inline-block">
+                <label class="control-label" style="display:block">Priority Date</label>
+                <input class="form-select form-select-lg mb-3" type="date" id="SelectedPriorityDate" asp-for="SelectedPriorityDate" />
+                <input type="hidden" asp-for="orderType" value=3 />
+            </div>
+        </div>
+        <div class="form-row" style="width:100%">
+
+            @if (Model.SubRegions == null)
+            {
+<div class="col-xs-12 col-sm-6 col-md-6 col-lg-2 selectFilter" style="display:inline-block">
+    <label class="control-label">Region</label>
+    <select id="SubRegionSelectedId" name="SubRegionSelectedId" asp-for="SubRegionSelectedId"
+            class="form-select form-select-lg mb-3"
+            asp-items="@(new SelectList(string.Empty, "Id", "Name"))"></select>
+</div> }
+            else
+            {
+<div class="col-xs-12 col-sm-6 col-md-6 col-lg-2 selectFilter" style="display:inline-block">
+    <label class="control-label">Region</label>
+    <select id="SubRegionSelectedId" name="SubRegionSelectedId" asp-for="SubRegionSelectedId"
+            class="form-select form-select-lg mb-3"
+            asp-items="@(new SelectList(Model.SubRegions, "Id", "Name"))"></select>
+</div>            }
+            @if (Model.States == null)
+            {
+<div class="col-xs-12 col-sm-6 col-md-6 col-lg-2 selectFilter" style="display:inline-block">
+    <label class="control-label">State</label>
+    <select id="StateSelectedId" name="StateSelectedId" asp-for="StateSelectedId"
+            class="form-select form-select-lg mb-3"
+            asp-items="@(new SelectList(string.Empty, "Id", "Name"))"></select>
+</div> }
+            else
+            {
+<div class="col-xs-12 col-sm-6 col-md-6 col-lg-2 selectFilter" style="display:inline-block">
+    <label class="control-label">State</label>
+    <select id="StateSelectedId" name="StateSelectedId" asp-for="StateSelectedId"
+            class="form-select form-select-lg mb-3"
+            asp-items="@(new SelectList(Model.States, "Id", "Name"))"></select>
+</div>            }
+
+            @if (Model.Territories == null)
+            {
+<div class="col-xs-12 col-sm-6 col-md-6 col-lg-2 selectFilter" style="display:inline-block">
+    <label class="control-label">Territory</label>
+
+    <select id="TerritorySelectedId" name="TerritorySelectedId" asp-for="TerritorySelectedId"
+            class="form-select form-select-lg mb-3"
+            asp-items="@(new SelectList(string.Empty, "Id", "Name"))"></select>
+</div> }
+            else
+            {
+<div class="col-xs-12 col-sm-6 col-md-6 col-lg-2 selectFilter" style="display:inline-block">
+    <label class="control-label">Territory</label>
+
+    <select id="TerritorySelectedId" name="TerritorySelectedId" asp-for="TerritorySelectedId"
+            class="form-select form-select-lg mb-3"
+            asp-items="@(new SelectList(Model.Territories, "Id", "Name"))"></select>
+</div>            }
+            <input type="submit" value="Search" class="btn btn-primary btn-lg searchbtn" />
+
+        </div>
+
+
+    </div>
+</form>
+
+
+<form asp-controller="Warehouse" asp-action="SaveOrder" method="post">
+    <table class="display table table-striped" style="text-align: center;  width:100%" id="example">
+        <thead class="table-dark">
+            <tr>
+                <th> Warehouse Name</th>
+                <th> Priority</th>
+                <th>Comment</th>
+                @foreach (var item in Model.Items)
+                {
+    <th> @item.Name</th>
+                    <th></th>}
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model.WarehouseModels != null && Model.HoldModel != null)
+            {
+<script>
+                         var holdReminingQuantity2 = @Model.HoldModel.ReminingQuantity;
+</script> holdReminingQuantity = Model.HoldModel.ReminingQuantity;
+                for (var index = 0; index < Model.WarehouseModel2.Count; index++)
+                {
+                    string dropDownPriorityId = "";
+                    dropDownPriorityId = "DDPI";
+                    string priorityQuantityId = "";
+                    priorityQuantityId = "PQ" + index;
+<tr>
+    <td>
+        <select id="WarehouseModel2[@index].WarehouseSelectedId" name="WarehouseModel2[@index].WarehouseSelectedId" asp-for="WarehouseModel2[index].WarehouseSelectedId"
+                asp-items="@(new SelectList(Model.WarehouseModel2[index].WarehouseModels, "Id", "Name"))"></select>
+
+    </td>
+    <td>
+        <select class="@dropDownPriorityId form-control" id="WarehouseModel2[@index].PrioritySelectedId" name="WarehouseModel2[@index].PrioritySelectedId" asp-for="WarehouseModel2[index].PrioritySelectedId"
+                asp-items="@(new SelectList(Model.WarehouseModel2[index].priorityModels, "Id", "Name"))" onchange="calculateTotal(@index, @Model.HoldModel.ReminingQuantity, @Model.holdTotalAssignedQuantity, @Model.HoldModel.ExtraQuantity)"></select>
+
+
+    </td>
+    <td>
+        <input asp-for="WarehouseModel2[index].Comment" type="text" />
+
+    </td>
+    @for (var itemIndex = 0; itemIndex < Model.WarehouseModel2[index].itemModels.Count; itemIndex++)
+    {
+<td><input type="number" class="@priorityQuantityId" asp-for="WarehouseModel2[index].itemModels[itemIndex].Quantity" onchange="calculateTotal(@index, @Model.HoldModel.ReminingQuantity,  @Model.holdTotalAssignedQuantity, @Model.HoldModel.ExtraQuantity)" /></td>
+                        <td><input type="hidden" asp-for="WarehouseModel2[index].itemModels[itemIndex].Id" id="WarehouseModel2[index].itemModels[itemIndex].Id" /></td>}
+    <input class="form-check-input" asp-for="HoldModel.QuotaQuantity" type="hidden" style="width:100px" />
+    <input id="calculatedRemainingQuantity" class="form-check-input" asp-for="HoldModel.ReminingQuantity" type="hidden" style="width:100px" />
+    @Html.Hidden("test", Model.HoldModel.ReminingQuantity)
+    <input class="form-check-input" asp-for="HoldModel.userId" type="hidden" style="width:100px" />
+    <input class="form-check-input" asp-for="HoldModel.PriorityDate" type="hidden" style="width:100px" />
+
+</tr>                }
+
+            }
+            <input type="hidden" asp-for="SelectedPriorityDate" />
+            <input type="hidden" asp-for="TerritorySelectedId" />
+            @if (Model.HoldModel != null)
+            {
+        <div>
+            <span>Territory Qouta</span>
+            <input id="Quota" type="number" disabled value="@Model.HoldModel.QuotaQuantity" style="margin:10px 20px 20px 0" />
+            <span>Remaining Quantity</span>
+            <input id="remaining" type="number" disabled value="@Model.HoldModel.ReminingQuantity" style="margin:10px 20px 20px 0" />
+            <span> Total Assigned</span>
+            <input id="total" type="number" value="@Model.holdTotalAssignedQuantity" disabled style="margin:10px 20px 20px 0" />
+            <span> Total extra</span>
+            <input id="extra" type="number" value="@Model.HoldModel.ExtraQuantity" disabled style="margin:10px 20px 20px 0" />
+
+            <span id="NOOrdersSpain" hidden>No search result</span>
+            <span id="NoQouta" hidden>there is no Qouta for selected priority date</span>
+
+        </div>            }
+        </tbody>
+    </table>
+    <input type="submit" value="Save" class="btn btn-primary btn-lg searchbtn" style="margin:auto" />
+</form>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
+<script src="~/filter/ddtf.js"></script>
+<script>
+    $('#example').ddTableFilter();
+</script>
+
+<script language="javascript">
+    var today = new Date();
+    var dd = String(today.getDate()).padStart(2, '0');
+    var mm = String(today.getMonth() + 1).padStart(2, '0');
+    var yyyy = today.getFullYear();
+
+    today = yyyy + '-' + mm + '-' + dd;
+    $('#SelectedPriorityDate').attr('min', today);
+</script>

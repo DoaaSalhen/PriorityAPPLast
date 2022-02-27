@@ -1,0 +1,378 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+@inject UserManager<AspNetUser> userManager
+
+@model PriorityApp.Service.Models.GeoFilterModel
+
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_CSLayout.cshtml";
+    int holdReminingQuantity = 0;
+    var user = await userManager.GetUserAsync(User);
+    var displayName = user.UserName;
+    var roles = await userManager.GetRolesAsync(user);
+    var tempModel = Model;
+}
+<style>
+    table {
+        border-collapse: collapse;
+        border-spacing: 0;
+        width: 100%;
+        border: 1px solid #ddd;
+    }
+
+    th, td {
+        text-align: left;
+        padding: 8px;
+    }
+
+    tr:nth-child(even) {
+        background-color: #f2f2f2
+    }
+
+    a.disabled {
+        pointer-events: none;
+    }
+</style>
+
+<script src="~/DataTable/jquery-3.5.1.js"></script>
+<script src="~/DataTable/jquery.dataTables.min.js"></script>
+<link rel="stylesheet" href="~/DataTable/jquery.dataTables.min.css">
+<script src="/lib/jquery/dist/jquery.js"></script>
+<link rel="stylesheet" href="~/css/newStyleSheet.css">
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('#SubRegionSelectedId').change(function () {
+            var ddlsource = "#SubRegionSelectedId";
+            var items = '';
+            if ($(ddlsource).val() != -1) {
+                var url = '@Url.Content("~/")' + "PriorityTool/CSDeliveryOrder/StateFilter";
+                $.getJSON(url, { id: $(ddlsource).val() }, function (data) {
+                    $('#StateSelectedId').empty();
+                    $.each(data, function (i, state) {
+                        items += "<option value='" + state.value + "'>" + state.text + "</option>";
+                    });
+                    $('#StateSelectedId').html(items);
+                });
+            }
+            else {
+                $('#StateSelectedId').html(items);
+            }
+        });
+
+
+        $('#StateSelectedId').change(function () {
+            var ddlsource = "#StateSelectedId";
+
+            var items = '';
+            if ($(ddlsource).val() != -1) {
+                var url = '@Url.Content("~/")' + "PriorityTool/CSDeliveryOrder/TerritoryFilter";
+                $.getJSON(url, { id: $(ddlsource).val() }, function (data) {
+                    $('#TerritorySelectedId').empty();
+                    $.each(data, function (i, territory) {
+                        items += "<option value='" + territory.value + "'>" + territory.text + "</option>";
+                    });
+                    $('#TerritorySelectedId').html(items);
+                });
+            }
+            else {
+                $('#TerritorySelectedId').html(items);
+
+            }
+
+        });
+
+        $('#TerritorySelectedId').change(function () {
+
+            var ddlsource = "#TerritorySelectedId";
+            var items = '';
+
+            if ($(ddlsource).val() != -1) {
+                var url = '@Url.Content("~/")' + "PriorityTool/CSDeliveryOrder/ZoneFilter";
+                $.getJSON(url, { id: $(ddlsource).val() }, function (data) {
+                    $('#ZoneSelectedId').empty();
+                    $.each(data, function (i, zone) {
+                        items += "<option value='" + zone.value + "'>" + zone.text + "</option>";
+                    });
+                    $('#ZoneSelectedId').html(items);
+                });
+            }
+            else {
+                $('#ZoneSelectedId').html(items);
+
+            }
+        });
+
+
+@*$('#CustomerSelectedId').change(function() {
+
+        @if(Model.Customers !=null)
+        {
+            long x = Model.CustomerSelectedId;
+            Model.OrderModel.orders = Model.OrderModel.orders.Where(o => o.CustomerId == 1).ToList();
+        }
+
+    });*@
+    });
+</script>
+
+
+<style>
+    table {
+        margin-bottom: 20px;
+    }
+</style>
+<script>
+    $(document).ready(function () {
+        var table = $('#example').DataTable({
+            "scrollY": "500px",
+            "scrollX": "100px",
+
+            "paging": false
+        });
+
+        $('a.toggle-vis').on('click', function (e) {
+            e.preventDefault();
+
+            // Get the column API object
+            var column = table.column($(this).attr('data-column'));
+
+            // Toggle the visibility
+            column.visible(!column.visible());
+        });
+    });
+</script>
+
+<form asp-controller="CSDeliveryOrder" asp-action="ShowSubmittedOrders" method="post" class="form-horizontal" role="form">
+    <div class="alert-danger" asp-validation-summary="ModelOnly"></div>
+    <div class="form-group">
+        <div class="form-row">
+            <div class="col-xs-12 col-sm-6 col-md-6 col-lg-4">
+                <label class="control-label">Priority Date</label>
+                <input type="date" id="SelectedPriorityDate" asp-for="SelectedPriorityDate" />
+                <input type="hidden" asp-for="orderType" value=2 />
+                <input type="hidden" asp-for="viewCase" value="show" />
+
+            </div>
+
+            <div class="col-xs-12 col-sm-6 col-md-6 col-lg-4">
+                <label class="control-label">Item</label>
+                <select id="ItemSelectedId" name="ItemSelectedId" asp-for="ItemSelectedId"
+                        class="form-control"
+                        asp-items="@(new SelectList(Model.Items, "Id", "Name"))"></select>
+            </div>
+        </div>
+
+        @if (Model.SubRegions == null)
+        {
+            <div class="form-row">
+                <div class="col-xs-12 col-sm-6 col-md-6 col-lg-4">
+                    <label class="control-label">SubRegion</label>
+                    <select id="SubRegionSelectedId" name="SubRegionSelectedId" asp-for="SubRegionSelectedId"
+                            class="form-control"
+                            asp-items="@(new SelectList(string.Empty, "Id", "Name"))"></select>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="form-row">
+                <div class="col-xs-12 col-sm-6 col-md-6 col-lg-4">
+                    <label class="control-label">SubRegion</label>
+                    <select id="SubRegionSelectedId" name="SubRegionSelectedId" asp-for="SubRegionSelectedId"
+                            class="form-control"
+                            asp-items="@(new SelectList(Model.SubRegions, "Id", "Name"))"></select>
+                </div>
+            </div>
+        }
+        @if (Model.States == null)
+        {
+            <div class="form-row">
+                <div class="col-xs-12 col-sm-6 col-md-6 col-lg-4">
+                    <label class="control-label">State</label>
+                    <select id="StateSelectedId" name="StateSelectedId" asp-for="StateSelectedId"
+                            class="form-control"
+                            asp-items="@(new SelectList(string.Empty, "Id", "Name"))"></select>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="form-row">
+                <div class="col-xs-12 col-sm-6 col-md-6 col-lg-4">
+                    <label class="control-label">State</label>
+                    <select id="StateSelectedId" name="StateSelectedId" asp-for="StateSelectedId"
+                            class="form-control"
+                            asp-items="@(new SelectList(Model.States, "Id", "Name"))"></select>
+                </div>
+            </div>
+
+        }
+
+        @if (Model.Territories == null)
+        {
+            <div class="form-row">
+                <div class="col-xs-12 col-sm-6 col-md-6 col-lg-4">
+                    <label class="control-label">Territory</label>
+
+                    <select id="TerritorySelectedId" name="TerritorySelectedId" asp-for="TerritorySelectedId"
+                            class="form-control"
+                            asp-items="@(new SelectList(string.Empty, "Id", "Name"))"></select>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="form-row">
+                <div class="col-xs-12 col-sm-6 col-md-6 col-lg-4">
+                    <label class="control-label">Territory</label>
+
+                    <select id="TerritorySelectedId" name="TerritorySelectedId" asp-for="TerritorySelectedId"
+                            class="form-control"
+                            asp-items="@(new SelectList(Model.Territories, "Id", "Name"))"></select>
+                </div>
+            </div>
+        }
+
+
+        @if (Model.Zones == null)
+        {
+            <div class="form-row">
+                <div class="col-xs-12 col-sm-6 col-md-6 col-lg-4">
+                    <label class="control-label">Zone</label>
+                    <select id="ZoneSelectedId" name="ZoneSelectedId" asp-for="ZoneSelectedId"
+                            class="form-control"
+                            asp-items="@(new SelectList(string.Empty, "Id", "Name"))"></select>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="form-row">
+                <div class="col-xs-12 col-sm-6 col-md-6 col-lg-4">
+                    <label class="control-label">Zone</label>
+                    <select id="ZoneSelectedId" name="ZoneSelectedId" asp-for="ZoneSelectedId"
+                            class="form-control"
+                            asp-items="@(new SelectList(Model.Zones, "Id", "Name"))"></select>
+                </div>
+            </div>
+        }
+
+        @if (Model.Customers != null)
+        {
+            <div class="form-row">
+                <div class="col-xs-12 col-sm-6 col-md-6 col-lg-4">
+                    <label class="control-label">Customer</label>
+                    <select id="CustomerSelectedId" name="CustomerSelectedId" asp-for="CustomerSelectedId"
+                            class="form-control"
+                            asp-items="@(new SelectList(Model.Customers, "Id", "CustomerName"))"></select>
+                </div>
+            </div>
+        }
+
+
+
+    </div>
+    <input type="submit" value="Search" />
+
+</form>
+
+<form class="CreateForm" asp-controller="CSDeliveryOrder" asp-action="" method="post">
+    <table class="display table table-striped" style="text-align: center;" id="example" width="1700px">
+        <thead class="thead-dark">
+            <tr>
+                <th> Customer Name</th>
+                <th>Order Number</th>
+                <th> Item </th>
+                <th>Quantity</th>
+                <th> Priority</th>
+                <th>Truck</th>
+                <th>Status</th>
+                <th>Comment</th>
+                <th> </th>
+                <th> </th>
+
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model.OrderModel != null)
+            {
+                @for (int index = 0; index < Model.OrderModel.orders.Count; index++)
+                {
+                    string diapatchedCheckListId = "DisList" + index;
+                    string UnlockId = "UnlockId" + index;
+
+            <tr>
+                <td>
+                    @Html.DisplayFor(model => model.OrderModel.orders[index].Customer.CustomerName)
+                    <input class="form-check-input" asp-for="OrderModel.orders[index].CustomerId" type="hidden" />
+                    <input class="form-check-input" asp-for="OrderModel.orders[index].Id" type="hidden" />
+                </td>
+                <td>
+                    @Html.DisplayFor(model => model.OrderModel.orders[index].OrderNumber)
+                    <input class="form-check-input" asp-for="OrderModel.orders[index].OrderNumber" type="hidden" />
+                </td>
+
+                <td>
+                    @Html.DisplayFor(model => model.OrderModel.orders[index].ItemId)
+                    <input class="form-check-input" asp-for="OrderModel.orders[index].ItemId" type="hidden" />
+                </td>
+
+                <td>
+                    @Html.DisplayFor(model => model.OrderModel.orders[index].Comment)
+                    <input class="form-check-input" asp-for="OrderModel.orders[index].Comment" type="hidden" />
+                </td>
+
+                <td>
+                    @Html.DisplayFor(model => model.OrderModel.orders[index].Status)
+                    <input class="form-check-input" asp-for="OrderModel.orders[index].Status" type="hidden" />
+                </td>
+                <td>
+                    @Html.DisplayFor(model => model.OrderModel.orders[index].Comment)
+                    <input class="form-check-input" asp-for="OrderModel.orders[index].Comment" type="hidden" />
+                </td>
+
+                @if ((Model.OrderModel.orders[index].Submitted == false) && (Model.OrderModel.orders[index].SubmitTime != null))
+                {
+
+            <td>
+                <a class="btn btn-danger" asp-action="OrderCancel" asp-route-id="@Model.OrderModel.orders[index].Id">Cancel</a>
+            </td> }
+                                else
+                                {
+            <td>
+                <a class="btn btn-danger disabled" asp-action="" asp-route-id="@Model.OrderModel.orders[index].Id">Cancel</a>
+            </td>
+            }
+                @if ((Model.OrderModel.orders[index].Submitted == true) && (Model.OrderModel.orders[index].Dispatched == false))
+                {
+
+            <td>
+                <a class="far fa-edit btn btn-info" value="@Model.OrderModel.orders[index].Id" id=@UnlockId asp-action="UnLockOrder" asp-route-id="@Model.OrderModel.orders[index].Id">Unlock</a>
+            </td>
+                }
+            </tr>
+                    <input class="form-check-input" asp-for="@Model.SubRegionSelectedId" type="hidden" />
+                    <input class="form-check-input" asp-for="@Model.StateSelectedId" type="hidden" />
+                    <input class="form-check-input" asp-for="@Model.TerritorySelectedId" type="hidden" />
+                    <input class="form-check-input" asp-for="@Model.ZoneSelectedId" type="hidden" />
+                    <input class="form-check-input" asp-for="@Model.SelectedPriorityDate" type="hidden" />
+                    <input class="form-check-input" asp-for="@Model.ItemSelectedId" type="hidden" />
+                }
+            }
+
+        </tbody>
+    </table>
+</form>
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
+
+<script src="~/filter/ddtf.js"></script>
+<script>
+    $('#example').ddTableFilter();
+</script>

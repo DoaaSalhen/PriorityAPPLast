@@ -1,0 +1,129 @@
+﻿@page
+@model LoginModel
+@*@{
+        ViewData["Title"] = "Log in";
+    }*@
+
+@*<h1>@ViewData["Title"]</h1>*@
+<!doctype html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>priority Tool</title>
+    <link rel="shortcut icon" href="~/login/assets/images/fav.png" type="image/x-icon">
+    <link rel="shortcut icon" href="~/login/assets/images/fav.jpg">
+    <link rel="stylesheet" href="~/login/assets/css/bootstrap.min.css">
+    <link rel="stylesheet" href="~/login/assets/css/all.min.css">
+    <link rel="stylesheet" href="~/login/assets/css/animate.css">
+    <link rel="stylesheet" href="~/login/assets/plugins/slider/css/owl.carousel.min.css">
+    <link rel="stylesheet" href="~/login/assets/plugins/slider/css/owl.theme.default.css">
+    <link rel="stylesheet" type="text/css" href="~/login/assets/css/style.css" />
+</head>
+
+<body class="form-login-body">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-10 mx-auto login-desk">
+                <div class="row">
+                    <div class="col-md-7 detail-box">
+                        <div class="detailsh">
+                            <img class="help" src="~/login/assets/images/6.jpg" alt="">
+             
+                        </div>
+                    </div>
+                    <div class="col-md-5 loginform">
+                        <h4>Welcome Back</h4>
+                        <p>Signin to your Account</p>
+                        <form id="account" method="post">
+                            <div class="login-det">
+                                <div asp-validation-summary="All" class="text-danger"></div>
+                                <div class="form-row">
+                                    <label asp-for="Input.Email">Username</label>
+                                    <div class="input-group mb-3">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text" id="basic-addon1">
+                                                <i class="far fa-user"></i>
+                                            </span>
+                                        </div>
+                                        <input type="text" class="form-control" asp-for="Input.Email" placeholder="Enter Username" aria-label="Username" aria-describedby="basic-addon1">
+                                        <span asp-validation-for="Input.Email" class="text-danger"></span>
+
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <label asp-for="Input.Password">Password</label>
+                                    <div class="input-group mb-3">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text" id="basic-addon1">
+                                                <i class="fas fa-lock"></i>
+                                            </span>
+                                        </div>
+                                        <input class="form-control" asp-for="Input.Password" type="password" placeholder="Enter Password" aria-label="Username" aria-describedby="basic-addon1">
+                                        <span asp-validation-for="Input.Password" class="text-danger"></span>
+
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="checkbox">
+                                        <label asp-for="Input.RememberMe">
+                                            <input asp-for="Input.RememberMe" />
+                                            @Html.DisplayNameFor(m => m.Input.RememberMe)
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <p class="forget"><a id="forgot-password" asp-page="./ForgotPassword">Forget Password?</a></p>
+
+                                <button class="btn btn-sm btn-danger" type="submit">Login</button>
+                          </div>
+                        </form>
+                       
+
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</body>
+
+<script src="~/login/assets/js/jquery-3.2.1.min.js"></script>
+<script src="~/login/assets/js/popper.min.js"></script>
+<script src="~/login/assets/js/bootstrap.min.js"></script>
+<script src="~/login/assets/plugins/scroll-fixed/jquery-scrolltofixed-min.js"></script>
+<script src="~/login/assets/plugins/slider/js/owl.carousel.min.js"></script>
+<script src="~/login/assets/js/script.js"></script>
+</html>
+
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Free Tour and Travel Website Tempalte | Smarteyeapps.com</title>
+    <link rel="shortcut icon" href="~/login/assets/images/fav.png" type="image/x-icon">
+    <link rel="shortcut icon" href="~/login/assets/images/fav.jpg">
+    <link rel="stylesheet" href="~/login/assets/css/bootstrap.min.css">
+    <link rel="stylesheet" href="~/login/assets/css/all.min.css">
+    <link rel="stylesheet" href="~/login/assets/css/animate.css">
+    <link rel="stylesheet" href="~/login/assets/plugins/slider/css/owl.carousel.min.css">
+    <link rel="stylesheet" href="~/login/assets/plugins/slider/css/owl.theme.default.css">
+    <link rel="stylesheet" type="text/css" href="~/login/assets/css/style.css" />
+ </head>
+
+<body>
+  </body>
+    <script src="~/login/assets/js/jquery-3.2.1.min.js"></script>
+    <script src="~/login/assets/js/popper.min.js"></script>
+    <script src="~/login/assets/js/bootstrap.min.js"></script>
+    <script src="~/login/assets/plugins/scroll-fixed/jquery-scrolltofixed-min.js"></script>
+    <script src="~/login/assets/plugins/slider/js/owl.carousel.min.js"></script>
+    <script src="~/login/assets/js/script.js"></script>
+    @section Scripts {
+        <partial name="_ValidationScriptsPartial" />
+    }
+</html>

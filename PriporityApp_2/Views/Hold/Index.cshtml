@@ -1,0 +1,96 @@
+﻿@model PriorityApp.Service.Models.HoldModel
+@inject UserManager<AspNetUser> userManager
+@inject SignInManager<AspNetUser> SignInManager
+
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/NiceAdmin/_CSLayout.cshtml";
+    var user = await userManager.GetUserAsync(User);
+    var roles = await userManager.GetRolesAsync(user);
+}
+<style>
+
+    .selectFilter {
+        margin-left: 40px;
+    }
+    .searchbtn {
+        margin: 20px 20px 20px 40px;
+        border-radius: 10px;
+        width: 200px;
+    }
+</style>
+<h3>Show Qouta</h3>
+
+<form asp-action="Search" method="post" asp-controller="Hold">
+
+    <div class="form-row" style="display:inline-block">
+        <label class="control-label" style="display:block; margin-bottom:5px;">Priority Date</label>
+        <input type="date" id="SelectedPriorityDate"  asp-for="PriorityDate" />
+    </div>
+    <div class="col-xs-12 col-sm-6 col-md-6 col-lg-4 selectFilter" style="display:inline-block">
+
+        <input type="submit" value="Search" class="btn btn-primary btn-lg searchbtn" style="margin:20px;" />
+        </div>
+</form>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                Salesman
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.PriorityDate)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.QuotaQuantity)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ReminingQuantity)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Tolerance)
+            </th>
+
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model.holdModels != null)
+        {
+            @for (int index = 0; index < Model.holdModels.Count; index++)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(model => model.holdModels[index].UserName)
+                        <input class="form-check-input" asp-for="holdModels[index].userId" type="hidden" />
+                    </td>
+                    <td>
+                        @Html.DisplayFor(model => model.holdModels[index].PriorityDate)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(model => model.holdModels[index].QuotaQuantity)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(model => model.holdModels[index].ReminingQuantity)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(model => model.holdModels[index].Tolerance)
+                    </td>
+                    @if (!roles.Contains("Sales"))
+                    {
+                        <td>
+                            <a class="far fa-edit btn btn-success" asp-action="Edit" asp-route-userId="@Model.holdModels[index].userId" asp-route-PriorityDate="@Model.holdModels[index].PriorityDate">Edit</a>
+                        </td>
+                    }
+                    else
+                    {
+                        <td>
+                            <a class="far fa-edit btn btn-success disabled" asp-action="" asp-route-territoryId="@Model.holdModels[index].userId" asp-route-PriorityDate="@Model.holdModels[index].PriorityDate">Edit</a>
+                        </td>
+                    }
+
+                </tr>
+            }
+        }
+    </tbody>
+</table>

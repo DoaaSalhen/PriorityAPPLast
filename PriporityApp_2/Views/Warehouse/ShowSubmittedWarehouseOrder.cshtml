@@ -1,0 +1,321 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{ }
+@model PriorityApp.Service.Models.MasterModels.WarehouseOrderModel
+
+@{ ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/NiceAdmin/_CSLayout.cshtml";
+    float holdReminingQuantity = 0; }
+<style>
+    table {
+        border-collapse: collapse;
+        border-spacing: 0;
+        width: 100%;
+        border: 1px solid #ddd;
+    }
+
+    th, td {
+        text-align: left;
+        padding: 8px;
+    }
+
+    tr:nth-child(even) {
+        background-color: #f2f2f2
+    }
+
+    a.disabled {
+        pointer-events: none;
+    }
+</style>
+
+<script src="~/DataTable/jquery-3.5.1.js"></script>
+<script src="~/DataTable/jquery.dataTables.min.js"></script>
+<link rel="stylesheet" href="~/DataTable/jquery.dataTables.min.css">
+<script src="/lib/jquery/dist/jquery.js"></script>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('#SubRegionSelectedId').change(function () {
+            var ddlsource = "#SubRegionSelectedId";
+            var items = '';
+            if ($(ddlsource).val() != -1) {
+                var url = '@Url.Content("~/")' + "PriorityTool/CSDeliveryOrder/StateFilter";
+                $.getJSON(url, { id: $(ddlsource).val() }, function (data) {
+                    $('#StateSelectedId').empty();
+                    $.each(data, function (i, state) {
+                        items += "<option value='" + state.value + "'>" + state.text + "</option>";
+                    });
+                    $('#StateSelectedId').html(items);
+                });
+            }
+            else {
+                $('#StateSelectedId').html(items);
+            }
+        });
+
+
+        $('#StateSelectedId').change(function () {
+            var ddlsource = "#StateSelectedId";
+
+            var items = '';
+            if ($(ddlsource).val() != -1) {
+                var url = '@Url.Content("~/")' + "PriorityTool/CSDeliveryOrder/TerritoryFilter";
+                $.getJSON(url, { id: $(ddlsource).val() }, function (data) {
+                    $('#TerritorySelectedId').empty();
+                    $.each(data, function (i, territory) {
+                        items += "<option value='" + territory.value + "'>" + territory.text + "</option>";
+                    });
+                    $('#TerritorySelectedId').html(items);
+                });
+            }
+            else {
+                $('#TerritorySelectedId').html(items);
+
+            }
+
+        });
+
+        $('#TerritorySelectedId').change(function () {
+
+            var ddlsource = "#TerritorySelectedId";
+            var items = '';
+
+            if ($(ddlsource).val() != -1) {
+                var url = '@Url.Content("~/")' + "PriorityTool/CSDeliveryOrder/ZoneFilter";
+                $.getJSON(url, { id: $(ddlsource).val() }, function (data) {
+                    $('#ZoneSelectedId').empty();
+                    $.each(data, function (i, zone) {
+                        items += "<option value='" + zone.value + "'>" + zone.text + "</option>";
+                    });
+                    $('#ZoneSelectedId').html(items);
+                });
+            }
+            else {
+                $('#ZoneSelectedId').html(items);
+
+            }
+
+
+        });
+    });
+</script>
+
+@*<link rel="stylesheet" href="~/css/newStyleSheet.css">*@
+<style>
+
+    table {
+        margin-bottom: 20px;
+    }
+
+    .selectFilter {
+        margin-left: 40px;
+    }
+
+    .searchbtn {
+        margin: 20px 20px 20px 40px;
+        border-radius: 10px;
+        width: 400px;
+    }
+</style>
+<script>
+    $(document).ready(function () {
+        var table = $('#example').DataTable({
+            "scrollY": "700px",
+            "scrollX": "200px",
+
+            "paging": false
+        });
+
+        $('a.toggle-vis').on('click', function (e) {
+            e.preventDefault();
+
+            // Get the column API object
+            var column = table.column($(this).attr('data-column'));
+
+            // Toggle the visibility
+            column.visible(!column.visible());
+        });
+    });</script>
+
+<form asp-controller="Warehouse" asp-action="SearchForOrders" method="post" class="form-horizontal" role="form">
+    <div class="alert-danger" asp-validation-summary="ModelOnly"></div>
+    <div class="form-group">
+        <div class="form-row">
+            <div class="col-xs-12 col-sm-6 col-md-6 col-lg-1 selectFilter" style="display:inline-block; margin-right:90px;">
+                <label class="control-label" style="display:block">Priority Date</label>
+                <input type="date" class="form-select-lg mb-4" id="SelectedPriorityDate" asp-for="SelectedPriorityDate" />
+            </div>
+            <input type="hidden" value="Show" asp-for="ViewCase" id="ViewCase" />
+            @if (Model.SubRegions == null)
+            {
+<div class="col-xs-12 col-sm-6 col-md-6 col-lg-2 selectFilter" style="display:inline-block">
+    <label class="control-label">SubRegion</label>
+    <select id="SubRegionSelectedId" name="SubRegionSelectedId" asp-for="SubRegionSelectedId"
+            class="form-select form-select-lg mb-3"
+            asp-items="@(new SelectList(string.Empty, "Id", "Name"))"></select>
+</div> }
+            else
+            {
+<div class="col-xs-12 col-sm-6 col-md-6 col-lg-2 selectFilter" style="display:inline-block">
+    <label class="control-label">SubRegion</label>
+    <select id="SubRegionSelectedId" name="SubRegionSelectedId" asp-for="SubRegionSelectedId"
+            class="form-select form-select-lg mb-3"
+            asp-items="@(new SelectList(Model.SubRegions, "Id", "Name"))"></select>
+</div>            }
+            @if (Model.States == null)
+            {
+<div class="col-xs-12 col-sm-6 col-md-6 col-lg-2 selectFilter" style="display:inline-block">
+    <label class="control-label">State</label>
+    <select id="StateSelectedId" name="StateSelectedId" asp-for="StateSelectedId"
+            class="form-select form-select-lg mb-3"
+            asp-items="@(new SelectList(string.Empty, "Id", "Name"))"></select>
+</div> }
+else
+{
+<div class="col-xs-12 col-sm-6 col-md-6 col-lg-2 selectFilter" style="display:inline-block">
+    <label class="control-label">State</label>
+    <select id="StateSelectedId" name="StateSelectedId" asp-for="StateSelectedId"
+            class="form-select form-select-lg mb-3"
+            asp-items="@(new SelectList(Model.States, "Id", "Name"))"></select>
+</div>      }
+
+            @if (Model.Territories == null)
+            {
+<div class="col-xs-12 col-sm-6 col-md-6 col-lg-2 selectFilter" style="display:inline-block">
+    <label class="control-label">Territory</label>
+
+    <select id="TerritorySelectedId" name="TerritorySelectedId" asp-for="TerritorySelectedId"
+            class="form-select form-select-lg mb-3"
+            asp-items="@(new SelectList(string.Empty, "Id", "Name"))"></select>
+</div> }
+else
+{
+<div class="col-xs-12 col-sm-6 col-md-6 col-lg-2 selectFilter" style="display:inline-block">
+    <label class="control-label">Territory</label>
+
+    <select id="TerritorySelectedId" name="TerritorySelectedId" asp-for="TerritorySelectedId"
+            class="form-select form-select-lg mb-3"
+            asp-items="@(new SelectList(Model.Territories, "Id", "Name"))"></select>
+</div>      }
+
+        </div>
+        <input type="submit" value="Search" class="btn btn-primary btn-lg searchbtn" />
+
+    </div>
+
+</form>
+
+<form asp-action="ShowSubmittedOrders" class="CreateForm" asp-controller="Warehouse" method="post">
+    <table id="example" class="display table table-striped" style="text-align: center; width:100%">
+        <thead class="table-dark">
+            <tr>
+                <th> Warehouse Name</th>
+                <th> Item </th>
+                <th> Priority</th>
+                <th>Quantity</th>
+                <th>Comment</th>
+                <th>Status</th>
+                <th></th>
+
+
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model.warehouseOrderHoldModels != null)
+            {
+                if (Model.HoldModel != null)
+                {
+
+<script>
+                         var holdReminingQuantity2 = @Model.HoldModel.ReminingQuantity;
+</script>
+ holdReminingQuantity = Model.HoldModel.ReminingQuantity;
+@for (int index = 0; index < Model.warehouseOrderHoldModels.Count; index++)
+{
+    string UnlockId = "UnlockId" + index;
+        <tr>
+            <td>
+                @Html.DisplayFor(model => model.warehouseOrderHoldModels[index].Order.Customer.CustomerName)
+                <input class="form-check-input" asp-for="warehouseOrderHoldModels[index].Order.CustomerId" type="hidden" />
+                <input class="form-check-input" asp-for="warehouseOrderHoldModels[index].Order.Id" type="hidden" />
+            </td>
+
+            <td>
+                @Html.DisplayFor(model => model.warehouseOrderHoldModels[index].Order.Item.Name)
+            </td>
+            <td>
+                @Html.DisplayFor(model => model.warehouseOrderHoldModels[index].Order.Priority.Name)
+            </td>
+            <td>
+                @Html.DisplayFor(model => model.warehouseOrderHoldModels[index].Order.PriorityQuantity)
+            </td>
+            <td>
+                @Html.DisplayFor(model => model.warehouseOrderHoldModels[index].Order.Comment)
+            </td>
+            <td>
+                @Html.DisplayFor(model => model.warehouseOrderHoldModels[index].Order.Status)
+            </td>
+
+
+            @if ((Model.warehouseOrderHoldModels[index].Order.Submitted == false) && (Model.warehouseOrderHoldModels[index].Order.SubmitTime != null))
+            {
+
+        <td>
+            <a class="btn btn-danger" asp-action="OrderCancel" asp-route-id="@Model.warehouseOrderHoldModels[index].Order.Id">Cancel</a>
+        </td> }
+                                else
+                                {
+        <td>
+            <a class="btn btn-danger disabled" asp-action="" asp-route-id="@Model.warehouseOrderHoldModels[index].Order.Id">Cancel</a>
+        </td>}
+            @if ((Model.warehouseOrderHoldModels[index].Order.Submitted == true) && (Model.warehouseOrderHoldModels[index].Order.Dispatched == false))
+            {
+
+        <td>
+            <a class="far fa-edit btn btn-info" value="@Model.warehouseOrderHoldModels[index].Order.Id" id=@UnlockId asp-action="UnLockOrder" asp-route-id="@Model.warehouseOrderHoldModels[index].Order.Id">Unlock</a>
+        </td> }
+                                else
+                                {
+        <td>
+            <a class="far fa-edit btn btn-info disabled" value="@Model.warehouseOrderHoldModels[index].Order.Id" id=@UnlockId asp-action=" " asp-route-id="@Model.warehouseOrderHoldModels[index].Order.Id">Unlock</a>
+        </td>}
+        </tr>
+            }
+                }
+                else
+                {
+<script>document.getElementById("NoQouta").hidden = false;</script>
+ }
+
+}
+else
+{
+<script>document.getElementById("NOOrdersSpain").hidden = false;</script>
+}
+
+            @if (Model.HoldModel != null)
+            {
+<span> Total</span>
+                <input id="total" type="number" value="0" disabled style="margin:10px 20px 20px 0" />
+                                <span>Remaining Quantity</span>
+                                                <input id="remaining" type="number" disabled value="@Model.HoldModel.ReminingQuantity" style="margin:10px 20px 20px 0" />
+}
+
+        </tbody>
+    </table>
+    <span id="NOOrdersSpain" hidden>No search result</span>
+    <span id="NoQouta" hidden>there is no Qouta for selected priority date</span>
+</form>
+
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
+
+<script>
+    function showNOOrdersSpain() {
+        document.getElementById("NOOrdersSpain").visiable = true;
+    }</script>
+<script src="~/filter/ddtf.js"></script>
+<script>$('#example').ddTableFilter();</script>
