@@ -43,7 +43,7 @@ namespace PriorityApp.Service.Models
         public int TerritorySelectedId { get; set; }
         public int ZoneSelectedId { get; set; }
         public long CustomerSelectedId { get; set; }
-
+        public float holdTotalAssignedQuantity { get; set; }
 
 
     }

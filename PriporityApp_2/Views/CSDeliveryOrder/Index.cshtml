@@ -45,7 +45,7 @@
 @*<link rel="stylesheet" href="~/css/newStyleSheet.css">*@
 
 <script src="~/DataTable/jquery-3.5.1.js"></script>
-@*<script src="~/DataTable/jquery.dataTables.min.js"></script>*@
+<script src="~/DataTable/jquery.dataTables.min.js"></script>
 <link rel="stylesheet" href="~/DataTable/jquery.dataTables.min.css">
 @*<script src="/lib/jquery/dist/jquery.js"></script>*@
 
@@ -249,8 +249,14 @@
         border-radius: 10px;
         width: 200px;
     }
+
+    input[type=number] 
+    {
+        width: 50px;
+        height:25px;
+    }
 </style>
-<script>
+@*<script>
     $(document).ready(function () {
         var table = $('#example').DataTable({
             "scrollY": "700px",
@@ -270,7 +276,7 @@
         });
     });
 
-</script>
+</script>*@
 
 <form asp-controller="CSDeliveryOrder" asp-action="SearchForOrders" method="post" class="form-horizontal" role="form">
     <div class="alert-danger" asp-validation-summary="ModelOnly"></div>
@@ -385,17 +391,15 @@
                 <th>Order Number</th>
                 <th>line</th>
                 <th> Item </th>
-                <th> POD Number</th>
-                <th> POD Name</th>
-                <th> Address</th>
-                <th> Zone</th>
-                <th> State</th>
+                <th> POD Zone</th>
+                <th> POD  State</th>
                 <th> O.Qty</th>
                 <th> Priority</th>
                 <th>Qty</th>
                 <th>Comment</th>
                 <th>Truck</th>
                 <th>Status</th>
+                <th> POD Details</th>
                 <th></th>
 
 
@@ -450,23 +454,6 @@
                 <input class="form-check-input" asp-for="OrderModel.orders[index].ItemId" type="hidden" />
             </td>
 
-            <td class="skip-filter">
-                <a class="nav-link collapsed" data-bs-target="#@podDetailsId" data-bs-toggle="collapse" href="#">
-                    <i></i><i class="bi bi-chevron-down ms-auto"></i>
-                </a>
-                <ul id="@podDetailsId" class="nav-content collapse ">
-                    <div>
-                        @Html.DisplayFor(model => model.OrderModel.orders[index].PODNumber)
-
-                    </div>
-                    <div>
-                        @Html.DisplayFor(model => model.OrderModel.orders[index].PODName) <br />
-                    </div>
-                    <div>
-                        @Html.DisplayFor(model => model.OrderModel.orders[index].PODZoneAddress)
-                    </div>
-                </ul>
-            </td>
             <td>
                 @Html.DisplayFor(model => model.OrderModel.orders[index].PODZoneName)
                 <input class="form-check-input" asp-for="OrderModel.orders[index].PODZoneName" type="hidden" />
@@ -502,7 +489,7 @@
                 <td>
                     <input class="form-check-input" asp-for="OrderModel.orders[index].Comment" type="text" style="width:100px" disabled value="@Model.OrderModel.orders[index].Comment" />
                 </td>
- }
+            }
             else if (Model.OrderModel.orders[index].SavedBefore == true && Model.OrderModel.orders[index].Submitted == false)
             {
                 <!--<td>
@@ -554,7 +541,7 @@
         <td>
             <input class="form-check-input" asp-for="OrderModel.orders[index].Comment" type="text" style="width:100px" value="@Model.OrderModel.orders[index].Comment" />
         </td>
-}
+    }
             <td style="width:150px">
                 @Html.DisplayFor(model => model.OrderModel.orders[index].Truck)
                 <input class="form-check-input" style="margin-left:60px" asp-for="OrderModel.orders[index].Truck" type="hidden" />
@@ -563,7 +550,23 @@
                 @Html.DisplayFor(model => model.OrderModel.orders[index].Status)
                 <input class="form-check-input" asp-for="OrderModel.orders[index].Status" type="hidden" />
             </td>
+            <td class="skip-filter">
+                <a class="nav-link collapsed" data-bs-target="#@podDetailsId" data-bs-toggle="collapse" href="#">
+                    <i></i><i class="bi bi-chevron-down ms-auto"></i>
+                </a>
+                <ul id="@podDetailsId" class="nav-content collapse ">
+                    <div>
+                        @Html.DisplayFor(model => model.OrderModel.orders[index].PODNumber)
 
+                    </div>
+                    <div>
+                        @Html.DisplayFor(model => model.OrderModel.orders[index].PODName) <br />
+                    </div>
+                    <div>
+                        @Html.DisplayFor(model => model.OrderModel.orders[index].PODZoneAddress)
+                    </div>
+                </ul>
+            </td>
             <td></td>
 
             <input class="form-check-input" asp-for="OrderModel.orders[index].Submitted" type="hidden" />

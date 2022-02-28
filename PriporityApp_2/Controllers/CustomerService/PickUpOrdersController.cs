@@ -210,7 +210,7 @@ namespace PriorityApp.Controllers.CustomerService
                 Model.Priorities = _priorityService.GetAllPriorities().Result.ToList();
                 TerritoryModel territoryModel = _territoryService.GetTerritory(Model.TerritorySelectedId);
                 Model.HoldModel = _holdService.GetHold(Model.SelectedPriorityDate.Date, territoryModel.userId);
-
+                Model.holdTotalAssignedQuantity = Model.HoldModel.QuotaQuantity - Model.HoldModel.ReminingQuantity;
                 Model.SubRegions = _regionService.GetAllISubRegions().Result;
 
                 Model.SubRegions.Insert(0, new Service.Models.MasterModels.SubRegionModel { Id = -2, Name = "Select SubRegion" });
@@ -249,6 +249,7 @@ namespace PriorityApp.Controllers.CustomerService
                 {
                     foreach (var customer in Model.Customers.Where(c => c.PrioritySelectedId != (int)CommanData.Priorities.No))
                     {
+                        hold = _holdService.GetHold(Model.HoldModel.PriorityDate, territoryModel.userId);
                         OrderModel2 updateModel = new OrderModel2();
                         if (customer.PrioritySelectedId == 3)
                         {
@@ -273,7 +274,7 @@ namespace PriorityApp.Controllers.CustomerService
                                     updateModel.ItemId = item.Id;
                                     updateModel.PriorityQuantity = item.Quantity;
                                     updateModel.CustomerId = customer.Id;
-                                    updateModel.PriorityDate = Model.SelectedPriorityDate;
+                                    updateModel.PriorityDate = Model.HoldModel.PriorityDate;
                                     updateModel.PriorityId = customer.PrioritySelectedId;
                                     updateModel.SavedBefore = true;
                                     updateModel.WHSavedID = applicationUser.Id;
@@ -282,18 +283,19 @@ namespace PriorityApp.Controllers.CustomerService
                                     updateModel.OrderCategoryId = (int) CommanData.OrderCategory.Pickup;
                                     if(customer.PrioritySelectedId == (int) CommanData.Priorities.Norm)
                                     {
-                                        Model.HoldModel.ReminingQuantity = Model.HoldModel.ReminingQuantity - (int)item.Quantity;
+                                        hold.ReminingQuantity = hold.ReminingQuantity - (int)item.Quantity;
                                     }
                                     else if(customer.PrioritySelectedId == (int) CommanData.Priorities.Extra)
                                     {
-                                        Model.HoldModel.ExtraQuantity = Model.HoldModel.ExtraQuantity + (int)item.Quantity;
+                                        hold.ExtraQuantity = hold.ExtraQuantity + (int)item.Quantity;
                                     }
-                                    updateOrderResult = _orderService.CreateOrder(updateModel, Model.HoldModel).Result;
+                                    updateOrderResult = _orderService.CreateOrder(updateModel, hold).Result;
                                 }
                                 if (updateOrderResult != null)
                                 {
                                     SavedOrderCount = SavedOrderCount + 1;
                                 }
+                                updateOrderResult = null;
                             }
                         }
                     }
@@ -382,6 +384,12 @@ namespace PriorityApp.Controllers.CustomerService
         {
             try
             {
+                UploadPickUpModel uploadPickUpModel = new UploadPickUpModel();
+                var subRegionModels = _regionService.GetAllISubRegions().Result;
+                subRegionModels.Insert(0, new SubRegionModel { Id = -1, Name = "select SubRegion" });
+                uploadPickUpModel.SubRegions = subRegionModels;
+                uploadPickUpModel.SubRegionSelectedId = -1;
+
                 string ExcelConnectionString = this._configuration.GetConnectionString("ExcelCon");
                 string SqlConnectionString = this._configuration.GetConnectionString("SqlCon");
                 bool addResult = false;
@@ -456,28 +464,28 @@ namespace PriorityApp.Controllers.CustomerService
                             if (addResult == true)
                             {
                                 ViewBag.Message = "File Uploaded Successfully";
-                                return View();
+                                return View(uploadPickUpModel);
                             }
                             else
                             {
                                 ViewBag.Error = "File Not Uploaded";
-                                return View();
+                                return View(uploadPickUpModel);
                             }
                         }
                         else
                         {
                             ViewBag.Error = "There is an error in your file";
-                            return View();
+                            return View(uploadPickUpModel);
                         }
                     }
                     else
                     {
                         ViewBag.Error = "There is an error in your file, empty file";
-                        return View();
+                        return View(uploadPickUpModel);
                     }
                 }
                 ViewBag.Error = "File Not Uploaded, please select valid file";
-                return View();
+                return View(uploadPickUpModel);
             }
             catch (Exception e)
             {
@@ -523,18 +531,11 @@ namespace PriorityApp.Controllers.CustomerService
             orderModel2.WHSavedID = applicationUser.Id;
             orderModel2.SavedBefore = true;
             orderModel2.Submitted = false;
-            //orderModel2.WHSubmittedID = applicationUser.Id;
-            //orderModel2.SubmitTime = DateTime.Now;
-            //orderModel2.Submitted = true;
-            //orderModel2.SubmitNumber = lastSubmitNumber;
-            //orderModel2.Status = status;
             orderModel2.OrderCategoryId = (int)CommanData.OrderCategory.Pickup;
+            HoldModel holdModel = GetHoldQuota(priorityDate, Convert.ToInt64(row["CustomerNumber"]));
 
             if (Convert.ToInt32(row["Priority"]) == (Int32)CommanData.Priorities.Norm)
             {
-
-                HoldModel holdModel = GetHoldQuota(priorityDate, Convert.ToInt64(row["CustomerNumber"]));
-
                 if (holdModel.ReminingQuantity >= Convert.ToInt32(row["Quantity"]))
                 {
                     holdModel.ReminingQuantity = holdModel.ReminingQuantity - (int)orderModel2.PriorityQuantity;
@@ -553,10 +554,11 @@ namespace PriorityApp.Controllers.CustomerService
                     return false;
                 }
             }
-            else
+            else if(Convert.ToInt32(row["Priority"]) == (Int32)CommanData.Priorities.Extra)
             {
-                var newOrderModel = await _orderService.CreateOrder(orderModel2);
-                if (newOrderModel == null)
+                holdModel.ExtraQuantity = holdModel.ExtraQuantity + (int)orderModel2.PriorityQuantity;
+                addResult = await _orderService.CreateOrder(orderModel2, holdModel);
+                if (addResult == null)
                 {
                     ViewBag.Error = "There is an error in the order with customer number =" + orderModel2.CustomerId + " and item Number = " + orderModel2.ItemId;
                     return false;

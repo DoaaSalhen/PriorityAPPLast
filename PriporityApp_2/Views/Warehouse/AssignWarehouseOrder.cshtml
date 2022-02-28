@@ -10,8 +10,8 @@
 
 @model PriorityApp.Service.Models.MasterModels.WarehouseOrderModel
 @{ ViewData["Title"] = "Index";
-                Layout = "~/Views/Shared/NiceAdmin/_CSLayout.cshtml";
-                float holdReminingQuantity = 0; }
+    Layout = "~/Views/Shared/NiceAdmin/_CSLayout.cshtml";
+    float holdReminingQuantity = 0; }
 <style>
     #NOOrdersSpain {
         margin: auto;
@@ -47,21 +47,22 @@
 <script src="~/DataTable/jquery-3.5.1.js"></script>
 <script src="~/DataTable/jquery.dataTables.min.js"></script>
 <link rel="stylesheet" href="~/DataTable/jquery.dataTables.min.css">
-<script src="/lib/jquery/dist/jquery.js"></script>
-
-
-@*<link rel="stylesheet" href="~/css/newStyleSheet.css">*@
-
 
 
 @if (Model.HoldModel != null)
 {
 
-<script>
+    <script>
                     var holdReminingQuantity3 = @Model.HoldModel.ReminingQuantity;
 
-</script>}
+    </script>
+}
 
+<script>
+    $(document).ready(function () {
+        $('#example').DataTable();
+    });
+</script>
 <script type="text/javascript">
     $(document).ready(function () {
         $('#SubRegionSelectedId').change(function () {
@@ -214,24 +215,27 @@
                 return false;
             }
     }
-    PriorityArr = [];
-    function calculateTotal(index, remainingQuantity,  holdTotalAssignedQuantity, ExtraQuantity)
-    {
+
+    var normTotalValues = [];
+    var extraTotalValues = [];
+    var priorityValues = [];
+    var totalQuantity = 0;
+    var extraTotalQuantity = 0;
+
+    function calculateTotal(index, remainingQuantity, holdTotalAssignedQuantity, ExtraQuantity) {
         //var priority = document.getElementById("DDPI" + index);
         var total = 0;
         var extraTotal = 0;
-    
-        //alert(remainingQuantity);
-        var DDeles = document.getElementsByClassName("DDPI");
+        var id = "DDPI" + index;
+        var DDeles = document.getElementById(id);
+        //remainingQuantity = document.getElementById("remaining").value;
+        //ExtraQuantity = document.getElementById("extra").value;
         var quantityForItems = 0;
-        for (var DDIndex = 0; DDIndex <= DDeles.length; DDIndex++)
+        var noTotal = 0;
+        if (DDeles.value == 3)
         {
-            var noTotal = 0;
-            if (DDeles[DDIndex].value == 3) {
-                var itemsQuantity = document.getElementsByClassName("PQ" + DDIndex);
-                //alert(itemsQuantity.length);
+                var itemsQuantity = document.getElementsByClassName("PQ" + index);
                 for (i = 0; i < itemsQuantity.length; i++) {
-                    //alert(itemsQuantity[i].value);
                     total = parseFloat(total) + parseFloat(itemsQuantity[i].value);
                     if (total > remainingQuantity) {
                         alert("you donot have enough quantity");
@@ -239,45 +243,29 @@
                         itemsQuantity[i].value = 0;
                     }
 
-                }
             }
-            else if (DDeles[DDIndex].value == 4)
-            {
-                var itemsQuantity = document.getElementsByClassName("PQ" + DDIndex);
+            normTotalValues[index] = total;
+            extraTotalValues[index] = 0;
+        }
+            else if (DDeles.value == 4) {
+            var itemsQuantity = document.getElementsByClassName("PQ" + index);
 
                 for (ii = 0; ii < itemsQuantity.length; ii++) {
                     //alert(itemsQuantity[i].value);
                     extraTotal = extraTotal + parseFloat(itemsQuantity[ii].value);
-                }
             }
-            else if (DDeles[DDIndex].value == 2) {
-                for (i = 0; i < itemsQuantity.length; i++) {
-                    //alert(itemsQuantity[i].value);
-                    noTotal = parseFloat(noTotal) + parseFloat(itemsQuantity[i].value);
-                }
-                if (PriorityArr[index] == 3) {
-                    document.getElementById("total").value = holdTotalAssignedQuantity - parseFloat(noTotal);
-                    var tempremaining = remainingQuantity + noTotal;
-                    document.getElementById("remaining").value = tempremaining;
-                    alert("33");
-
-                }
-                else if (PriorityArr[index] == 4)
-                {
-                    document.getElementById("extra").value = ExtraQuantity - noTotal;
-                    alert("44");
-
-                }
+            normTotalValues[index] = 0;
+            extraTotalValues[index] = extraTotal;
             }
-
-            PriorityArr[index] = DDeles[DDIndex].value;
-
+        else if (DDeles.value == 2) {
+            extraTotalValues[index] = 0;
+            normTotalValues[index] = 0;
         }
-        alert(total);
-        document.getElementById("total").value = holdTotalAssignedQuantity + parseFloat(total);
-        var tempremaining = remainingQuantity - total;
-        document.getElementById("remaining").value = tempremaining;
-        document.getElementById("extra").value = ExtraQuantity + extraTotal;
+        totalQuantity = normTotalValues.reduce(function (a, b) { return parseFloat(a) + parseFloat(b); });
+        extraTotalQuantity = extraTotalValues.reduce(function (a, b) { return parseFloat(a) + parseFloat(b); });
+        document.getElementById("total").value = holdTotalAssignedQuantity + parseFloat(totalQuantity);
+        document.getElementById("remaining").value = remainingQuantity - parseFloat(totalQuantity);
+        document.getElementById("extra").value = ExtraQuantity + extraTotalQuantity;
 
     }
 
@@ -288,7 +276,7 @@
         margin-bottom: 20px;
     }
 </style>
-<script>
+@*<script>
     $(document).ready(function () {
         var table = $('#example').DataTable({
             "scrollY": "700px",
@@ -308,7 +296,7 @@
         });
     });
 
-</script>
+</script>*@
 <style>
 
     table {
@@ -323,6 +311,10 @@
         margin: 20px 20px 20px 40px;
         border-radius: 10px;
         width: 400px;
+    }
+
+    input[type=number] {
+        width: 80px;
     }
 </style>
 
@@ -341,55 +333,55 @@
 
             @if (Model.SubRegions == null)
             {
-<div class="col-xs-12 col-sm-6 col-md-6 col-lg-2 selectFilter" style="display:inline-block">
-    <label class="control-label">Region</label>
-    <select id="SubRegionSelectedId" name="SubRegionSelectedId" asp-for="SubRegionSelectedId"
-            class="form-select form-select-lg mb-3"
-            asp-items="@(new SelectList(string.Empty, "Id", "Name"))"></select>
-</div> }
+                <div class="col-xs-12 col-sm-6 col-md-6 col-lg-2 selectFilter" style="display:inline-block">
+                    <label class="control-label">Region</label>
+                    <select id="SubRegionSelectedId" name="SubRegionSelectedId" asp-for="SubRegionSelectedId"
+                            class="form-select form-select-lg mb-3"
+                            asp-items="@(new SelectList(string.Empty, "Id", "Name"))"></select>
+                </div> }
             else
             {
-<div class="col-xs-12 col-sm-6 col-md-6 col-lg-2 selectFilter" style="display:inline-block">
-    <label class="control-label">Region</label>
-    <select id="SubRegionSelectedId" name="SubRegionSelectedId" asp-for="SubRegionSelectedId"
-            class="form-select form-select-lg mb-3"
-            asp-items="@(new SelectList(Model.SubRegions, "Id", "Name"))"></select>
-</div>            }
+                <div class="col-xs-12 col-sm-6 col-md-6 col-lg-2 selectFilter" style="display:inline-block">
+                    <label class="control-label">Region</label>
+                    <select id="SubRegionSelectedId" name="SubRegionSelectedId" asp-for="SubRegionSelectedId"
+                            class="form-select form-select-lg mb-3"
+                            asp-items="@(new SelectList(Model.SubRegions, "Id", "Name"))"></select>
+                </div>      }
             @if (Model.States == null)
             {
-<div class="col-xs-12 col-sm-6 col-md-6 col-lg-2 selectFilter" style="display:inline-block">
-    <label class="control-label">State</label>
-    <select id="StateSelectedId" name="StateSelectedId" asp-for="StateSelectedId"
-            class="form-select form-select-lg mb-3"
-            asp-items="@(new SelectList(string.Empty, "Id", "Name"))"></select>
-</div> }
+                <div class="col-xs-12 col-sm-6 col-md-6 col-lg-2 selectFilter" style="display:inline-block">
+                    <label class="control-label">State</label>
+                    <select id="StateSelectedId" name="StateSelectedId" asp-for="StateSelectedId"
+                            class="form-select form-select-lg mb-3"
+                            asp-items="@(new SelectList(string.Empty, "Id", "Name"))"></select>
+                </div> }
             else
             {
-<div class="col-xs-12 col-sm-6 col-md-6 col-lg-2 selectFilter" style="display:inline-block">
-    <label class="control-label">State</label>
-    <select id="StateSelectedId" name="StateSelectedId" asp-for="StateSelectedId"
-            class="form-select form-select-lg mb-3"
-            asp-items="@(new SelectList(Model.States, "Id", "Name"))"></select>
-</div>            }
+                <div class="col-xs-12 col-sm-6 col-md-6 col-lg-2 selectFilter" style="display:inline-block">
+                    <label class="control-label">State</label>
+                    <select id="StateSelectedId" name="StateSelectedId" asp-for="StateSelectedId"
+                            class="form-select form-select-lg mb-3"
+                            asp-items="@(new SelectList(Model.States, "Id", "Name"))"></select>
+                </div>      }
 
             @if (Model.Territories == null)
             {
-<div class="col-xs-12 col-sm-6 col-md-6 col-lg-2 selectFilter" style="display:inline-block">
-    <label class="control-label">Territory</label>
+                <div class="col-xs-12 col-sm-6 col-md-6 col-lg-2 selectFilter" style="display:inline-block">
+                    <label class="control-label">Territory</label>
 
-    <select id="TerritorySelectedId" name="TerritorySelectedId" asp-for="TerritorySelectedId"
-            class="form-select form-select-lg mb-3"
-            asp-items="@(new SelectList(string.Empty, "Id", "Name"))"></select>
-</div> }
+                    <select id="TerritorySelectedId" name="TerritorySelectedId" asp-for="TerritorySelectedId"
+                            class="form-select form-select-lg mb-3"
+                            asp-items="@(new SelectList(string.Empty, "Id", "Name"))"></select>
+                </div> }
             else
             {
-<div class="col-xs-12 col-sm-6 col-md-6 col-lg-2 selectFilter" style="display:inline-block">
-    <label class="control-label">Territory</label>
+                <div class="col-xs-12 col-sm-6 col-md-6 col-lg-2 selectFilter" style="display:inline-block">
+                    <label class="control-label">Territory</label>
 
-    <select id="TerritorySelectedId" name="TerritorySelectedId" asp-for="TerritorySelectedId"
-            class="form-select form-select-lg mb-3"
-            asp-items="@(new SelectList(Model.Territories, "Id", "Name"))"></select>
-</div>            }
+                    <select id="TerritorySelectedId" name="TerritorySelectedId" asp-for="TerritorySelectedId"
+                            class="form-select form-select-lg mb-3"
+                            asp-items="@(new SelectList(Model.Territories, "Id", "Name"))"></select>
+                </div>      }
             <input type="submit" value="Search" class="btn btn-primary btn-lg searchbtn" />
 
         </div>
@@ -408,69 +400,74 @@
                 <th>Comment</th>
                 @foreach (var item in Model.Items)
                 {
-    <th> @item.Name</th>
-                    <th></th>}
+                    <th> @item.Name</th>
+                    <th></th>
+}
             </tr>
         </thead>
         <tbody>
             @if (Model.WarehouseModels != null && Model.HoldModel != null)
             {
-<script>
+                <script>
                          var holdReminingQuantity2 = @Model.HoldModel.ReminingQuantity;
-</script> holdReminingQuantity = Model.HoldModel.ReminingQuantity;
+                </script>
+ holdReminingQuantity = Model.HoldModel.ReminingQuantity;
                 for (var index = 0; index < Model.WarehouseModel2.Count; index++)
                 {
                     string dropDownPriorityId = "";
-                    dropDownPriorityId = "DDPI";
+                    dropDownPriorityId = "DDPI" + index;
                     string priorityQuantityId = "";
                     priorityQuantityId = "PQ" + index;
-<tr>
-    <td>
-        <select id="WarehouseModel2[@index].WarehouseSelectedId" name="WarehouseModel2[@index].WarehouseSelectedId" asp-for="WarehouseModel2[index].WarehouseSelectedId"
-                asp-items="@(new SelectList(Model.WarehouseModel2[index].WarehouseModels, "Id", "Name"))"></select>
+                    <tr>
+                        <td>
+                            <select id="WarehouseModel2[@index].WarehouseSelectedId" name="WarehouseModel2[@index].WarehouseSelectedId" asp-for="WarehouseModel2[index].WarehouseSelectedId"
+                                    asp-items="@(new SelectList(Model.WarehouseModel2[index].WarehouseModels, "Id", "Name"))"></select>
 
-    </td>
-    <td>
-        <select class="@dropDownPriorityId form-control" id="WarehouseModel2[@index].PrioritySelectedId" name="WarehouseModel2[@index].PrioritySelectedId" asp-for="WarehouseModel2[index].PrioritySelectedId"
-                asp-items="@(new SelectList(Model.WarehouseModel2[index].priorityModels, "Id", "Name"))" onchange="calculateTotal(@index, @Model.HoldModel.ReminingQuantity, @Model.holdTotalAssignedQuantity, @Model.HoldModel.ExtraQuantity)"></select>
+                        </td>
+                        <td>
+                            <select class="form-control" id=@dropDownPriorityId name="WarehouseModel2[@index].PrioritySelectedId" asp-for="WarehouseModel2[index].PrioritySelectedId"
+                                    asp-items="@(new SelectList(Model.WarehouseModel2[index].priorityModels, "Id", "Name"))" onchange="calculateTotal(@index, @Model.HoldModel.ReminingQuantity, @Model.holdTotalAssignedQuantity, @Model.HoldModel.ExtraQuantity)"></select>
 
 
-    </td>
-    <td>
-        <input asp-for="WarehouseModel2[index].Comment" type="text" />
+                        </td>
+                        <td>
+                            <input asp-for="WarehouseModel2[index].Comment" type="text" />
 
-    </td>
-    @for (var itemIndex = 0; itemIndex < Model.WarehouseModel2[index].itemModels.Count; itemIndex++)
-    {
-<td><input type="number" class="@priorityQuantityId" asp-for="WarehouseModel2[index].itemModels[itemIndex].Quantity" onchange="calculateTotal(@index, @Model.HoldModel.ReminingQuantity,  @Model.holdTotalAssignedQuantity, @Model.HoldModel.ExtraQuantity)" /></td>
-                        <td><input type="hidden" asp-for="WarehouseModel2[index].itemModels[itemIndex].Id" id="WarehouseModel2[index].itemModels[itemIndex].Id" /></td>}
-    <input class="form-check-input" asp-for="HoldModel.QuotaQuantity" type="hidden" style="width:100px" />
-    <input id="calculatedRemainingQuantity" class="form-check-input" asp-for="HoldModel.ReminingQuantity" type="hidden" style="width:100px" />
-    @Html.Hidden("test", Model.HoldModel.ReminingQuantity)
-    <input class="form-check-input" asp-for="HoldModel.userId" type="hidden" style="width:100px" />
-    <input class="form-check-input" asp-for="HoldModel.PriorityDate" type="hidden" style="width:100px" />
+                        </td>
+                        @for (var itemIndex = 0; itemIndex < Model.WarehouseModel2[index].itemModels.Count; itemIndex++)
+                        {
+                            <td><input type="number" class="@priorityQuantityId" asp-for="WarehouseModel2[index].itemModels[itemIndex].Quantity" onchange="calculateTotal(@index, @Model.HoldModel.ReminingQuantity,  @Model.holdTotalAssignedQuantity, @Model.HoldModel.ExtraQuantity)" /></td>
+                            <td><input type="hidden" asp-for="WarehouseModel2[index].itemModels[itemIndex].Id" id="WarehouseModel2[index].itemModels[itemIndex].Id" /></td>
+}
+                        <input class="form-check-input" asp-for="HoldModel.QuotaQuantity" type="hidden" style="width:100px" />
+                        <input id="calculatedRemainingQuantity" class="form-check-input" asp-for="HoldModel.ReminingQuantity" type="hidden" style="width:100px" />
+                        @Html.Hidden("test", Model.HoldModel.ReminingQuantity)
+                        <input class="form-check-input" asp-for="HoldModel.userId" type="hidden" style="width:100px" />
+                        <input class="form-check-input" asp-for="HoldModel.PriorityDate" type="hidden" style="width:100px" />
 
-</tr>                }
+                    </tr>
+           }
 
             }
             <input type="hidden" asp-for="SelectedPriorityDate" />
             <input type="hidden" asp-for="TerritorySelectedId" />
             @if (Model.HoldModel != null)
             {
-        <div>
-            <span>Territory Qouta</span>
-            <input id="Quota" type="number" disabled value="@Model.HoldModel.QuotaQuantity" style="margin:10px 20px 20px 0" />
-            <span>Remaining Quantity</span>
-            <input id="remaining" type="number" disabled value="@Model.HoldModel.ReminingQuantity" style="margin:10px 20px 20px 0" />
-            <span> Total Assigned</span>
-            <input id="total" type="number" value="@Model.holdTotalAssignedQuantity" disabled style="margin:10px 20px 20px 0" />
-            <span> Total extra</span>
-            <input id="extra" type="number" value="@Model.HoldModel.ExtraQuantity" disabled style="margin:10px 20px 20px 0" />
+                <div>
+                    <span>Territory Qouta</span>
+                    <input id="Quota" type="number" disabled value="@Model.HoldModel.QuotaQuantity" style="margin:10px 20px 20px 0" />
+                    <span>Remaining Quantity</span>
+                    <input id="remaining" type="number" disabled value="@Model.HoldModel.ReminingQuantity" style="margin:10px 20px 20px 0" />
+                    <span> Total Assigned</span>
+                    <input id="total" type="number" value="@Model.holdTotalAssignedQuantity" disabled style="margin:10px 20px 20px 0" />
+                    <span> Total extra</span>
+                    <input id="extra" type="number" value="@Model.HoldModel.ExtraQuantity" disabled style="margin:10px 20px 20px 0" />
 
-            <span id="NOOrdersSpain" hidden>No search result</span>
-            <span id="NoQouta" hidden>there is no Qouta for selected priority date</span>
+                    <span id="NOOrdersSpain" hidden>No search result</span>
+                    <span id="NoQouta" hidden>there is no Qouta for selected priority date</span>
 
-        </div>            }
+                </div>
+}
         </tbody>
     </table>
     <input type="submit" value="Save" class="btn btn-primary btn-lg searchbtn" style="margin:auto" />

@@ -250,7 +250,7 @@ namespace PriorityApp.Service.Implementation
                     users.AddRange(x);
                 }
                 List<string> userIds = users.Select(u => u.Id).ToList();
-                List<Order> orders = _repository.Find(o => o.SavedBefore == true && o.Submitted == submitted, false, o=>o.Customer.zone.Territory).Where(o => userIds.Contains(o.WHSavedID)).ToList();
+                List<Order> orders = _repository.Find(o => o.SavedBefore == true && o.PriorityId !=(int)CommanData.Priorities.No && o.Submitted == submitted, false, o=>o.Customer.zone.Territory).Where(o => userIds.Contains(o.WHSavedID)).ToList();
 
                 List<OrderModel2> selectedorderModels2 = new List<OrderModel2>();
                 selectedorderModels2 = _mapper.Map<List<OrderModel2>>(orders);

@@ -36,8 +36,6 @@
 <script src="~/DataTable/jquery-3.5.1.js"></script>
 <script src="~/DataTable/jquery.dataTables.min.js"></script>
 <link rel="stylesheet" href="~/DataTable/jquery.dataTables.min.css">
-<script src="/lib/jquery/dist/jquery.js"></script>
-@*<script src="~/DataTable/jquery.dataTables.min.js"></script>*@
 
 
 @*<link rel="stylesheet" href="~/css/newStyleSheet.css">*@
@@ -47,14 +45,19 @@
 @if (Model.HoldModel != null)
 {
 
-<script>
+    <script>
     var holdReminingQuantity3 = @Model.HoldModel.ReminingQuantity;
             var holdAssignedQuantity3 = @Model.holdTotalAssignedQuantity;
          var holdExtraQuantity3 = @Model.HoldModel.ExtraQuantity;
 
-</script>
+    </script>
 }
 
+@*<script>
+    $(document).ready(function () {
+        $('#example').DataTable();
+    });
+    </script>*@
 <script type="text/javascript">
     $(document).ready(function () {
         $('#SubRegionSelectedId').change(function () {
@@ -241,28 +244,11 @@
         border-radius: 10px;
         width: 400px;
     }
+
+    input[type=number] {
+        width: 80px;
+    }
 </style>
-<script>
-    $(document).ready(function () {
-        var table = $('#example').DataTable({
-            "scrollY": "700px",
-            "scrollX": "200px",
-
-            "paging": false
-        });
-
-        $('a.toggle-vis').on('click', function (e) {
-            e.preventDefault();
-
-            // Get the column API object
-            var column = table.column($(this).attr('data-column'));
-
-            // Toggle the visibility
-            column.visible(!column.visible());
-        });
-    });
-
-</script>
 
 <form asp-controller="CSDeliveryOrder" asp-action="SearchForOrders" method="post" class="form-horizontal" role="form">
     <div class="alert-danger" asp-validation-summary="ModelOnly"></div>
@@ -285,80 +271,80 @@
 
             @if (Model.SubRegions == null)
             {
-            <div class="col-xs-12 col-sm-6 col-md-6 col-lg-2 selectFilter" style="display:inline-block">
-                <label class="control-label">SubRegion</label>
-                <select id="SubRegionSelectedId" name="SubRegionSelectedId" asp-for="SubRegionSelectedId"
-                        class="form-select form-select-lg mb-3"
-                        asp-items="@(new SelectList(string.Empty, "Id", "Name"))"></select>
-            </div>
+                <div class="col-xs-12 col-sm-6 col-md-6 col-lg-2 selectFilter" style="display:inline-block">
+                    <label class="control-label">SubRegion</label>
+                    <select id="SubRegionSelectedId" name="SubRegionSelectedId" asp-for="SubRegionSelectedId"
+                            class="form-select form-select-lg mb-3"
+                            asp-items="@(new SelectList(string.Empty, "Id", "Name"))"></select>
+                </div>
             }
             else
             {
-            <div class="col-xs-12 col-sm-6 col-md-6 col-lg-2 selectFilter" style="display:inline-block">
-                <label class="control-label">SubRegion</label>
-                <select id="SubRegionSelectedId" name="SubRegionSelectedId" asp-for="SubRegionSelectedId"
-                        class="form-select form-select-lg mb-3"
-                        asp-items="@(new SelectList(Model.SubRegions, "Id", "Name"))"></select>
-            </div>
+                <div class="col-xs-12 col-sm-6 col-md-6 col-lg-2 selectFilter" style="display:inline-block">
+                    <label class="control-label">SubRegion</label>
+                    <select id="SubRegionSelectedId" name="SubRegionSelectedId" asp-for="SubRegionSelectedId"
+                            class="form-select form-select-lg mb-3"
+                            asp-items="@(new SelectList(Model.SubRegions, "Id", "Name"))"></select>
+                </div>
             }
             @if (Model.States == null)
             {
-            <div class="col-xs-12 col-sm-6 col-md-6 col-lg-2 selectFilter" style="display:inline-block">
-                <label class="control-label">State</label>
-                <select id="StateSelectedId" name="StateSelectedId" asp-for="StateSelectedId"
-                        class="form-select form-select-lg mb-3"
-                        asp-items="@(new SelectList(string.Empty, "Id", "Name"))"></select>
-            </div>
+                <div class="col-xs-12 col-sm-6 col-md-6 col-lg-2 selectFilter" style="display:inline-block">
+                    <label class="control-label">State</label>
+                    <select id="StateSelectedId" name="StateSelectedId" asp-for="StateSelectedId"
+                            class="form-select form-select-lg mb-3"
+                            asp-items="@(new SelectList(string.Empty, "Id", "Name"))"></select>
+                </div>
             }
             else
             {
-            <div class="col-xs-12 col-sm-6 col-md-6 col-lg-2 selectFilter" style="display:inline-block">
-                <label class="control-label">State</label>
-                <select id="StateSelectedId" name="StateSelectedId" asp-for="StateSelectedId"
-                        class="form-select form-select-lg mb-3"
-                        asp-items="@(new SelectList(Model.States, "Id", "Name"))"></select>
-            </div>
+                <div class="col-xs-12 col-sm-6 col-md-6 col-lg-2 selectFilter" style="display:inline-block">
+                    <label class="control-label">State</label>
+                    <select id="StateSelectedId" name="StateSelectedId" asp-for="StateSelectedId"
+                            class="form-select form-select-lg mb-3"
+                            asp-items="@(new SelectList(Model.States, "Id", "Name"))"></select>
+                </div>
             }
 
             @if (Model.Territories == null)
             {
-            <div class="col-xs-12 col-sm-6 col-md-6 col-lg-2 selectFilter" style="display:inline-block">
-                <label class="control-label">Territory</label>
+                <div class="col-xs-12 col-sm-6 col-md-6 col-lg-2 selectFilter" style="display:inline-block">
+                    <label class="control-label">Territory</label>
 
-                <select id="TerritorySelectedId" name="TerritorySelectedId" asp-for="TerritorySelectedId"
-                        class="form-select form-select-lg mb-3"
-                        asp-items="@(new SelectList(string.Empty, "Id", "Name"))"></select>
-            </div>
+                    <select id="TerritorySelectedId" name="TerritorySelectedId" asp-for="TerritorySelectedId"
+                            class="form-select form-select-lg mb-3"
+                            asp-items="@(new SelectList(string.Empty, "Id", "Name"))"></select>
+                </div>
             }
             else
             {
-            <div class="col-xs-12 col-sm-6 col-md-6 col-lg-2 selectFilter" style="display:inline-block">
-                <label class="control-label">Territory</label>
+                <div class="col-xs-12 col-sm-6 col-md-6 col-lg-2 selectFilter" style="display:inline-block">
+                    <label class="control-label">Territory</label>
 
-                <select id="TerritorySelectedId" name="TerritorySelectedId" asp-for="TerritorySelectedId"
-                        class="form-select form-select-lg mb-3"
-                        asp-items="@(new SelectList(Model.Territories, "Id", "Name"))"></select>
-            </div>
+                    <select id="TerritorySelectedId" name="TerritorySelectedId" asp-for="TerritorySelectedId"
+                            class="form-select form-select-lg mb-3"
+                            asp-items="@(new SelectList(Model.Territories, "Id", "Name"))"></select>
+                </div>
             }
 
 
             @if (Model.Zones == null)
             {
-            <div class="col-xs-12 col-sm-6 col-md-6 col-lg-2 selectFilter" style="display:inline-block">
-                <label class="control-label">Zone</label>
-                <select id="ZoneSelectedId" name="ZoneSelectedId" asp-for="ZoneSelectedId"
-                        class="form-select form-select-lg mb-3"
-                        asp-items="@(new SelectList(string.Empty, "Id", "Name"))"></select>
-            </div>
+                <div class="col-xs-12 col-sm-6 col-md-6 col-lg-2 selectFilter" style="display:inline-block">
+                    <label class="control-label">Zone</label>
+                    <select id="ZoneSelectedId" name="ZoneSelectedId" asp-for="ZoneSelectedId"
+                            class="form-select form-select-lg mb-3"
+                            asp-items="@(new SelectList(string.Empty, "Id", "Name"))"></select>
+                </div>
             }
             else
             {
-            <div class="col-xs-12 col-sm-6 col-md-6 col-lg-2 selectFilter" style="display:inline-block">
-                <label class="control-label">Zone</label>
-                <select id="ZoneSelectedId" name="ZoneSelectedId" asp-for="ZoneSelectedId"
-                        class="form-select form-select-lg mb-3"
-                        asp-items="@(new SelectList(Model.Zones, "Id", "Name"))"></select>
-            </div>
+                <div class="col-xs-12 col-sm-6 col-md-6 col-lg-2 selectFilter" style="display:inline-block">
+                    <label class="control-label">Zone</label>
+                    <select id="ZoneSelectedId" name="ZoneSelectedId" asp-for="ZoneSelectedId"
+                            class="form-select form-select-lg mb-3"
+                            asp-items="@(new SelectList(Model.Zones, "Id", "Name"))"></select>
+                </div>
             }
         </div>
         <input type="submit" value="Search" class="btn btn-primary btn-lg searchbtn" />
@@ -421,10 +407,10 @@
                             @if (Model.OrderModel.orders[index].Submitted == true)
                             {
                                 @*<td style="width:200px">
-                                <div><input class="form-check-input" id=@radioButtonListId asp-for="OrderModel.orders[index].PriorityId" type="radio" value="2" disabled style="" onchange="QuantityValidation(0, @radioButtonListId, @index, @priorityQuantityId, @holdReminingQuantity, false, 0)" /><label>No</label></div>
-                                <div> <input class="form-check-input" id=@radioButtonListId asp-for="OrderModel.orders[index].PriorityId" type="radio" value="3" disabled style="" onchange="QuantityValidation(0, @radioButtonListId, @index, @priorityQuantityId, @holdReminingQuantity, false, 0)" /><label>Norm</label></div>
-                                <div><input class="form-check-input" id=@radioButtonListId asp-for="OrderModel.orders[index].PriorityId" type="radio" value="4" disabled style="" onchange="QuantityValidation(0, @radioButtonListId, @index, @priorityQuantityId, @holdReminingQuantity, false, 0)" /><label>Extra</label></div>
-                            </td>*@
+                                        <div><input class="form-check-input" id=@radioButtonListId asp-for="OrderModel.orders[index].PriorityId" type="radio" value="2" disabled style="" onchange="QuantityValidation(0, @radioButtonListId, @index, @priorityQuantityId, @holdReminingQuantity, false, 0)" /><label>No</label></div>
+                                        <div> <input class="form-check-input" id=@radioButtonListId asp-for="OrderModel.orders[index].PriorityId" type="radio" value="3" disabled style="" onchange="QuantityValidation(0, @radioButtonListId, @index, @priorityQuantityId, @holdReminingQuantity, false, 0)" /><label>Norm</label></div>
+                                        <div><input class="form-check-input" id=@radioButtonListId asp-for="OrderModel.orders[index].PriorityId" type="radio" value="4" disabled style="" onchange="QuantityValidation(0, @radioButtonListId, @index, @priorityQuantityId, @holdReminingQuantity, false, 0)" /><label>Extra</label></div>
+                                    </td>*@
                                 <td>
                                     <select id="@radioButtonListId" name="OrderModel.orders[@index].PriorityId" disabled asp-for="OrderModel.orders[index].PriorityId"
                                             asp-items="@(new SelectList(Model.Priorities, "Id", "Name"))" onchange="QuantityValidation(@Model.OrderModel.orders[index].OrderQuantity, @radioButtonListId, @index, @priorityQuantityId, @holdReminingQuantity, false, 0)"></select>
@@ -443,10 +429,10 @@
                             else if (Model.OrderModel.orders[index].SavedBefore == true && Model.OrderModel.orders[index].Submitted == false)
                             {
                                 @*<td style="width:200px">
-                                <div> <input id=@radioButtonListId asp-for="OrderModel.orders[index].PriorityId" type="radio" value="2" disabled style="margin-left:40px" onchange="QuantityValidation(0,@radioButtonListId, @index, @priorityQuantityId, @holdReminingQuantity, true, @Model.OrderModel.orders[index].PriorityQuantity, @Model.OrderModel.orders[index].PriorityId)" /><label style="margin-left:60px">No</label></div>
-                                <div> <input id=@radioButtonListId asp-for="OrderModel.orders[index].PriorityId" type="radio" value="3" style="margin-left:40px" onchange="QuantityValidation(0,@radioButtonListId, @index, @priorityQuantityId, @holdReminingQuantity, true, @Model.OrderModel.orders[index].PriorityQuantity, @Model.OrderModel.orders[index].PriorityId)" /><label style="margin-left:60px">Norm</label></div>
-                                <div> <input id=@radioButtonListId asp-for="OrderModel.orders[index].PriorityId" type="radio" value="4" style="margin-left:40px" onchange="QuantityValidation(0, @radioButtonListId, @index, @priorityQuantityId, @holdReminingQuantity, true, @Model.OrderModel.orders[index].PriorityQuantity, @Model.OrderModel.orders[index].PriorityId)" /><label style="margin-left:60px">Extra</label></div>
-                            </td>*@
+                                        <div> <input id=@radioButtonListId asp-for="OrderModel.orders[index].PriorityId" type="radio" value="2" disabled style="margin-left:40px" onchange="QuantityValidation(0,@radioButtonListId, @index, @priorityQuantityId, @holdReminingQuantity, true, @Model.OrderModel.orders[index].PriorityQuantity, @Model.OrderModel.orders[index].PriorityId)" /><label style="margin-left:60px">No</label></div>
+                                        <div> <input id=@radioButtonListId asp-for="OrderModel.orders[index].PriorityId" type="radio" value="3" style="margin-left:40px" onchange="QuantityValidation(0,@radioButtonListId, @index, @priorityQuantityId, @holdReminingQuantity, true, @Model.OrderModel.orders[index].PriorityQuantity, @Model.OrderModel.orders[index].PriorityId)" /><label style="margin-left:60px">Norm</label></div>
+                                        <div> <input id=@radioButtonListId asp-for="OrderModel.orders[index].PriorityId" type="radio" value="4" style="margin-left:40px" onchange="QuantityValidation(0, @radioButtonListId, @index, @priorityQuantityId, @holdReminingQuantity, true, @Model.OrderModel.orders[index].PriorityQuantity, @Model.OrderModel.orders[index].PriorityId)" /><label style="margin-left:60px">Extra</label></div>
+                                    </td>*@
                                 <td>
                                     <select id="@radioButtonListId" name="OrderModel.orders[@index].PriorityId" asp-for="OrderModel.orders[index].PriorityId"
                                             asp-items="@(new SelectList(Model.Priorities, "Id", "Name"))" onchange="QuantityValidation(0, @radioButtonListId, @index, @priorityQuantityId, @holdReminingQuantity, true, @Model.OrderModel.orders[index].PriorityQuantity, @Model.OrderModel.orders[index].PriorityId, @Model.holdTotalAssignedQuantity, @Model.HoldModel.ExtraQuantity)"></select>

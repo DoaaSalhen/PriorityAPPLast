@@ -284,51 +284,51 @@ namespace PriorityApp.Controllers.CustomerService
                 bool updateOrderResult = false;
                 int SavedOrderCount = 0;
                 bool AllOrdersSaved = true;
-                HoldModel DBholdModel = _holdService.GetHold(Model.HoldModel.PriorityDate, Model.HoldModel.userId);
 
                 foreach (var orderModel in Model.OrderModel.orders)
                 {
+                    HoldModel DBholdModel = _holdService.GetHold(Model.HoldModel.PriorityDate, Model.HoldModel.userId);
                     OrderModel2 updateModel = _orderService.GetOrder((long)orderModel.Id);
                     if (orderModel.SavedBefore == true)
                     {
+                        float changeRate = (float)orderModel.PriorityQuantity - (float)updateModel.PriorityQuantity;
+
                         if (orderModel.PriorityId == (int)CommanData.Priorities.Norm && updateModel.PriorityId == (int)CommanData.Priorities.Norm)
                         {
-                            float changeRate = (float)updateModel.PriorityQuantity - (float)orderModel.PriorityQuantity;
-                            DBholdModel.ReminingQuantity = DBholdModel.ReminingQuantity + changeRate;
+                            DBholdModel.ReminingQuantity = DBholdModel.ReminingQuantity - changeRate;
 
                         }
                         else if (orderModel.PriorityId == (int)CommanData.Priorities.Norm && updateModel.PriorityId == (int)CommanData.Priorities.Extra)
                         {
-                            DBholdModel.ReminingQuantity = (float)DBholdModel.ReminingQuantity - (float)orderModel.PriorityQuantity;
-                            DBholdModel.ExtraQuantity = (float)DBholdModel.ExtraQuantity - (float)orderModel.PriorityQuantity;
+                            DBholdModel.ReminingQuantity = (float)DBholdModel.ReminingQuantity - (float)orderModel.PriorityQuantity - changeRate;
+                            DBholdModel.ExtraQuantity = (float)DBholdModel.ExtraQuantity - (float)orderModel.PriorityQuantity + changeRate;
                         }
                         else if (orderModel.PriorityId == (int)CommanData.Priorities.Extra && updateModel.PriorityId == (int)CommanData.Priorities.Norm)
                         {
-                            DBholdModel.ReminingQuantity = (float)DBholdModel.ReminingQuantity - (float)updateModel.PriorityQuantity;
-                            DBholdModel.ExtraQuantity = (float)DBholdModel.ExtraQuantity + (float)updateModel.PriorityQuantity;
+                            DBholdModel.ReminingQuantity = (float)DBholdModel.ReminingQuantity - (float)updateModel.PriorityQuantity- -changeRate;
+                            DBholdModel.ExtraQuantity = (float)DBholdModel.ExtraQuantity + (float)updateModel.PriorityQuantity + changeRate;
                         }
 
                         else if (orderModel.PriorityId == (int)CommanData.Priorities.Extra && updateModel.PriorityId == (int)CommanData.Priorities.Extra)
                         {
-                            float changeRate = (float)updateModel.PriorityQuantity - (float)orderModel.PriorityQuantity;
                             DBholdModel.ExtraQuantity = DBholdModel.ExtraQuantity + changeRate;
 
                         }
                         else if (orderModel.PriorityId == (int)CommanData.Priorities.No && updateModel.PriorityId == (int)CommanData.Priorities.Norm)
                         {
-                            DBholdModel.ReminingQuantity = (float)DBholdModel.ReminingQuantity + (float)updateModel.PriorityQuantity;
+                            DBholdModel.ReminingQuantity = (float)DBholdModel.ReminingQuantity + (float)updateModel.PriorityQuantity - changeRate;
                         }
                         else if (orderModel.PriorityId == (int)CommanData.Priorities.No && updateModel.PriorityId == (int)CommanData.Priorities.Extra)
                         {
-                            DBholdModel.ExtraQuantity = (float)DBholdModel.ExtraQuantity + (float)updateModel.PriorityQuantity;
+                            DBholdModel.ExtraQuantity = (float)DBholdModel.ExtraQuantity + (float)updateModel.PriorityQuantity + changeRate;
                         }
                         else if (orderModel.PriorityId == (int)CommanData.Priorities.Norm && updateModel.PriorityId == (int)CommanData.Priorities.No)
                         {
-                            DBholdModel.ReminingQuantity = (float)DBholdModel.ReminingQuantity - (float)updateModel.PriorityQuantity;
+                            DBholdModel.ReminingQuantity = (float)DBholdModel.ReminingQuantity - (float)updateModel.PriorityQuantity - changeRate;
                         }
                         else if (orderModel.PriorityId == (int)CommanData.Priorities.Extra && updateModel.PriorityId == (int)CommanData.Priorities.No)
                         {
-                            DBholdModel.ExtraQuantity = (float)DBholdModel.ExtraQuantity + (float)updateModel.PriorityQuantity;
+                            DBholdModel.ExtraQuantity = (float)DBholdModel.ExtraQuantity + (float)updateModel.PriorityQuantity + changeRate;
                         }
                     }
 
@@ -357,10 +357,13 @@ namespace PriorityApp.Controllers.CustomerService
                     else if(orderModel.SavedBefore == true && orderModel.PriorityId == (int)CommanData.Priorities.No)
                     {
                         updateModel.PriorityId = orderModel.PriorityId;
-                        updateModel.SavedBefore = false;
+                        updateModel.SavedBefore = true;
                         updateModel.Truck = "";
                         updateModel.WHSavedID = applicationUser.Id;
                         updateModel.PriorityQuantity = 0;
+                        updateModel.ItemId = orderModel.ItemId;
+                        updateModel.OrderCategoryId = (int)CommanData.OrderCategory.Delivery;
+                        updateModel.Comment = "";
 
                     }
                     updateOrderResult = _orderService.UpdateOrder2(updateModel, DBholdModel).Result;
@@ -372,6 +375,7 @@ namespace PriorityApp.Controllers.CustomerService
                     {
                         AllOrdersSaved = false;
                     }
+                    updateOrderResult = false;
                 }
                 TempData["SubmittedOrdersCount"] = SavedOrderCount;
                 if (Model.orderType == (int)CommanData.OrderCategory.Delivery)
@@ -427,7 +431,6 @@ namespace PriorityApp.Controllers.CustomerService
                 }
 
                 info.holdModels = info.holdModels.GroupBy(h => h.userId).Select(x => x.First()).ToList();
-                //info.holdModels = info.holdModels.Distinct<HoldModel>().ToList();
                 info.ordersTosubmit = unSubmittedOrders;
                 info.submittedOrdersTerritories = submittedOrdersTerritories;
                 info.OrdersCount = unSubmittedOrders.Count();
