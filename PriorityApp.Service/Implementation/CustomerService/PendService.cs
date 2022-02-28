@@ -21,6 +21,7 @@ namespace PriorityApp.Service.Implementation.CustomerService
         private readonly IRepository<Order, long> _repository;
         private readonly ILogger<PendService> _logger;
         private readonly IMapper _mapper;
+        private readonly IRepository<Order, long> _orderRepository;
 
         public enum Zones
         {
@@ -34,11 +35,13 @@ namespace PriorityApp.Service.Implementation.CustomerService
         }
         public PendService(IRepository<Order, long> repository,
                             ILogger<PendService> logger,
-                            IMapper mapper)
+                            IMapper mapper,
+                            IRepository<Order, long> orderRepository)
         {
             _repository = repository;
             logger = _logger;
             mapper = _mapper;
+            _orderRepository = orderRepository;
         }
         List<Order> IPendService.GetPend()
         {
@@ -163,6 +166,12 @@ namespace PriorityApp.Service.Implementation.CustomerService
                 var orders2 = _repository.Findlist().Result.Where(o => o.OrderCategoryId == (int)CommanData.OrderCategory.Delivery).GroupBy(x => x.OrderNumber).Where(x => x.Count() > 1).ToList();
                 foreach (var order2 in orders2)
                 {
+                    //var partialOrder = order2.Where(o => o.SavedBefore == true && o.PriorityQuantity > o.OrderQuantity);
+
+                    //if(partialOrder != null)
+                    //{
+
+                    //}
                     var sumbittedOrder = order2.Where(o => o.Dispatched == true).Count();
                     if (sumbittedOrder < 1)
                     {
@@ -170,23 +179,12 @@ namespace PriorityApp.Service.Implementation.CustomerService
                         {
                             if (order.SavedBefore == false)
                             {
-                                // long id = (long)order.Where(o => o.SavedBefore == false).Select(x => x.Id).FirstOrDefault();
                                 _repository.DeleteById(order.Id);
                             }
 
                         }
                     }
                 }
-                //foreach (var order in orders.ToList())
-                //{
-                //    var x = order.Select(o => o.Id).Any();
-                //    if (x == true)
-                //    {
-                //        long id = (long)order.Where(o => o.SavedBefore == false).Select(x => x.Id).FirstOrDefault();
-                //        _repository.DeleteById(id);
-                //    }
-
-                //}
                 return true;
             }
             catch (Exception e)
