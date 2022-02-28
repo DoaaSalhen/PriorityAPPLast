@@ -45,19 +45,19 @@ namespace Repository.EntityFramework.Migrations
                        column: x => x.CustomerId,
                        principalTable: "Customers",
                        principalColumn: "Id",
-                       onDelete: ReferentialAction.Restrict);
+                       onDelete: ReferentialAction.Cascade);
                    table.ForeignKey(
                        name: "FK_Orders_Items_ItemId",
                        column: x => x.ItemId,
                        principalTable: "Items",
                        principalColumn: "Id",
-                       onDelete: ReferentialAction.Restrict);
+                       onDelete: ReferentialAction.Cascade);
                    table.ForeignKey(
                        name: "FK_Orders_Priorities_PriorityId",
                        column: x => x.PriorityId,
                        principalTable: "Priorities",
                        principalColumn: "Id",
-                       onDelete: ReferentialAction.Restrict);
+                       onDelete: ReferentialAction.Cascade);
                });
 
             migrationBuilder.CreateIndex(
