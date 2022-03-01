@@ -39,8 +39,8 @@ namespace PriorityApp.Service.Implementation.CustomerService
                             IRepository<Order, long> orderRepository)
         {
             _repository = repository;
-            logger = _logger;
-            mapper = _mapper;
+             _logger = logger;
+            _mapper = mapper;
             _orderRepository = orderRepository;
         }
         List<Order> IPendService.GetPend()
@@ -52,9 +52,7 @@ namespace PriorityApp.Service.Implementation.CustomerService
         {
             try
             {
-                //List<Order> PendOrders = _repository.Find(x => x.Dispatched == false).ToList();
-                List<Order> PendOrders = _repository.Find(x => x.PriorityId == (int)CommanData.Priorities.No).ToList(); //priority No
-                //Find(x => x.Dispatched).ToList();
+                List<Order> PendOrders = _repository.Find(x => x.SavedBefore == false).ToList(); //priority No
                 foreach (Order o in PendOrders)
                 {
                     _repository.Delete(o);
@@ -163,27 +161,35 @@ namespace PriorityApp.Service.Implementation.CustomerService
             {
                 // var orders = _repository.Findlist().Result.GroupBy(x => x.OrderNumber).Where(x => x.Count() > 1).Select(x => x.Where(x => x.SavedBefore == false && x.OrderCategoryId == (int)CommanData.OrderCategory.Delivery)).ToList();
                 //var orders = _repository.Findlist().Result.Where(x => x.SavedBefore == false && x.OrderCategoryId == (int)CommanData.OrderCategory.Delivery).GroupBy(x => x.OrderNumber).Where(x => x.Count() > 1).ToList();
-                var orders2 = _repository.Findlist().Result.Where(o => o.OrderCategoryId == (int)CommanData.OrderCategory.Delivery).GroupBy(x => x.OrderNumber).Where(x => x.Count() > 1).ToList();
+                var orders2 = _repository.Findlist().Result.GroupBy(x => x.OrderNumber).Where(x => x.Count() > 1).ToList();
                 foreach (var order2 in orders2)
                 {
-                    //var partialOrder = order2.Where(o => o.SavedBefore == true && o.PriorityQuantity > o.OrderQuantity);
-
-                    //if(partialOrder != null)
-                    //{
-
-                    //}
-                    var sumbittedOrder = order2.Where(o => o.Dispatched == true).Count();
-                    if (sumbittedOrder < 1)
+                    float OriginalQuantity = 0;
+                    float priorityQuantitySum = 0;
+                    Order partialOrder = new Order();
+                    foreach (var order in order2.ToList())
                     {
-                        foreach (var order in order2.ToList())
-                        {
                             if (order.SavedBefore == false)
                             {
                                 _repository.DeleteById(order.Id);
                             }
-
-                        }
+                            else if(order.SavedBefore == true && order.PriorityQuantity< order.OrderQuantity)
+                            {
+                                priorityQuantitySum = priorityQuantitySum + (float)order.PriorityQuantity;
+                                OriginalQuantity = (float) order.OrginalQuantity;
+                                partialOrder = order;
+                            }
                     }
+                            if(priorityQuantitySum < OriginalQuantity)
+                            {
+                                partialOrder.OrderQuantity = OriginalQuantity - priorityQuantitySum;
+                                var newOrder = _orderRepository.Add(partialOrder);
+                                if (newOrder == null)
+                                {
+                                    return false;
+                                }
+                    }
+                            
                 }
                 return true;
             }

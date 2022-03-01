@@ -45,7 +45,7 @@ namespace PriorityApp.Models.Models
 
         public float?       PriorityQuantity { get; set; }
 
-        public int?       OrginalQuantity { get; set; }
+        public float?       OrginalQuantity { get; set; }
 
         public string    Status { get; set; }
 
