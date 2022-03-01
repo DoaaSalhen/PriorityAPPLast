@@ -167,21 +167,39 @@ namespace PriorityApp.Service.Implementation.CustomerService
                     float OriginalQuantity = 0;
                     float priorityQuantitySum = 0;
                     Order partialOrder = new Order();
+                    Order mainOrder = new Order();
                     foreach (var order in order2.ToList())
                     {
                             if (order.SavedBefore == false)
                             {
                                 _repository.DeleteById(order.Id);
                             }
-                            else if(order.SavedBefore == true && order.PriorityQuantity< order.OrderQuantity)
+                            else if(order.SavedBefore == true)
                             {
                                 priorityQuantitySum = priorityQuantitySum + (float)order.PriorityQuantity;
                                 OriginalQuantity = (float) order.OrginalQuantity;
-                                partialOrder = order;
+                            mainOrder = order;
                             }
                     }
                             if(priorityQuantitySum < OriginalQuantity)
                             {
+                                partialOrder.OrderNumber = mainOrder.OrderNumber;
+                                        partialOrder.CustomerId = mainOrder.CustomerId;
+                                partialOrder.ItemId = mainOrder.ItemId;
+                                partialOrder.OrderCategoryId = mainOrder.OrderCategoryId;
+                                    partialOrder.OrderDate = mainOrder.OrderDate;
+                                partialOrder.OrderDocument = mainOrder.OrderDocument;
+                                partialOrder.OrginalQuantity = mainOrder.OrginalQuantity;
+                                partialOrder.PODName = mainOrder.PODName;
+                                partialOrder.PODNumber = mainOrder.PODNumber;
+                                partialOrder.PODZoneAddress = mainOrder.PODZoneAddress;
+                                partialOrder.PODZoneName = mainOrder.PODZoneName;
+                                partialOrder.PODZoneState = mainOrder.PODZoneState;
+                                partialOrder.PriorityDate = DateTime.Today;
+                                partialOrder.SavedBefore = false;
+                                partialOrder.Submitted = false;
+                                partialOrder.LineID = mainOrder.LineID;
+                                partialOrder.Dispatched = false;
                                 partialOrder.OrderQuantity = OriginalQuantity - priorityQuantitySum;
                                 var newOrder = _orderRepository.Add(partialOrder);
                                 if (newOrder == null)

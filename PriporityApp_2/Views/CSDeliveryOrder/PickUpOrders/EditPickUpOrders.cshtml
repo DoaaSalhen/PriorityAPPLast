@@ -197,7 +197,7 @@
         AssignedValuesArray[index] = 0;
         totalQuantity = AssignedValuesArray.reduce(function (a, b) { return parseFloat(a) + parseFloat(b); });
         document.getElementById("total").value = holdTotalAssignedQuantity + Math.abs(totalQuantity);
-        checkTotalQuantityVsHoldRemainingQuantity(holdReminingQuantity3, totalQuantity);
+        checkTotalQuantityVsHoldRemainingQuantity(holdReminingQuantity3, totalQuantity, holdTotalAssignedQuantity );
     }
 
     function compareInsertedQuantityVSOrderQuantity(insertedQuantity, orderQuantity) {

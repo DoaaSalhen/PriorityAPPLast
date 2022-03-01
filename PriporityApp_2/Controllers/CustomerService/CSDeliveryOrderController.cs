@@ -234,7 +234,7 @@ namespace PriorityApp.Controllers.CustomerService
                 }
 
                 Model.OrderModel = new OrderModel();
-                Model.OrderModel.orders = orderModels;
+                Model.OrderModel.orders = orderModels.OrderBy(o=>o.OrderNumber).ToList();
                 Model.Customers = customerModels;
                 Model.Priorities = _priorityService.GetAllPriorities().Result.ToList();
                 TerritoryModel territoryModel = _territoryService.GetTerritory(Model.TerritorySelectedId);
@@ -316,11 +316,11 @@ namespace PriorityApp.Controllers.CustomerService
                         }
                         else if (orderModel.PriorityId == (int)CommanData.Priorities.No && updateModel.PriorityId == (int)CommanData.Priorities.Norm)
                         {
-                            DBholdModel.ReminingQuantity = (float)DBholdModel.ReminingQuantity + (float)updateModel.PriorityQuantity - changeRate;
+                            DBholdModel.ReminingQuantity = (float)DBholdModel.ReminingQuantity + (float)updateModel.PriorityQuantity ;
                         }
                         else if (orderModel.PriorityId == (int)CommanData.Priorities.No && updateModel.PriorityId == (int)CommanData.Priorities.Extra)
                         {
-                            DBholdModel.ExtraQuantity = (float)DBholdModel.ExtraQuantity + (float)updateModel.PriorityQuantity + changeRate;
+                            DBholdModel.ExtraQuantity = (float)DBholdModel.ExtraQuantity - (float)updateModel.PriorityQuantity ;
                         }
                         else if (orderModel.PriorityId == (int)CommanData.Priorities.Norm && updateModel.PriorityId == (int)CommanData.Priorities.No)
                         {
@@ -356,13 +356,14 @@ namespace PriorityApp.Controllers.CustomerService
                     }
                     else if(orderModel.SavedBefore == true && orderModel.PriorityId == (int)CommanData.Priorities.No)
                     {
+                        DBholdModel.TempReminingQuantity = DBholdModel.ReminingQuantity;
                         updateModel.PriorityId = orderModel.PriorityId;
                         updateModel.SavedBefore = true;
                         updateModel.Truck = "";
                         updateModel.WHSavedID = applicationUser.Id;
                         updateModel.PriorityQuantity = 0;
                         updateModel.ItemId = orderModel.ItemId;
-                        updateModel.OrderCategoryId = (int)CommanData.OrderCategory.Delivery;
+                        updateModel.OrderCategoryId = Model.orderType;
                         updateModel.Comment = "";
 
                     }
