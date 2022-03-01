@@ -32,6 +32,10 @@
         margin-right: 40px;
         margin-top: 0px;
     }
+    input[type=number]
+    {
+        width:50px;
+    }
 </style>
 @*<script src="~/DataTable/jquery-3.5.1.js"></script>*@
 @*<script src="~/DataTable/jquery.dataTables.min.js"></script>
@@ -625,13 +629,13 @@
             {
         <div>
             <span>Territory Qouta</span>
-            <input id="Quota" type="number" disabled value="@Model.HoldModel.QuotaQuantity" style="margin:10px 20px 20px 0" />
+            <input id="Quota" type="number" disabled value="@Model.HoldModel.QuotaQuantity" style="margin:10px 20px 20px 0; width:90px" />
             <span>Remaining Quantity</span>
-            <input id="remaining" type="number" disabled value="@Model.HoldModel.ReminingQuantity" style="margin:10px 20px 20px 0" />
+            <input id="remaining" type="number" disabled value="@Model.HoldModel.ReminingQuantity" style="margin:10px 20px 20px 0; width:90px" />
             <span> Total Assigned</span>
-            <input id="total" type="number" value="@Model.holdTotalAssignedQuantity" disabled style="margin:10px 20px 20px 0" />
+            <input id="total" type="number" value="@Model.holdTotalAssignedQuantity" disabled style="margin:10px 20px 20px 0; width:90px" />
             <span> Total extra</span>
-            <input id="extra" type="number" value="@Model.HoldModel.ExtraQuantity" disabled style="margin:10px 20px 20px 0" />
+            <input id="extra" type="number" value="@Model.HoldModel.ExtraQuantity" disabled style="margin:10px 20px 20px 0; width:90px" />
 
         </div>
             }

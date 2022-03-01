@@ -343,6 +343,9 @@ else
         @Html.DisplayFor(model => model.warehouseOrderHoldModels[index].Order.Customer.CustomerName)
         <input class="form-check-input" asp-for="warehouseOrderHoldModels[index].Order.CustomerId" type="hidden" />
         <input class="form-check-input" asp-for="warehouseOrderHoldModels[index].Order.Id" type="hidden" />
+
+        <input type="hidden" asp-for="SelectedPriorityDate" />
+        <input type="hidden" asp-for="TerritorySelectedId" />
     </td>
 
 

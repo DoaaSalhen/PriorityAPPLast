@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Repository.EntityFramework;
 
 namespace Repository.EntityFramework.Migrations
 {
     [DbContext(typeof(APPDBContext))]
-    partial class APPDBContextModelSnapshot : ModelSnapshot
+    [Migration("20220228113515_order-number-nullable-migration")]
+    partial class ordernumbernullablemigration
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -497,7 +499,7 @@ namespace Repository.EntityFramework.Migrations
                     b.Property<string>("OrderDocument")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<long>("OrderNumber")
+                    b.Property<long?>("OrderNumber")
                         .HasColumnType("bigint");
 
                     b.Property<float?>("OrderQuantity")

@@ -176,7 +176,7 @@
                 ExtraValuesArray[index] = 0;
             }
             extraQuantity = ExtraValuesArray.reduce(function (a, b) { return parseFloat(a) + parseFloat(b); });
-            document.getElementById("extra").value = parseFloat(tempholdExtraQuantity3) + extraQuantity;
+            document.getElementById("extra").value = parseFloat(tempholdExtraQuantity3) + parseFloat(extraQuantity);
             totalQuantity = AssignedValuesArray.reduce(function (a, b) { return parseFloat(a) + parseFloat(b); });
             var totalCheckResult = checkTotalQuantityVsHoldRemainingQuantity(tempholdReminingQuantity3, totalQuantity, tempholdAssignedQuantity3);
             if (totalCheckResult == false) {
@@ -394,6 +394,9 @@
 
                                 @Html.DisplayFor(model => model.OrderModel.orders[index].TerritoryId)
                                 <input class="form-check-input" asp-for="OrderModel.orders[index].TerritoryId" type="hidden" />
+
+                                <input type="hidden" asp-for="SelectedPriorityDate" />
+                                <input type="hidden" asp-for="TerritorySelectedId" />
                             </td>
 
                             <td>
@@ -523,13 +526,13 @@
             @if (Model.HoldModel != null)
             {
                 <span>Territory Qouta</span>
-                <input id="Quota" type="number" disabled value="@Model.HoldModel.QuotaQuantity" style="margin:10px 20px 20px 0" />
+                <input id="Quota" type="number" disabled value="@Model.HoldModel.QuotaQuantity"  style="margin:10px 20px 20px 0; width:90px" />
                 <span>Remaining Quantity</span>
-                <input id="remaining" type="number" disabled value="@Model.HoldModel.ReminingQuantity" style="margin:10px 20px 20px 0" />
+                <input id="remaining" type="number" disabled value="@Model.HoldModel.ReminingQuantity"  style="margin:10px 20px 20px 0; width:90px" />
                 <span> Total Assigned</span>
-                <input id="total" type="number" value="@Model.holdTotalAssignedQuantity" disabled style="margin:10px 20px 20px 0" />
+                <input id="total" type="number" value="@Model.holdTotalAssignedQuantity" disabled  style="margin:10px 20px 20px 0; width:90px" />
                 <span> Total extra</span>
-                <input id="extra" type="number" value="@Model.HoldModel.ExtraQuantity" disabled style="margin:10px 20px 20px 0" />
+                <input id="extra" type="number" value="@Model.HoldModel.ExtraQuantity" disabled  style="margin:10px 20px 20px 0; width:90px" />
 
             }
 

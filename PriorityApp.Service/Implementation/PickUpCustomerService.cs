@@ -66,7 +66,8 @@ namespace PriorityApp.Service.Implementation
                     dt.Columns[index].ColumnName = itemModel.Id.ToString();
                 }
                 float tempRemaining = 0;
-                foreach (DataRow row in dt.Rows)
+
+                    foreach (DataRow row in dt.Rows)
                 {
                     string customerNumber = row["CustomerNumber"].ToString();
                     if (customerNumber != "")
@@ -76,7 +77,7 @@ namespace PriorityApp.Service.Implementation
                         var xxxx = (DateTime)row["PriorityDate"];
                         var xx = (double)row["Priority"];
                         var xxxxxx = (double)row["Priority"] == (double)CommanData.Priorities.Norm;
-                        if (((double)row["Priority"] == (double)CommanData.Priorities.Norm || (double)row["Priority"] == (double)CommanData.Priorities.Extra) && (DateTime.Compare((DateTime)row["PriorityDate"], DateTime.Today) >= 0))
+                        if (((double)row["Priority"] == (double)CommanData.Priorities.Norm || (double)row["Priority"] == (double)CommanData.Priorities.Extra || row["Priority"].ToString() =="") && (DateTime.Compare((DateTime)row["PriorityDate"], DateTime.Today) >= 0) || (row["PriorityDate"].ToString()==""))
                         {
                             CustomerModel customer = _deliveryCustomerService.GetDeliveryCustomer(Convert.ToInt64(customerNumber));
                             var hold = _holdService.GetHold((DateTime)row["PriorityDate"], customer.zone.Territory.userId);
@@ -86,7 +87,7 @@ namespace PriorityApp.Service.Implementation
                                 {
                                     var x = row[index].ToString();
 
-                                    if (row[index].ToString() != "")
+                                    if (row[index].ToString() != "" && row["Priority"].ToString() !="" && row["PriorityDate"].ToString() != "")
                                     {
                                         if ((double)row["Priority"] == (double)CommanData.Priorities.Norm)
                                         {

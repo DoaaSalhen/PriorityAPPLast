@@ -409,6 +409,9 @@
                                 <input class="form-check-input" asp-for="OrderModel.orders[index].CustomerId" type="hidden" />
                                 <input class="form-check-input" asp-for="OrderModel.orders[index].Id" type="hidden" />
 
+
+                                <input type="hidden" asp-for="SelectedPriorityDate" />
+                                <input type="hidden" asp-for="TerritorySelectedId" />
                             </td>
                             @*<td>
                                     @Html.DisplayFor(model => model.OrderModel.orders[index].Customer.CustomerType)
@@ -542,11 +545,11 @@
             @if (Model.HoldModel != null)
             {
                 <span> Total</span>
-                <input id="total" type="number" value="0" disabled style="margin:10px 20px 20px 0" />
+                <input id="total" type="number" value="0" disabled  style="margin:10px 20px 20px 0; width:90px" />
                 <span>Remaining Quantity</span>
-                <input id="remaining" type="number" disabled value="@Model.HoldModel.ReminingQuantity" style="margin:10px 20px 20px 0" />
+                <input id="remaining" type="number" disabled value="@Model.HoldModel.ReminingQuantity"  style="margin:10px 20px 20px 0; width:90px"/>
                 <span>Original Quota</span>
-                <input id="originalQuota" type="number" disabled value="@Model.HoldModel.QuotaQuantity" style="margin:10px 20px 20px 0" />
+                <input id="originalQuota" type="number" disabled value="@Model.HoldModel.QuotaQuantity"  style="margin:10px 20px 20px 0; width:90px" />
             }
 
         </tbody>

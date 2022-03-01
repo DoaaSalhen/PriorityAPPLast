@@ -19,10 +19,10 @@ namespace PriorityApp.Models.Models
     {
         [Key]
         public long Id { get; set; }
-        public long OrderNumber { get; set; }
+        public long  OrderNumber { get; set; }
         public DateTime  PriorityDate { get; set; }
         public Customer   Customer   { get; set; }
-        public long CustomerId { get; set; }
+        public long  CustomerId { get; set; }
         public int? CustomerType { get; set; }
 
         public string    OrderDocument { get; set; }
@@ -39,9 +39,9 @@ namespace PriorityApp.Models.Models
         public string    PODZoneAddress { get; set; }
         //
         public float?       OrderQuantity { get; set; }
-        public int       PriorityId { get; set; }
+        public int ?      PriorityId { get; set; }
 
-        public Priority  Priority { get; set; }
+        public Priority   Priority { get; set; }
 
         public float?       PriorityQuantity { get; set; }
 

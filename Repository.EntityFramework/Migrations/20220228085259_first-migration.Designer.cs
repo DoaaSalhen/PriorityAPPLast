@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Repository.EntityFramework;
 
 namespace Repository.EntityFramework.Migrations
 {
     [DbContext(typeof(APPDBContext))]
-    partial class APPDBContextModelSnapshot : ModelSnapshot
+    [Migration("20220228085259_first-migration")]
+    partial class firstmigration
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -524,7 +526,7 @@ namespace Repository.EntityFramework.Migrations
                     b.Property<DateTime>("PriorityDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<int?>("PriorityId")
+                    b.Property<int>("PriorityId")
                         .HasColumnType("int");
 
                     b.Property<float?>("PriorityQuantity")
@@ -750,7 +752,9 @@ namespace Repository.EntityFramework.Migrations
 
                     b.HasOne("PriorityApp.Models.Models.MasterModels.Priority", "Priority")
                         .WithMany()
-                        .HasForeignKey("PriorityId");
+                        .HasForeignKey("PriorityId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Customer");
 

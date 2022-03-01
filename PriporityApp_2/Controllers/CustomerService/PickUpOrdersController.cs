@@ -178,7 +178,7 @@ namespace PriorityApp.Controllers.CustomerService
                 List<PickUpOrder> pickUpOrders = new List<PickUpOrder>();
                 DateTime selectedPriorityDate = Model.SelectedPriorityDate.Date;
 
-                if (Model.ZoneSelectedId != -1)
+                if (Model.ZoneSelectedId > 0)
                 {
 
                     customerModels = _deliveryCustomerService.GetCutomersByZoneId(Model.ZoneSelectedId).Result;

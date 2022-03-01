@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Repository.EntityFramework;
 
 namespace Repository.EntityFramework.Migrations
 {
     [DbContext(typeof(APPDBContext))]
-    partial class APPDBContextModelSnapshot : ModelSnapshot
+    [Migration("20220228114909_CustomerId-nullable-migration")]
+    partial class CustomerIdnullablemigration
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -473,7 +475,7 @@ namespace Repository.EntityFramework.Migrations
                     b.Property<string>("Comment")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<long>("CustomerId")
+                    b.Property<long?>("CustomerId")
                         .HasColumnType("bigint");
 
                     b.Property<int?>("CustomerType")
@@ -497,7 +499,7 @@ namespace Repository.EntityFramework.Migrations
                     b.Property<string>("OrderDocument")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<long>("OrderNumber")
+                    b.Property<long?>("OrderNumber")
                         .HasColumnType("bigint");
 
                     b.Property<float?>("OrderQuantity")
@@ -521,7 +523,7 @@ namespace Repository.EntityFramework.Migrations
                     b.Property<string>("PODZoneState")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("PriorityDate")
+                    b.Property<DateTime?>("PriorityDate")
                         .HasColumnType("datetime2");
 
                     b.Property<int?>("PriorityId")
@@ -734,9 +736,7 @@ namespace Repository.EntityFramework.Migrations
                 {
                     b.HasOne("PriorityApp.Models.Models.MasterModels.Customer", "Customer")
                         .WithMany()
-                        .HasForeignKey("CustomerId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("CustomerId");
 
                     b.HasOne("PriorityApp.Models.Models.MasterModels.Item", "Item")
                         .WithMany()

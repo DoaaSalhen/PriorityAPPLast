@@ -420,6 +420,9 @@
                     priorityQuantityId = "PQ" + index;
                     <tr>
                         <td>
+                            <input type="hidden" asp-for="@Model.TerritorySelectedId" />
+                            <input type="hidden" asp-for="SelectedPriorityDate" />
+
                             <select id="WarehouseModel2[@index].WarehouseSelectedId" name="WarehouseModel2[@index].WarehouseSelectedId" asp-for="WarehouseModel2[index].WarehouseSelectedId"
                                     asp-items="@(new SelectList(Model.WarehouseModel2[index].WarehouseModels, "Id", "Name"))"></select>
 
@@ -455,13 +458,13 @@
             {
                 <div>
                     <span>Territory Qouta</span>
-                    <input id="Quota" type="number" disabled value="@Model.HoldModel.QuotaQuantity" style="margin:10px 20px 20px 0" />
+                    <input id="Quota" type="number" disabled value="@Model.HoldModel.QuotaQuantity"  style="margin:10px 20px 20px 0; width:90px" />
                     <span>Remaining Quantity</span>
-                    <input id="remaining" type="number" disabled value="@Model.HoldModel.ReminingQuantity" style="margin:10px 20px 20px 0" />
+                    <input id="remaining" type="number" disabled value="@Model.HoldModel.ReminingQuantity"  style="margin:10px 20px 20px 0; width:90px" />
                     <span> Total Assigned</span>
-                    <input id="total" type="number" value="@Model.holdTotalAssignedQuantity" disabled style="margin:10px 20px 20px 0" />
+                    <input id="total" type="number" value="@Model.holdTotalAssignedQuantity" disabled  style="margin:10px 20px 20px 0; width:90px"/>
                     <span> Total extra</span>
-                    <input id="extra" type="number" value="@Model.HoldModel.ExtraQuantity" disabled style="margin:10px 20px 20px 0" />
+                    <input id="extra" type="number" value="@Model.HoldModel.ExtraQuantity" disabled  style="margin:10px 20px 20px 0; width:90px" />
 
                     <span id="NOOrdersSpain" hidden>No search result</span>
                     <span id="NoQouta" hidden>there is no Qouta for selected priority date</span>
