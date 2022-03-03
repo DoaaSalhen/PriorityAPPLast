@@ -218,7 +218,7 @@
             //resetIfFalse(priorityQuantityId, radioButtonListId);
 
         }
-
+        document.getElementById("sum").value = parseFloat(document.getElementById("extra").value) + parseFloat(document.getElementById("total").value);
     }
 
     function resetIfFalse(index, priorityQuantityId, radioButtonListId, holdReminingQuantity3)
@@ -452,13 +452,13 @@
                     string customerId = "customerId" + index;
                     <tr>
                         @*<td>
-                                <select id="WarehouseModel2[@index].WarehouseSelectedId" name="WarehouseModel2[@index].WarehouseSelectedId" asp-for="WarehouseModel2[index].WarehouseSelectedId"
-                                        asp-items="@(new SelectList(Model.WarehouseModel2[index].WarehouseModels, "Id", "Name"))"></select>
+                        <select id="WarehouseModel2[@index].WarehouseSelectedId" name="WarehouseModel2[@index].WarehouseSelectedId" asp-for="WarehouseModel2[index].WarehouseSelectedId"
+                                asp-items="@(new SelectList(Model.WarehouseModel2[index].WarehouseModels, "Id", "Name"))"></select>
 
-                            </td>
-                            <td>
-                                <select class="@dropDownPriorityId form-control" id="WarehouseModel2[@index].PrioritySelectedId" name="WarehouseModel2[@index].PrioritySelectedId" asp-for="WarehouseModel2[index].PrioritySelectedId"
-                                        asp-items="@(new SelectList(Model.WarehouseModel2[index].priorityModels, "Id", "Name"))" onchange="calculateTotal(@index, @Model.HoldModel.ReminingQuantity)"></select>*@
+                    </td>
+                    <td>
+                        <select class="@dropDownPriorityId form-control" id="WarehouseModel2[@index].PrioritySelectedId" name="WarehouseModel2[@index].PrioritySelectedId" asp-for="WarehouseModel2[index].PrioritySelectedId"
+                                asp-items="@(new SelectList(Model.WarehouseModel2[index].priorityModels, "Id", "Name"))" onchange="calculateTotal(@index, @Model.HoldModel.ReminingQuantity)"></select>*@
 
 
                         @*</td>*@
@@ -507,6 +507,7 @@
             <input type="hidden" asp-for="TerritorySelectedId" />
             @if (Model.HoldModel != null)
             {
+                float summation = Model.HoldModel.ExtraQuantity + Model.holdTotalAssignedQuantity;
                 <div>
                     <span>Territory Qouta</span>
                     <input id="Quota" type="number" disabled value="@Model.HoldModel.QuotaQuantity" style="margin:10px 20px 20px 0; width:90px" />
@@ -516,11 +517,13 @@
                     <input id="total" type="number" value="@Model.holdTotalAssignedQuantity" disabled style="margin:10px 20px 20px 0; width:90px" />
                     <span> Total extra</span>
                     <input id="extra" type="number" value="@Model.HoldModel.ExtraQuantity" disabled style="margin:10px 20px 20px 0; width:90px" />
+                    <span>Summation</span>
+                    <input id="sum" type="number" value="@summation" disabled style="margin:10px 20px 20px 0; width:90px" />
 
-                    <span id="NOOrdersSpain" hidden>No search result</span>
-                    <span id="NoQouta" hidden>there is no Qouta for selected priority date</span>
+            <span id="NOOrdersSpain" hidden>No search result</span>
+            <span id="NoQouta" hidden>there is no Qouta for selected priority date</span>
 
-                </div>
+            </div>
 
             }
         </tbody>

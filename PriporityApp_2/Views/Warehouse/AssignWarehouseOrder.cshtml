@@ -172,6 +172,7 @@
             //resetIfFalse(priorityQuantityId, radioButtonListId);
 
         }
+        document.getElementById("sum").value = parseFloat(document.getElementById("extra").value) + parseFloat(document.getElementById("total").value);
 
     }
 
@@ -447,6 +448,7 @@
             <input type="hidden" asp-for="TerritorySelectedId" />
             @if (Model.HoldModel != null)
             {
+                float summation = Model.HoldModel.ExtraQuantity + Model.holdTotalAssignedQuantity;
                 <div>
                     <span>Territory Qouta</span>
                     <input id="Quota" type="number" disabled value="@Model.HoldModel.QuotaQuantity" style="margin:10px 20px 20px 0; width:90px" />
@@ -456,11 +458,14 @@
                     <input id="total" type="number" value="@Model.holdTotalAssignedQuantity" disabled style="margin:10px 20px 20px 0; width:90px" />
                     <span> Total extra</span>
                     <input id="extra" type="number" value="@Model.HoldModel.ExtraQuantity" disabled style="margin:10px 20px 20px 0; width:90px" />
+                    <span>Summation</span>
+                    <input id="sum" type="number" value="@summation" disabled style="margin:10px 20px 20px 0; width:90px" />
 
                     <span id="NOOrdersSpain" hidden>No search result</span>
                     <span id="NoQouta" hidden>there is no Qouta for selected priority date</span>
 
                 </div>
+
             }
         </tbody>
     </table>

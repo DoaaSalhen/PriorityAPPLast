@@ -161,6 +161,7 @@
         //    alert("please you must insert quantity less than or equal order quantity");
         //    resetIfFalse(index, priorityQuantityId, radioButtonListId, holdReminingQuantity2, tempholdAssignedQuantity3);
         //}
+        document.getElementById("sum").value = parseFloat(document.getElementById("extra").value) + parseFloat(document.getElementById("total").value);
 
     }
 
@@ -399,7 +400,7 @@
                                 <td>
                                     <input class="form-check-input" asp-for="warehouseOrderHoldModels[index].Order.Truck" type="number" style="width:100px" value="@Model.warehouseOrderHoldModels[index].Order.Truck" />
                                 </td>
- }
+                            }
                             else
                             {
                                 <td>
@@ -422,7 +423,7 @@
                                 <td>
                                     <input class="form-check-input" asp-for="warehouseOrderHoldModels[index].Order.Truck" type="number" style="width:100px" value="@Model.warehouseOrderHoldModels[index].Order.Truck" />
                                 </td>
-}
+                            }
 
                             <td>
                                 @Html.DisplayFor(model => model.warehouseOrderHoldModels[index].Order.Status)
@@ -474,19 +475,25 @@
 
             @if (Model.HoldModel != null)
             {
-                <span>Territory Qouta</span>
-                <input id="Quota" type="number" disabled value="@Model.HoldModel.QuotaQuantity" style="margin:10px 20px 20px 0" />
-                <span>Remaining Quantity</span>
-                <input id="remaining" type="number" disabled value="@Model.HoldModel.ReminingQuantity" style="margin:10px 20px 20px 0" />
-                <span> Total Assigned</span>
-                <input id="total" type="number" value="@Model.holdTotalAssignedQuantity" disabled style="margin:10px 20px 20px 0" />
-                <span> Total extra</span>
-                <input id="extra" type="number" value="@Model.HoldModel.ExtraQuantity" disabled style="margin:10px 20px 20px 0" />
+                float summation = Model.HoldModel.ExtraQuantity + Model.holdTotalAssignedQuantity;
+                <div>
+                    <span>Territory Qouta</span>
+                    <input id="Quota" type="number" disabled value="@Model.HoldModel.QuotaQuantity" style="margin:10px 20px 20px 0; width:90px" />
+                    <span>Remaining Quantity</span>
+                    <input id="remaining" type="number" disabled value="@Model.HoldModel.ReminingQuantity" style="margin:10px 20px 20px 0; width:90px" />
+                    <span> Total Assigned</span>
+                    <input id="total" type="number" value="@Model.holdTotalAssignedQuantity" disabled style="margin:10px 20px 20px 0; width:90px" />
+                    <span> Total extra</span>
+                    <input id="extra" type="number" value="@Model.HoldModel.ExtraQuantity" disabled style="margin:10px 20px 20px 0; width:90px" />
+                    <span>Summation</span>
+                    <input id="sum" type="number" value="@summation" disabled style="margin:10px 20px 20px 0; width:90px" />
 
-                <span id="NOOrdersSpain" hidden>No search result</span>
-                <span id="NoQouta" hidden>there is no Qouta for selected priority date</span>
+                    <span id="NOOrdersSpain" hidden>No search result</span>
+                    <span id="NoQouta" hidden>there is no Qouta for selected priority date</span>
+
+                </div>
+
             }
-
 
         </tbody>
     </table>
