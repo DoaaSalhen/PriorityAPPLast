@@ -42,7 +42,7 @@ namespace MVCCore.ImportExcel.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Index(IFormFile postedFile)
+        public async Task<IActionResult> Index(IFormFile postedFile, float QuantityToDelete)
         {
 
             if (_pendService.ClearPend().Result)
@@ -70,7 +70,7 @@ namespace MVCCore.ImportExcel.Controllers
                     }
 
                     DataTable dt = _pendService.ReadExcelData(filePath, ExcelConnectionString);
-                    dt = _pendService.Preprocess(dt);
+                    dt = _pendService.Preprocess(dt,QuantityToDelete);
 
                     if (dt.Rows.Count != 0)
                     {

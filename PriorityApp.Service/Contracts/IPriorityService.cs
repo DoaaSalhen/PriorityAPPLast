@@ -9,6 +9,8 @@ namespace PriorityApp.Service.Contracts
     public interface IPriorityService
     {
         Task<List<PriorityModel>> GetAllPriorities();
+        Task<List<PriorityModel>> GetAllPrioritiesExceptExtra();
+
         Task<bool> CreatePriority(PriorityModel model);
         Task<bool> UpdatePriority(PriorityModel model);
         bool DeletePriority(int id);

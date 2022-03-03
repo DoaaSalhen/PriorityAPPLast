@@ -94,15 +94,25 @@ namespace PriorityApp.Controllers.CustomerService
                 WarehouseOrderModel warehouseOrderModel = new WarehouseOrderModel();
                 List<ItemModel> itemModels = new List<ItemModel>();
                 List<WarehouseModel2> warehouseModel2s = new List<WarehouseModel2>();
-                var subRegionModels = _regionService.GetAllISubRegions().Result;
-                subRegionModels.Insert(0, new SubRegionModel { Id = -1, Name = "select SubRegion" });
-                warehouseOrderModel.SubRegions = subRegionModels;
+                AspNetUser applicationUser = _userManager.GetUserAsync(User).Result;
+                List<string> roles = (List<string>)_userManager.GetRolesAsync(applicationUser).Result;
                 itemModels = _itemService.GetItemsByType("Bags").Result;
-                warehouseOrderModel.SubRegionSelectedId = -1;
                 warehouseOrderModel.SelectedPriorityDate = DateTime.Today;
                 warehouseOrderModel.WarehouseModel2 = warehouseModel2s;
                 warehouseOrderModel.Items = itemModels;
-                warehouseOrderModel.HoldModel = null;
+                if (!roles.Contains("Sales"))
+                {
+                    var subRegionModels = _regionService.GetAllISubRegions().Result;
+                    subRegionModels.Insert(0, new SubRegionModel { Id = -1, Name = "select SubRegion" });
+                    warehouseOrderModel.SubRegions = subRegionModels;
+                    warehouseOrderModel.SubRegionSelectedId = -1;
+                    warehouseOrderModel.HoldModel = null;
+                }
+                else
+                {
+                    warehouseOrderModel.HoldModel = _holdService.GetLastHoldByUserIdAndPriorityDate(applicationUser.Id, warehouseOrderModel.SelectedPriorityDate);
+                }
+                
                 return View(warehouseOrderModel);
             }
             catch (Exception e)
@@ -118,7 +128,19 @@ namespace PriorityApp.Controllers.CustomerService
         {
             try
             {
-                TerritoryModel territoryModel = _territoryService.GetTerritory(model.TerritorySelectedId);
+                AspNetUser applicationUser = _userManager.GetUserAsync(User).Result;
+                List<string> roles = (List<string>)_userManager.GetRolesAsync(applicationUser).Result;
+                TerritoryModel territoryModel = null;
+                if (roles.Contains("Sales"))
+                {
+                    territoryModel = _territoryService.GetTerritoryByUserId(applicationUser.Id);
+
+                }
+                else
+                {
+                    territoryModel = _territoryService.GetTerritory(model.TerritorySelectedId);
+
+                }
                 HoldModel holdModel = _holdService.GetHold(model.SelectedPriorityDate, territoryModel.userId);
                 if (holdModel != null)
                 {
@@ -130,21 +152,32 @@ namespace PriorityApp.Controllers.CustomerService
                     {
                         WarehouseModel2 warehouseModel2 = new WarehouseModel2();
                         warehouseModel2.itemModels = _itemService.GetItemsByType("Bags").Result.ToList();
-                        warehouseModel2.priorityModels = _priorityService.GetAllPriorities().Result.ToList();
+                        if (!roles.Contains("Sales"))
+                        {
+                            warehouseModel2.priorityModels = _priorityService.GetAllPriorities().Result.ToList();
+
+                        }
+                        else
+                        {
+                            warehouseModel2.priorityModels = _priorityService.GetAllPrioritiesExceptExtra().Result.ToList();
+
+                        }
                         warehouseModel2.WarehouseModels = _warehouseService.GetAllWarehouse().Result.ToList();
 
                         warehouseModel2s.Add(warehouseModel2);
                     }
                     model.WarehouseModel2 = warehouseModel2s;
                     model.Items = _itemService.GetItemsByType("Bags").Result.ToList();
-                    model.SubRegions = _regionService.GetAllISubRegions().Result;
+                    if (!roles.Contains("Sales"))
+                    {
+                        model.SubRegions = _regionService.GetAllISubRegions().Result;
+                        model.SubRegions.Insert(0, new Service.Models.MasterModels.SubRegionModel { Id = -2, Name = "Select SubRegion" });
+                        model.States = _stateService.GetStatesBySubRegionId(model.SubRegionSelectedId).Result;
+                        model.States.Insert(0, new StateModel { Id = -1, Name = "Select State" });
+                        model.Territories = _territoryService.GetAllTerritoriesByStateId(model.StateSelectedId).Result;
+                        model.Territories.Insert(0, new TerritoryModel { Id = -1, Name = "Select Territory" });
 
-                    model.SubRegions.Insert(0, new Service.Models.MasterModels.SubRegionModel { Id = -2, Name = "Select SubRegion" });
-                    model.States = _stateService.GetStatesBySubRegionId(model.SubRegionSelectedId).Result;
-                    model.States.Insert(0, new StateModel { Id = -1, Name = "Select State" });
-
-                    model.Territories = _territoryService.GetAllTerritoriesByStateId(model.StateSelectedId).Result;
-                    model.Territories.Insert(0, new TerritoryModel { Id = -1, Name = "Select Territory" });
+                    }
                 }
                 else
                 {
@@ -264,6 +297,8 @@ namespace PriorityApp.Controllers.CustomerService
             {
                 WarehouseOrderModel warehouseOrderModel = new WarehouseOrderModel();
                 List<ItemModel> itemModels = new List<ItemModel>();
+                AspNetUser applicationUser = _userManager.GetUserAsync(User).Result;
+                List<string> roles = (List<string>)_userManager.GetRolesAsync(applicationUser).Result;
 
                 var subRegionModels = _regionService.GetAllISubRegions().Result;
                 subRegionModels.Insert(0, new SubRegionModel { Id = -1, Name = "select SubRegion" });
@@ -273,7 +308,16 @@ namespace PriorityApp.Controllers.CustomerService
                 warehouseOrderModel.SubRegions = subRegionModels;
                 warehouseOrderModel.SubRegionSelectedId = -1;
                 warehouseOrderModel.SelectedPriorityDate = DateTime.Today;
-                warehouseOrderModel.Priorities = _priorityService.GetAllPriorities().Result.ToList();
+                if (!roles.Contains("Sales"))
+                {
+                    warehouseOrderModel.Priorities = _priorityService.GetAllPriorities().Result.ToList();
+
+                }
+                else
+                {
+                    warehouseOrderModel.Priorities = _priorityService.GetAllPrioritiesExceptExtra().Result.ToList();
+
+                }
                 return View(warehouseOrderModel);
             }
             catch (Exception e)

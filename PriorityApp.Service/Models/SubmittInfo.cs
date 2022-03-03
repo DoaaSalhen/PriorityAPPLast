@@ -10,6 +10,7 @@ namespace PriorityApp.Service.Models
 
         public List<OrderModel2> ordersTosubmit { get; set; }
         public List<SubmittedOrdersTerritories> submittedOrdersTerritories { get; set; }
+        public TerritoryModel SubmittedOrdersTerritory  { get; set; }
         public List<HoldModel> holdModels { get; set; }
         public int OrdersCount { get; set; }
 

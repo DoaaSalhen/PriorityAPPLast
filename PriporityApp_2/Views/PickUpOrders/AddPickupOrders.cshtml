@@ -3,8 +3,12 @@
 *@
 @{ }
 @model PriorityApp.Service.Models.UploadPickUpModel
+@inject UserManager<AspNetUser> userManager
+@inject SignInManager<AspNetUser> SignInManager
 @{ ViewData["Title"] = "Home Page";
-    Layout = "~/Views/Shared/NiceAdmin/_CSLayout.cshtml"; }
+    Layout = "~/Views/Shared/NiceAdmin/_CSLayout.cshtml";
+    var user = await userManager.GetUserAsync(User);
+    var roles = await userManager.GetRolesAsync(user);}
 <style>
     .searchbtn {
         margin: 20px 20px 20px 40px;
@@ -67,67 +71,69 @@
 @if (ViewBag.Message != null)
 {
 <div style="background-color: #00e600; height: 60px; box-shadow: 5px; margin: 0px 20px 20px 50px; text-align:center; font-size:x-large">@ViewBag.Message</div> }
-            else if (ViewBag.Error != null)
-            {
+else if (ViewBag.Error != null)
+{
 <div style="background-color: #ff3333; height: 60px; box-shadow: 5px; margin: 0px 20px 20px 50px; text-align: center; font-size: x-large">@ViewBag.Error</div>}
 <h2>Upload PIckUpOrders</h2>
 
 <form asp-action="DownloadAddPickUpTemplate">
 
-
-    @if (Model.SubRegions == null)
+    @if (!roles.Contains("Sales"))
     {
-<div class="col-xs-12 col-sm-6 col-md-6 col-lg-2 selectFilter" style="display:inline-block">
-    <label class="control-label">Region</label>
-    <select id="SubRegionSelectedId" name="SubRegionSelectedId" asp-for="SubRegionSelectedId"
-            class="form-select form-select-lg mb-3"
-            asp-items="@(new SelectList(string.Empty, "Id", "Name"))"></select>
-</div> }
-            else
-            {
-<div class="col-xs-12 col-sm-6 col-md-6 col-lg-2 selectFilter" style="display:inline-block">
-    <label class="control-label">Region</label>
-    <select id="SubRegionSelectedId" name="SubRegionSelectedId" asp-for="SubRegionSelectedId"
-            class="form-select form-select-lg mb-3"
-            asp-items="@(new SelectList(Model.SubRegions, "Id", "Name"))"></select>
-</div>}
-    @if (Model.States == null)
-    {
-<div class="col-xs-12 col-sm-6 col-md-6 col-lg-2 selectFilter" style="display:inline-block">
-    <label class="control-label">State</label>
-    <select id="StateSelectedId" name="StateSelectedId" asp-for="StateSelectedId"
-            class="form-select form-select-lg mb-3"
-            asp-items="@(new SelectList(string.Empty, "Id", "Name"))"></select>
-</div> }
-            else
-            {
-<div class="col-xs-12 col-sm-6 col-md-6 col-lg-2 selectFilter" style="display:inline-block">
-    <label class="control-label">State</label>
-    <select id="StateSelectedId" name="StateSelectedId" asp-for="StateSelectedId"
-            class="form-select form-select-lg mb-3"
-            asp-items="@(new SelectList(Model.States, "Id", "Name"))"></select>
-</div>      }
+        @if (Model.SubRegions == null)
+        {
+        <div class="col-xs-12 col-sm-6 col-md-6 col-lg-2 selectFilter" style="display:inline-block">
+            <label class="control-label">Region</label>
+            <select id="SubRegionSelectedId" name="SubRegionSelectedId" asp-for="SubRegionSelectedId"
+                    class="form-select form-select-lg mb-3"
+                    asp-items="@(new SelectList(string.Empty, "Id", "Name"))"></select>
+        </div> }
+        else
+        {
+        <div class="col-xs-12 col-sm-6 col-md-6 col-lg-2 selectFilter" style="display:inline-block">
+            <label class="control-label">Region</label>
+            <select id="SubRegionSelectedId" name="SubRegionSelectedId" asp-for="SubRegionSelectedId"
+                    class="form-select form-select-lg mb-3"
+                    asp-items="@(new SelectList(Model.SubRegions, "Id", "Name"))"></select>
+        </div>}
+                        @if (Model.States == null)
+                        {
+        <div class="col-xs-12 col-sm-6 col-md-6 col-lg-2 selectFilter" style="display:inline-block">
+            <label class="control-label">State</label>
+            <select id="StateSelectedId" name="StateSelectedId" asp-for="StateSelectedId"
+                    class="form-select form-select-lg mb-3"
+                    asp-items="@(new SelectList(string.Empty, "Id", "Name"))"></select>
+        </div> }
+        else
+        {
+        <div class="col-xs-12 col-sm-6 col-md-6 col-lg-2 selectFilter" style="display:inline-block">
+            <label class="control-label">State</label>
+            <select id="StateSelectedId" name="StateSelectedId" asp-for="StateSelectedId"
+                    class="form-select form-select-lg mb-3"
+                    asp-items="@(new SelectList(Model.States, "Id", "Name"))"></select>
+        </div>          }
 
-    @if (Model.Territories == null)
-    {
-<div class="col-xs-12 col-sm-6 col-md-6 col-lg-2 selectFilter" style="display:inline-block">
-    <label class="control-label">Territory</label>
+                                        @if (Model.Territories == null)
+                                        {
+                        <div class="col-xs-12 col-sm-6 col-md-6 col-lg-2 selectFilter" style="display:inline-block">
+                            <label class="control-label">Territory</label>
 
-    <select id="TerritorySelectedId" name="TerritorySelectedId" asp-for="TerritorySelectedId"
-            class="form-select form-select-lg mb-3"
-            asp-items="@(new SelectList(string.Empty, "Id", "Name"))"></select>
-</div> }
-else
-{
-<div class="col-xs-12 col-sm-6 col-md-6 col-lg-2 selectFilter" style="display:inline-block">
-    <label class="control-label">Territory</label>
+                            <select id="TerritorySelectedId" name="TerritorySelectedId" asp-for="TerritorySelectedId"
+                                    class="form-select form-select-lg mb-3"
+                                    asp-items="@(new SelectList(string.Empty, "Id", "Name"))"></select>
+                        </div> }
+                                        else
+                                        {
+        <div class="col-xs-12 col-sm-6 col-md-6 col-lg-2 selectFilter" style="display:inline-block">
+            <label class="control-label">Territory</label>
 
-    <select id="TerritorySelectedId" name="TerritorySelectedId" asp-for="TerritorySelectedId"
-            class="form-select form-select-lg mb-3"
-            asp-items="@(new SelectList(Model.Territories, "Id", "Name"))"></select>
-</div>}
-    <input type="submit" value="Download Template" class="btn btn-link" style="margin-bottom:40px" />
-</form>
+            <select id="TerritorySelectedId" name="TerritorySelectedId" asp-for="TerritorySelectedId"
+                    class="form-select form-select-lg mb-3"
+                    asp-items="@(new SelectList(Model.Territories, "Id", "Name"))"></select>
+        </div>}
+    }
+                                                <input type="submit" value="Download Template" class="btn btn-link" style="margin-bottom:40px" />
+                                                            </form>
 
 
 <div class="text-center uploadOrdersDiv">
@@ -151,8 +157,11 @@ else
     <p>To assign new PickUp Quantities, Please in Priority Coloumn :- </p>
     <ul>
         <li>Add 3 if priority is Norm</li>
-        <li>Add 4 if priority is Extra</li>
-    </ul>
+        @if (!roles.Contains("Sales"))
+        {
+         <li>Add 4 if priority is Extra</li>
+        }
+                </ul>
 
     <a class="nav-link collapsed" data-bs-target="#table-nav" data-bs-toggle="collapse" href="#">
         <i class=""></i><span>See Example</span><i class="bi bi-chevron-down ms-auto"></i>

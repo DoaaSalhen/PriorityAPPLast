@@ -332,6 +332,25 @@ namespace PriorityApp.Service.Implementation
             return null; 
         }
 
+        public async Task<List<OrderModel2>> GetSubmittedOdersByUserId(string id, bool submitted)
+        {
+
+                List<OrderModel> selectedOrders = new List<OrderModel>();
+                try
+                {
+                    List<Order> orders = _repository.Find(o => o.SavedBefore == true && o.PriorityId != (int)CommanData.Priorities.No && o.Submitted == submitted && o.WHSavedID == id, false, o => o.Customer.zone.Territory).ToList();
+
+                    List<OrderModel2> selectedorderModels2 = new List<OrderModel2>();
+                    selectedorderModels2 = _mapper.Map<List<OrderModel2>>(orders);
+                    return selectedorderModels2;
+                }
+                catch (Exception e)
+                {
+                    e.ToString();
+                }
+                return null;
+            }
+
         public async Task<List<OrderModel2>> GetSubmittedOdersByPriorityDateAndDispatch(DateTime fromPriorityDate, DateTime toPriorityDate, bool dispatchCase)
         {
             try

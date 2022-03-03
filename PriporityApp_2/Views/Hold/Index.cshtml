@@ -2,35 +2,62 @@
 @inject UserManager<AspNetUser> userManager
 @inject SignInManager<AspNetUser> SignInManager
 
-@{
-    ViewData["Title"] = "Index";
+@{ ViewData["Title"] = "Index";
     Layout = "~/Views/Shared/NiceAdmin/_CSLayout.cshtml";
     var user = await userManager.GetUserAsync(User);
-    var roles = await userManager.GetRolesAsync(user);
-}
+    var roles = await userManager.GetRolesAsync(user); }
 <style>
 
     .selectFilter {
         margin-left: 40px;
     }
+
     .searchbtn {
         margin: 20px 20px 20px 40px;
         border-radius: 10px;
         width: 200px;
     }
 </style>
+<script src="~/DataTable/jquery-3.5.1.js"></script>
+<script src="~/DataTable/jquery.dataTables.min.js"></script>
+<link rel="stylesheet" href="~/DataTable/jquery.dataTables.min.css">
+
+<script>
+    $(document).ready(function () {
+        var table = $('#example').DataTable({
+            //"scrollY": "1000px",
+            //"scrollX": "700px",
+
+            "paging": false
+        });
+
+        $('a.toggle-vis').on('click', function (e) {
+            e.preventDefault();
+
+            // Get the column API object
+            var column = table.column($(this).attr('data-column'));
+
+            // Toggle the visibility
+            column.visible(!column.visible());
+        });
+    });
+
+</script>
+
 <h3>Show Qouta</h3>
 
-<form asp-action="Search" method="post" asp-controller="Hold">
+<form method="post" asp-controller="Hold">
 
     <div class="form-row" style="display:inline-block">
         <label class="control-label" style="display:block; margin-bottom:5px;">Priority Date</label>
-        <input type="date" id="SelectedPriorityDate"  asp-for="PriorityDate" />
+        <input type="date" id="SelectedPriorityDate" asp-for="PriorityDate" />
     </div>
     <div class="col-xs-12 col-sm-6 col-md-6 col-lg-4 selectFilter" style="display:inline-block">
 
-        <input type="submit" value="Search" class="btn btn-primary btn-lg searchbtn" style="margin:20px;" />
-        </div>
+        <input type="submit" value="Search" asp-action="Search" class="btn btn-primary btn-lg searchbtn" style="margin:20px;" />
+    </div>
+
+    <input type="submit" value="Download Quota" asp-action="ExportQuotaDaily" class="btn btn-link" style="margin-bottom:40px" />
 </form>
 <table class="table">
     <thead>
@@ -57,40 +84,47 @@
     <tbody>
         @if (Model.holdModels != null)
         {
-            @for (int index = 0; index < Model.holdModels.Count; index++)
-            {
-                <tr>
-                    <td>
-                        @Html.DisplayFor(model => model.holdModels[index].UserName)
-                        <input class="form-check-input" asp-for="holdModels[index].userId" type="hidden" />
-                    </td>
-                    <td>
-                        @Html.DisplayFor(model => model.holdModels[index].PriorityDate)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(model => model.holdModels[index].QuotaQuantity)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(model => model.holdModels[index].ReminingQuantity)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(model => model.holdModels[index].Tolerance)
-                    </td>
-                    @if (!roles.Contains("Sales"))
-                    {
-                        <td>
-                            <a class="far fa-edit btn btn-success" asp-action="Edit" asp-route-userId="@Model.holdModels[index].userId" asp-route-PriorityDate="@Model.holdModels[index].PriorityDate">Edit</a>
-                        </td>
-                    }
-                    else
-                    {
-                        <td>
-                            <a class="far fa-edit btn btn-success disabled" asp-action="" asp-route-territoryId="@Model.holdModels[index].userId" asp-route-PriorityDate="@Model.holdModels[index].PriorityDate">Edit</a>
-                        </td>
-                    }
+@for (int index = 0; index < Model.holdModels.Count; index++)
+{
+<tr>
+    <td>
+        @Html.DisplayFor(model => model.holdModels[index].UserName)
+        <input class="form-check-input" asp-for="holdModels[index].userId" type="hidden" />
+    </td>
+    <td>
+        @Html.DisplayFor(model => model.holdModels[index].PriorityDate)
+    </td>
+    <td>
+        @Html.DisplayFor(model => model.holdModels[index].QuotaQuantity)
+    </td>
+    <td>
+        @Html.DisplayFor(model => model.holdModels[index].ReminingQuantity)
+    </td>
+    <td>
+        @Html.DisplayFor(model => model.holdModels[index].Tolerance)
+    </td>
+    @if (!roles.Contains("Sales"))
+    {
+<td>
+    <a class="far fa-edit btn btn-success" asp-action="Edit" asp-route-userId="@Model.holdModels[index].userId" asp-route-PriorityDate="@Model.holdModels[index].PriorityDate">Edit</a>
+</td>
+ }
+else
+{
+<td>
+    <a class="far fa-edit btn btn-success disabled" asp-action="" asp-route-territoryId="@Model.holdModels[index].userId" asp-route-PriorityDate="@Model.holdModels[index].PriorityDate">Edit</a>
+</td>
+}
 
-                </tr>
-            }
-        }
+</tr>
+}}
     </tbody>
 </table>
+
+<script src="~/filter/ddtf.js"></script>
+<script>
+    $('#example').ddTableFilter();
+</script>
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

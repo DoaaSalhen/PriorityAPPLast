@@ -39,7 +39,7 @@ namespace PriorityApp.Service.Implementation
             _itemService = itemService;
             _holdService = holdService;
         }
-        public DataTable PreprocessInsertedPickOrders(DataTable dt, int itemStartIndex)
+        public DataTable PreprocessInsertedPickOrders(DataTable dt, int itemStartIndex, List<string> roles)
         {
 
             try
@@ -70,14 +70,13 @@ namespace PriorityApp.Service.Implementation
                 foreach (DataRow row in dt.Rows)
                 {
                     if (row["PriorityDate"].ToString() != "" || row["Priority"].ToString() != "")
-                    {
-                        string customerNumber = row["CustomerNumber"].ToString();
+                    {                        string customerNumber = row["CustomerNumber"].ToString();
                         double totalQuantityForCustomer = 0;
                         var xxx = (DateTime.Compare((DateTime)row["PriorityDate"], DateTime.Today));
                         var xxxx = (DateTime)row["PriorityDate"];
                         var xx = (double)row["Priority"];
                         var xxxxxx = (double)row["Priority"] == (double)CommanData.Priorities.Norm;
-                        if (((double)row["Priority"] == (double)CommanData.Priorities.Norm || (double)row["Priority"] == (double)CommanData.Priorities.Extra) && (DateTime.Compare((DateTime)row["PriorityDate"], DateTime.Today) >= 0))
+                        if (((double)row["Priority"] == (double)CommanData.Priorities.Norm || ((double)row["Priority"] == (double)CommanData.Priorities.Extra && !roles.Contains("Sales")) && (DateTime.Compare((DateTime)row["PriorityDate"], DateTime.Today) >= 0)))
                         {
                             if (customerNumber != "")
                             {

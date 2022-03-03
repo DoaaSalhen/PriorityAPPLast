@@ -11,6 +11,6 @@ namespace PriorityApp.Service.Contracts
     public interface IPickUpCustomerService
     {
 
-        public DataTable PreprocessInsertedPickOrders(DataTable dt, int itemStartIndex);
+        DataTable PreprocessInsertedPickOrders(DataTable dt, int itemStartIndex, List<string> roles);
     }
 }

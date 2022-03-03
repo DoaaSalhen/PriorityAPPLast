@@ -130,6 +130,25 @@ namespace PriorityApp.Controllers.CustomerService
             }
         }
 
+        [Authorize(Roles = "SuperAdmin, Admin, CustomerService")]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult ExportQuotaDaily(HoldModel model)
+        {
+            MemoryStream memoryStream;
+
+            try
+            {
+                List<HoldModel> models = _holdService.GetHoldBypriorityDate(model.PriorityDate);
+                models.ForEach(h => h.UserName = _userManager.FindByIdAsync(h.userId).Result.UserName);
+                memoryStream = _excelService.ExportQuotaToExcel(models);
+                return File(memoryStream.ToArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "TodayQuota.xlsx");
+            }
+            catch (Exception e)
+            {
+                return RedirectToAction("ERROR404");
+            }
+        }
 
         [Authorize(Roles = "SuperAdmin, Admin, CustomerService")]
         // POST: HoldController/Create
@@ -168,13 +187,6 @@ namespace PriorityApp.Controllers.CustomerService
                         result = _holdService.AddQuotaFile(dt, SqlConnectionString);
                     }
                 }
-                //foreach (DataRow row in dt.Rows)
-                //{
-                //    if (row["Salesman"] == DBNull.Value)
-                //    {
-                //        rowsCount = rowsCount++;
-                //    }
-                //}
                 if (result == true)
                 {
                     ViewBag.Message = " File Uploaded Successfully";  //you have added "+ dt.Rows.Count +" new Quota rows";

@@ -85,6 +85,47 @@ namespace PriorityApp.Service.Implementation.Comman
 
         }
 
+
+        public MemoryStream ExportQuotaToExcel(List<HoldModel> models)
+        {
+            try
+            {
+                DataTable dt = new DataTable("DailyQuota");
+                dt.Columns.AddRange(new DataColumn[5] { new DataColumn("PriorityDate"),
+                                            new DataColumn("User"),
+                                            new DataColumn("QuotaQuantity"),
+                                            new DataColumn("RemainingQuantity"),
+                                            new DataColumn("ExtraQuantity"),
+                                            });
+
+
+                foreach (var hold in models)
+                {
+
+                    dt.Rows.Add(hold.PriorityDate, hold.UserName, hold.QuotaQuantity, hold.ReminingQuantity, hold.ExtraQuantity);
+                }
+
+                using (XLWorkbook wb = new XLWorkbook())
+                {
+                    wb.Worksheets.Add(dt);
+                    using (MemoryStream stream = new MemoryStream())
+                    {
+                        wb.SaveAs(stream);
+                        return stream;
+                        //return File(stream.ToArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Grid.xlsx");
+                    }
+                }
+
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e.ToString());
+            }
+            return null;
+            // Area Customer Number Customer Name Order .	Ty Line    Item POD .	POD Alfa Name Address Zone State   Qty Priority    Comments Truck.	Status SubmitDate  SubmitTime
+
+        }
+
         public DataTable ReadExcelData(string filePath, string excelConnectionString)
         {
             try

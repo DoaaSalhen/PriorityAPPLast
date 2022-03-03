@@ -18,7 +18,7 @@ namespace PriorityApp.Service.Contracts.CustomerService
 
         public bool FixDuplication();
 
-        public DataTable Preprocess(DataTable dt);
+        public DataTable Preprocess(DataTable dt, float QtyToDelete);
 
     }
 }

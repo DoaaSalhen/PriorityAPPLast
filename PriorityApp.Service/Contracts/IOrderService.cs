@@ -19,7 +19,7 @@ namespace PriorityApp.Service.Contracts
         Task<List<OrderModel2>> GetOdersByListOfCustomerNumbers(List<long> CustomerNumbers, DateTime selectedPriorityDate);
 
         Task<List<OrderModel2>> GetSubmittedOdersByListOfCustomerNumbers(List<long> CustomerNumbers, DateTime fromPriorityDate, DateTime toPriorityDate);
-
+        Task<List<OrderModel2>> GetSubmittedOdersByUserId(string id, bool submitted);
 
         Task<bool> UpdateOrder2(OrderModel2 model, HoldModel holdModel);
 

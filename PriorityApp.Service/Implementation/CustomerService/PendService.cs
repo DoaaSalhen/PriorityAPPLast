@@ -161,7 +161,7 @@ namespace PriorityApp.Service.Implementation.CustomerService
             {
                 // var orders = _repository.Findlist().Result.GroupBy(x => x.OrderNumber).Where(x => x.Count() > 1).Select(x => x.Where(x => x.SavedBefore == false && x.OrderCategoryId == (int)CommanData.OrderCategory.Delivery)).ToList();
                 //var orders = _repository.Findlist().Result.Where(x => x.SavedBefore == false && x.OrderCategoryId == (int)CommanData.OrderCategory.Delivery).GroupBy(x => x.OrderNumber).Where(x => x.Count() > 1).ToList();
-                var orders2 = _repository.Findlist().Result.GroupBy(x => x.OrderNumber).Where(x => x.Count() > 1).ToList();
+                var orders2 = _repository.Findlist().Result.Where(x=>x.OrderCategoryId == (int)CommanData.OrderCategory.Delivery).GroupBy(x => x.OrderNumber).Where(x => x.Count() > 1).ToList();
                 foreach (var order2 in orders2)
                 {
                     float OriginalQuantity = 0;
@@ -265,7 +265,7 @@ namespace PriorityApp.Service.Implementation.CustomerService
         //    return false;
         //}
 
-        public DataTable Preprocess(DataTable dt)
+        public DataTable Preprocess(DataTable dt, float QtyToDelete)
         {
 
             try
@@ -283,23 +283,20 @@ namespace PriorityApp.Service.Implementation.CustomerService
                     if (customerNumber.ToString() != "")
                     {
                         row["OrderCategoryId"] = (int)CommanData.OrderCategory.Delivery;
-                        string z = row["QNTY"].ToString();
-                        // var customerNumber = row["SDPA8"];
-                        if (row["STATUS"].ToString() == "Cancelled")
-                        {
-                            row.Delete();
-                        }
-                        else if (z == "1")
-                        {
-                            row.Delete();
-                        }
-                        else if (row["ABAC02"].ToString() == "EG04")
+                        double z = (double)row["QNTY"];
+                       
+                        if (row["ABAC02"].ToString() == "EG04")
                         {
                             row["ABAC02"] = 2;
                         }
                         else if (row["ABAC02"].ToString() == "EG01" || row["ABAC02"].ToString() == "EG02" || row["ABAC02"].ToString() == "EG03")
                         {
                             row["ABAC02"] = 1;
+                        }
+                        string status = row["STATUS"].ToString().Trim();
+                        if (row["STATUS"].ToString().Trim() == "C" || z < 1 || (z < QtyToDelete && row["ABAC02"].ToString() == "1") )
+                        {
+                            row.Delete();
                         }
                         if (customerNumber.ToString().Contains("P"))
                         {

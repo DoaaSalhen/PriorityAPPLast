@@ -1,21 +1,18 @@
 ﻿@*
     For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 *@
-@{
-}
+@{ }
 @inject UserManager<AspNetUser> userManager
 
 @model PriorityApp.Service.Models.GeoFilterModel
 
-@{
-    ViewData["Title"] = "Index";
-    Layout = "~/Views/Shared/NiceAdmin/_CSLayout.cshtml";
-    int holdReminingQuantity = 0;
-    var user = await userManager.GetUserAsync(User);
-    var displayName = user.UserName;
-    var roles = await userManager.GetRolesAsync(user);
-    var tempModel = Model;
-}
+@{ ViewData["Title"] = "Index";
+                Layout = "~/Views/Shared/NiceAdmin/_CSLayout.cshtml";
+                int holdReminingQuantity = 0;
+                var user = await userManager.GetUserAsync(User);
+                var displayName = user.UserName;
+                var roles = await userManager.GetRolesAsync(user);
+                var tempModel = Model; }
 <style>
     table {
         border-collapse: collapse;
@@ -122,6 +119,28 @@
     });
 </script>
 
+<script>
+    $(document).ready(function () {
+        var table = $('#example').DataTable({
+            //"scrollY": "1000px",
+            //"scrollX": "700px",
+
+            "paging": false
+        });
+
+        $('a.toggle-vis').on('click', function (e) {
+            e.preventDefault();
+
+            // Get the column API object
+            var column = table.column($(this).attr('data-column'));
+
+            // Toggle the visibility
+            column.visible(!column.visible());
+        });
+    });
+
+</script>
+
 
 <style>
 
@@ -139,26 +158,6 @@
         width: 400px;
     }
 </style>
-<script>
-    $(document).ready(function () {
-        var table = $('#example').DataTable({
-            "scrollY": "700px",
-            "scrollX": "200px",
-
-            "paging": false
-        });
-
-        $('a.toggle-vis').on('click', function (e) {
-            e.preventDefault();
-
-            // Get the column API object
-            var column = table.column($(this).attr('data-column'));
-
-            // Toggle the visibility
-            column.visible(!column.visible());
-        });
-    });
-</script>
 
 <form asp-controller="CSDeliveryOrder" asp-action="ShowSubmittedOrders" method="post" class="form-horizontal" role="form">
     <div class="alert-danger" asp-validation-summary="ModelOnly"></div>
@@ -180,83 +179,76 @@
             </div>
         </div>
         <div class="form-row" style="width:100%">
+            @if (!roles.Contains("Sales"))
+            {
+@if (Model.SubRegions == null)
+{
+<div class="col-xs-12 col-sm-6 col-md-6 col-lg-2 selectFilter" style="display:inline-block">
+    <label class="control-label">Region</label>
+    <select id="SubRegionSelectedId" name="SubRegionSelectedId" asp-for="SubRegionSelectedId"
+            class="form-select form-select-lg mb-3"
+            asp-items="@(new SelectList(string.Empty, "Id", "Name"))"></select>
+</div> }
+else
+{
+<div class="col-xs-12 col-sm-6 col-md-6 col-lg-2 selectFilter" style="display:inline-block">
+    <label class="control-label">Region</label>
+    <select id="SubRegionSelectedId" name="SubRegionSelectedId" asp-for="SubRegionSelectedId"
+            class="form-select form-select-lg mb-3"
+            asp-items="@(new SelectList(Model.SubRegions, "Id", "Name"))"></select>
+</div>}
+                @if (Model.States == null)
+                {
+<div class="col-xs-12 col-sm-6 col-md-6 col-lg-2 selectFilter" style="display:inline-block">
+    <label class="control-label">State</label>
+    <select id="StateSelectedId" name="StateSelectedId" asp-for="StateSelectedId"
+            class="form-select form-select-lg mb-3"
+            asp-items="@(new SelectList(string.Empty, "Id", "Name"))"></select>
+</div> }
+else
+{
+<div class="col-xs-12 col-sm-6 col-md-6 col-lg-2 selectFilter" style="display:inline-block">
+    <label class="control-label">State</label>
+    <select id="StateSelectedId" name="StateSelectedId" asp-for="StateSelectedId"
+            class="form-select form-select-lg mb-3"
+            asp-items="@(new SelectList(Model.States, "Id", "Name"))"></select>
+</div>}
 
-            @if (Model.SubRegions == null)
-            {
-                <div class="col-xs-12 col-sm-6 col-md-6 col-lg-2 selectFilter" style="display:inline-block">
-                    <label class="control-label">Region</label>
-                    <select id="SubRegionSelectedId" name="SubRegionSelectedId" asp-for="SubRegionSelectedId"
-                            class="form-select form-select-lg mb-3"
-                            asp-items="@(new SelectList(string.Empty, "Id", "Name"))"></select>
-                </div>
-            }
-            else
-            {
-                <div class="col-xs-12 col-sm-6 col-md-6 col-lg-2 selectFilter" style="display:inline-block">
-                    <label class="control-label">Region</label>
-                    <select id="SubRegionSelectedId" name="SubRegionSelectedId" asp-for="SubRegionSelectedId"
-                            class="form-select form-select-lg mb-3"
-                            asp-items="@(new SelectList(Model.SubRegions, "Id", "Name"))"></select>
-                </div>
-            }
-            @if (Model.States == null)
-            {
-                <div class="col-xs-12 col-sm-6 col-md-6 col-lg-2 selectFilter" style="display:inline-block">
-                    <label class="control-label">State</label>
-                    <select id="StateSelectedId" name="StateSelectedId" asp-for="StateSelectedId"
-                            class="form-select form-select-lg mb-3"
-                            asp-items="@(new SelectList(string.Empty, "Id", "Name"))"></select>
-                </div>
-            }
-            else
-            {
-                <div class="col-xs-12 col-sm-6 col-md-6 col-lg-2 selectFilter" style="display:inline-block">
-                    <label class="control-label">State</label>
-                    <select id="StateSelectedId" name="StateSelectedId" asp-for="StateSelectedId"
-                            class="form-select form-select-lg mb-3"
-                            asp-items="@(new SelectList(Model.States, "Id", "Name"))"></select>
-                </div>
-            }
-
-            @if (Model.Territories == null)
-            {
+                                @if (Model.Territories == null)
+                                {
                 <div class="col-xs-12 col-sm-6 col-md-6 col-lg-2 selectFilter" style="display:inline-block">
                     <label class="control-label">Territory</label>
 
                     <select id="TerritorySelectedId" name="TerritorySelectedId" asp-for="TerritorySelectedId"
                             class="form-select form-select-lg mb-3"
                             asp-items="@(new SelectList(string.Empty, "Id", "Name"))"></select>
-                </div>
-            }
+                </div> }
             else
             {
-                <div class="col-xs-12 col-sm-6 col-md-6 col-lg-2 selectFilter" style="display:inline-block">
-                    <label class="control-label">Territory</label>
+<div class="col-xs-12 col-sm-6 col-md-6 col-lg-2 selectFilter" style="display:inline-block">
+    <label class="control-label">Territory</label>
 
-                    <select id="TerritorySelectedId" name="TerritorySelectedId" asp-for="TerritorySelectedId"
-                            class="form-select form-select-lg mb-3"
-                            asp-items="@(new SelectList(Model.Territories, "Id", "Name"))"></select>
-                </div>
-            }
+    <select id="TerritorySelectedId" name="TerritorySelectedId" asp-for="TerritorySelectedId"
+            class="form-select form-select-lg mb-3"
+            asp-items="@(new SelectList(Model.Territories, "Id", "Name"))"></select>
+</div>}            }
 
             @if (Model.Zones == null)
             {
-                <div class="col-xs-12 col-sm-6 col-md-6 col-lg-2 selectFilter" style="display:inline-block">
-                    <label class="control-label">Zone</label>
-                    <select id="ZoneSelectedId" name="ZoneSelectedId" asp-for="ZoneSelectedId"
-                            class="form-select form-select-lg mb-3"
-                            asp-items="@(new SelectList(string.Empty, "Id", "Name"))"></select>
-                </div>
-            }
-            else
-            {
-                <div class="col-xs-12 col-sm-6 col-md-6 col-lg-2 selectFilter" style="display:inline-block">
-                    <label class="control-label">Zone</label>
-                    <select id="ZoneSelectedId" name="ZoneSelectedId" asp-for="ZoneSelectedId"
-                            class="form-select form-select-lg mb-3"
-                            asp-items="@(new SelectList(Model.Zones, "Id", "Name"))"></select>
-                </div>
-            }
+<div class="col-xs-12 col-sm-6 col-md-6 col-lg-2 selectFilter" style="display:inline-block">
+    <label class="control-label">Zone</label>
+    <select id="ZoneSelectedId" name="ZoneSelectedId" asp-for="ZoneSelectedId"
+            class="form-select form-select-lg mb-3"
+            asp-items="@(new SelectList(string.Empty, "Id", "Name"))"></select>
+</div> }
+else
+{
+<div class="col-xs-12 col-sm-6 col-md-6 col-lg-2 selectFilter" style="display:inline-block">
+    <label class="control-label">Zone</label>
+    <select id="ZoneSelectedId" name="ZoneSelectedId" asp-for="ZoneSelectedId"
+            class="form-select form-select-lg mb-3"
+            asp-items="@(new SelectList(Model.Zones, "Id", "Name"))"></select>
+</div>}
             <input type="submit" value="Search" class="btn btn-primary btn-lg searchbtn" />
 
         </div>
@@ -286,86 +278,80 @@
         <tbody>
             @if (Model.OrderModel != null)
             {
-                @for (int index = 0; index < Model.OrderModel.orders.Count; index++)
-                {
-                    string diapatchedCheckListId = "DisList" + index;
-                    string UnlockId = "UnlockId" + index;
+@for (int index = 0; index < Model.OrderModel.orders.Count; index++)
+{
+    string diapatchedCheckListId = "DisList" + index;
+    string UnlockId = "UnlockId" + index;
 
-            <tr>
-                <td>
-                    @Html.DisplayFor(model => model.OrderModel.orders[index].Customer.CustomerName)
-                    <input class="form-check-input" asp-for="OrderModel.orders[index].CustomerId" type="hidden" />
-                    <input class="form-check-input" asp-for="OrderModel.orders[index].Id" type="hidden" />
-                </td>
-                <td>
-                    @Html.DisplayFor(model => model.OrderModel.orders[index].OrderNumber)
-                    <input class="form-check-input" asp-for="OrderModel.orders[index].OrderNumber" type="hidden" />
-                </td>
+<tr>
+    <td>
+        @Html.DisplayFor(model => model.OrderModel.orders[index].Customer.CustomerName)
+        <input class="form-check-input" asp-for="OrderModel.orders[index].CustomerId" type="hidden" />
+        <input class="form-check-input" asp-for="OrderModel.orders[index].Id" type="hidden" />
+    </td>
+    <td>
+        @Html.DisplayFor(model => model.OrderModel.orders[index].OrderNumber)
+        <input class="form-check-input" asp-for="OrderModel.orders[index].OrderNumber" type="hidden" />
+    </td>
 
-                <td>
-                    @Html.DisplayFor(model => model.OrderModel.orders[index].Item.Id)
-                    <input class="form-check-input" asp-for="OrderModel.orders[index].ItemId" type="hidden" />
-                </td>
-                <td>
-                    @Html.DisplayFor(model => model.OrderModel.orders[index].PriorityQuantity)
-                    <input class="form-check-input" asp-for="OrderModel.orders[index].PriorityQuantity" type="hidden" />
-                </td>
+    <td>
+        @Html.DisplayFor(model => model.OrderModel.orders[index].Item.Id)
+        <input class="form-check-input" asp-for="OrderModel.orders[index].ItemId" type="hidden" />
+    </td>
+    <td>
+        @Html.DisplayFor(model => model.OrderModel.orders[index].PriorityQuantity)
+        <input class="form-check-input" asp-for="OrderModel.orders[index].PriorityQuantity" type="hidden" />
+    </td>
 
-                <td>
-                    @Html.DisplayFor(model => model.OrderModel.orders[index].Priority.Name)
-                    <input class="form-check-input" asp-for="OrderModel.orders[index].Priority.Name" type="hidden" />
-                </td>
-                <td>
-                    @Html.DisplayFor(model => model.OrderModel.orders[index].Truck)
-                    <input class="form-check-input" asp-for="OrderModel.orders[index].Truck" type="hidden" />
-                </td>
+    <td>
+        @Html.DisplayFor(model => model.OrderModel.orders[index].Priority.Name)
+        <input class="form-check-input" asp-for="OrderModel.orders[index].Priority.Name" type="hidden" />
+    </td>
+    <td>
+        @Html.DisplayFor(model => model.OrderModel.orders[index].Truck)
+        <input class="form-check-input" asp-for="OrderModel.orders[index].Truck" type="hidden" />
+    </td>
 
-                <td>
-                    @Html.DisplayFor(model => model.OrderModel.orders[index].Status)
-                    <input class="form-check-input" asp-for="OrderModel.orders[index].Status" type="hidden" />
-                </td>
-                <td>
-                    @Html.DisplayFor(model => model.OrderModel.orders[index].Comment)
-                    <input class="form-check-input" asp-for="OrderModel.orders[index].Comment" type="hidden" />
-                </td>
+    <td>
+        @Html.DisplayFor(model => model.OrderModel.orders[index].Status)
+        <input class="form-check-input" asp-for="OrderModel.orders[index].Status" type="hidden" />
+    </td>
+    <td>
+        @Html.DisplayFor(model => model.OrderModel.orders[index].Comment)
+        <input class="form-check-input" asp-for="OrderModel.orders[index].Comment" type="hidden" />
+    </td>
 
-                @if ((Model.OrderModel.orders[index].Submitted == false) && (Model.OrderModel.orders[index].SubmitTime != null))
-                {
+    @if ((Model.OrderModel.orders[index].Submitted == false) && (Model.OrderModel.orders[index].SubmitTime != null))
+    {
 
-            <td>
-                <a class="btn btn-danger" asp-action="OrderCancel" asp-route-id="@Model.OrderModel.orders[index].Id">Cancel</a>
-            </td>
- }
-        else
-        {
-            <td>
-                <a class="btn btn-danger disabled" asp-action="" asp-route-id="@Model.OrderModel.orders[index].Id">Cancel</a>
-            </td>
-}
-                @if ((Model.OrderModel.orders[index].Submitted == true) && (Model.OrderModel.orders[index].Dispatched == false))
-                {
+<td>
+    <a class="btn btn-danger" asp-action="OrderCancel" asp-route-id="@Model.OrderModel.orders[index].Id">Cancel</a>
+</td> }
+                    else
+                    {
+<td>
+    <a class="btn btn-danger disabled" asp-action="" asp-route-id="@Model.OrderModel.orders[index].Id">Cancel</a>
+</td>}
+    @if ((Model.OrderModel.orders[index].Submitted == true) && (Model.OrderModel.orders[index].Dispatched == false))
+    {
 
-            <td>
-                <a class="far fa-edit btn btn-info" value="@Model.OrderModel.orders[index].Id" id=@UnlockId asp-action="UnLockOrder" asp-route-id="@Model.OrderModel.orders[index].Id">Unlock</a>
-            </td>
-}
-        else 
-        {
-            <td>
-                <a class="far fa-edit btn btn-info disabled"  value="@Model.OrderModel.orders[index].Id" id=@UnlockId asp-action=" " asp-route-id="@Model.OrderModel.orders[index].Id">Unlock</a>
-            </td>
-        }
-            </tr>
+<td>
+    <a class="far fa-edit btn btn-info" value="@Model.OrderModel.orders[index].Id" id=@UnlockId asp-action="UnLockOrder" asp-route-id="@Model.OrderModel.orders[index].Id">Unlock</a>
+</td> }
+                    else
+                    {
+<td>
+    <a class="far fa-edit btn btn-info disabled" value="@Model.OrderModel.orders[index].Id" id=@UnlockId asp-action=" " asp-route-id="@Model.OrderModel.orders[index].Id">Unlock</a>
+</td>}
+</tr>
                     <input class="form-check-input" asp-for="@Model.SubRegionSelectedId" type="hidden" />
 
-                    <input class="form-check-input" asp-for="@Model.StateSelectedId" type="hidden" />
-                    <input class="form-check-input" asp-for="@Model.TerritorySelectedId" type="hidden" />
-                    <input class="form-check-input" asp-for="@Model.HoldModel.userId" type="hidden" />
-                    <input class="form-check-input" asp-for="@Model.ZoneSelectedId" type="hidden" />
-                    <input class="form-check-input" asp-for="@Model.SelectedPriorityDate" type="hidden" />
-                    <input class="form-check-input" asp-for="@Model.ItemSelectedId" type="hidden" />
-                }
-            }
+                                        <input class="form-check-input" asp-for="@Model.StateSelectedId" type="hidden" />
+                                                            <input class="form-check-input" asp-for="@Model.TerritorySelectedId" type="hidden" />
+                                                                                <input class="form-check-input" asp-for="@Model.HoldModel.userId" type="hidden" />
+                                                                                                    <input class="form-check-input" asp-for="@Model.ZoneSelectedId" type="hidden" />
+                                                                                                                        <input class="form-check-input" asp-for="@Model.SelectedPriorityDate" type="hidden" />
+                                                                                                                                            <input class="form-check-input" asp-for="@Model.ItemSelectedId" type="hidden" />                }            }
 
         </tbody>
     </table>

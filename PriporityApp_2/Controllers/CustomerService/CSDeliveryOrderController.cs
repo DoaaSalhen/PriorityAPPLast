@@ -187,17 +187,38 @@ namespace PriorityApp.Controllers.CustomerService
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult SearchForOrders(GeoFilterModel Model)
+        public async Task<ActionResult> SearchForOrders(GeoFilterModel Model)
         {
             try
             {
                 List<OrderModel2> orderModels = new List<OrderModel2>();
                 List<CustomerModel> customerModels = new List<CustomerModel>();
                 DateTime selectedPriorityDate = Model.SelectedPriorityDate.Date;
-
-                if (Model.ZoneSelectedId != -1)
+                AspNetUser applicationUser = await _userManager.GetUserAsync(User);
+                TerritoryModel territoryModelSales = null;
+                var roles = _userManager.GetRolesAsync(applicationUser).Result.ToList();
+                if(roles.Contains("Sales"))
                 {
-
+                     territoryModelSales = _territoryService.GetTerritoryByUserId(applicationUser.Id);
+                    Model.TerritorySelectedId = territoryModelSales.Id;
+                    Model.HoldModel = _holdService.GetHold(Model.SelectedPriorityDate.Date, territoryModelSales.userId);
+                    Model.Priorities = _priorityService.GetAllPrioritiesExceptExtra().Result.ToList();
+                                
+                }
+                else
+                {
+                    Model.Priorities = _priorityService.GetAllPriorities().Result.ToList();
+                    TerritoryModel territoryModel = _territoryService.GetTerritory(Model.TerritorySelectedId);
+                    Model.HoldModel = _holdService.GetHold(Model.SelectedPriorityDate.Date, territoryModel.userId);
+                    Model.SubRegions = _regionService.GetAllISubRegions().Result;
+                    Model.SubRegions.Insert(0, new Service.Models.MasterModels.SubRegionModel { Id = -1, Name = "Select Region" });
+                    Model.States = _stateService.GetStatesBySubRegionId(Model.SubRegionSelectedId).Result;
+                    Model.States.Insert(0, new StateModel { Id = -1, Name = "Select State" });
+                    Model.Territories = _territoryService.GetAllTerritoriesByStateId(Model.StateSelectedId).Result;
+                    Model.Territories.Insert(0, new TerritoryModel { Id = -1, Name = "Select Territory" });
+                }
+                if (Model.ZoneSelectedId >0 )
+                {
                     customerModels = _deliveryCustomerService.GetCutomersByZoneId(Model.ZoneSelectedId).Result;
                     Model.Zones = _zoneService.GetListOfZonesByTerritoryId(Model.TerritorySelectedId);
                     Model.Zones.Insert(0, new ZoneModel { Id = -1, Name = "select Zone" });
@@ -236,20 +257,20 @@ namespace PriorityApp.Controllers.CustomerService
                 Model.OrderModel = new OrderModel();
                 Model.OrderModel.orders = orderModels.OrderBy(o=>o.OrderNumber).ToList();
                 Model.Customers = customerModels;
-                Model.Priorities = _priorityService.GetAllPriorities().Result.ToList();
-                TerritoryModel territoryModel = _territoryService.GetTerritory(Model.TerritorySelectedId);
-                Model.HoldModel = _holdService.GetHold(Model.SelectedPriorityDate.Date, territoryModel.userId);
+                //Model.Priorities = _priorityService.GetAllPriorities().Result.ToList();
+                //TerritoryModel territoryModel = _territoryService.GetTerritory(Model.TerritorySelectedId);
+                //Model.HoldModel = _holdService.GetHold(Model.SelectedPriorityDate.Date, territoryModel.userId);
                 Model.OrderModel.holdModel = Model.HoldModel;
                 Model.holdTotalAssignedQuantity = Model.HoldModel.QuotaQuantity - Model.HoldModel.ReminingQuantity;
-                Model.SubRegions = _regionService.GetAllISubRegions().Result;
-                //Model.SubRegionSelectedId = -1;
+                //Model.SubRegions = _regionService.GetAllISubRegions().Result;
+                ////Model.SubRegionSelectedId = -1;
 
-                Model.SubRegions.Insert(0, new Service.Models.MasterModels.SubRegionModel { Id = -1, Name = "Select Region" });
-                Model.States = _stateService.GetStatesBySubRegionId(Model.SubRegionSelectedId).Result;
-                Model.States.Insert(0, new StateModel { Id = -1, Name = "Select State" });
+                //Model.SubRegions.Insert(0, new Service.Models.MasterModels.SubRegionModel { Id = -1, Name = "Select Region" });
+                //Model.States = _stateService.GetStatesBySubRegionId(Model.SubRegionSelectedId).Result;
+                //Model.States.Insert(0, new StateModel { Id = -1, Name = "Select State" });
 
-                Model.Territories = _territoryService.GetAllTerritoriesByStateId(Model.StateSelectedId).Result;
-                Model.Territories.Insert(0, new TerritoryModel { Id = -1, Name = "Select Territory" });
+                //Model.Territories = _territoryService.GetAllTerritoriesByStateId(Model.StateSelectedId).Result;
+                //Model.Territories.Insert(0, new TerritoryModel { Id = -1, Name = "Select Territory" });
                 itemModels = _itemService.GetAllItems().Result;
                 itemModels.Insert(0, new ItemModel { Id = -1, Name = "All" });
                 Model.Items = itemModels;
@@ -305,7 +326,7 @@ namespace PriorityApp.Controllers.CustomerService
                         }
                         else if (orderModel.PriorityId == (int)CommanData.Priorities.Extra && updateModel.PriorityId == (int)CommanData.Priorities.Norm)
                         {
-                            DBholdModel.ReminingQuantity = (float)DBholdModel.ReminingQuantity - (float)updateModel.PriorityQuantity- -changeRate;
+                            DBholdModel.ReminingQuantity = (float)DBholdModel.ReminingQuantity + (float)updateModel.PriorityQuantity -changeRate;
                             DBholdModel.ExtraQuantity = (float)DBholdModel.ExtraQuantity + (float)updateModel.PriorityQuantity + changeRate;
                         }
 
@@ -408,21 +429,41 @@ namespace PriorityApp.Controllers.CustomerService
             try
             {
                 List<string> roles = (List<string>)_userManager.GetRolesAsync(applicationUser).Result;
-                List<OrderModel2> unSubmittedOrders = _orderService.GetAllUnSubmittedOrdersByRole(roles, submitted).Result;
-                List<long> customerIds = unSubmittedOrders.Select(o => o.CustomerId).ToList();
-                List<int> zoneIds = _deliveryCustomerService.GetZoneIdsByListOfCustomerIds(customerIds);
-                List<int> territoryIds = _zoneService.GetListOfTerritoryIdsByZoneIds(zoneIds);
-                var territoryModels = _territoryService.GetAllTeritories().Result.Where(t => territoryIds.Contains(t.Id)).GroupBy(t => t.Id).ToList();
+                List<OrderModel2> unSubmittedOrders = null;
                 SubmittInfo info = new SubmittInfo();
                 info.holdModels = new List<HoldModel>();
                 List<SubmittedOrdersTerritories> submittedOrdersTerritories = new List<SubmittedOrdersTerritories>();
-                //var unsubmittedOrdersGroup = unSubmittedOrders.GroupBy(o => o.Customer.zone.Territory.userId).ToList();
-                foreach (var territoryModel in territoryModels)
+                if (!roles.Contains("Sales"))
                 {
-                    SubmittedOrdersTerritories item = new SubmittedOrdersTerritories();
-                    item.territorryModel = territoryModel.First();
-                    submittedOrdersTerritories.Add(item);
+                    unSubmittedOrders = _orderService.GetAllUnSubmittedOrdersByRole(roles, submitted).Result;
+                    List<long> customerIds = unSubmittedOrders.Select(o => o.CustomerId).ToList();
+                    List<int> zoneIds = _deliveryCustomerService.GetZoneIdsByListOfCustomerIds(customerIds);
+                    List<int> territoryIds = _zoneService.GetListOfTerritoryIdsByZoneIds(zoneIds);
+                     var territoryModels = _territoryService.GetAllTeritories().Result.Where(t => territoryIds.Contains(t.Id)).GroupBy(t => t.Id).ToList();
+                    var unsubmittedOrdersGroup = unSubmittedOrders.GroupBy(o => o.Customer.zone.Territory.userId).ToList();
+                    foreach (var territoryModel in territoryModels)
+                    {
+                        SubmittedOrdersTerritories item = new SubmittedOrdersTerritories();
+                        item.territorryModel = territoryModel.First();
+                        submittedOrdersTerritories.Add(item);
+                    }
+                    info.submittedOrdersTerritories = submittedOrdersTerritories;
                 }
+                else
+                {
+                    unSubmittedOrders = _orderService.GetSubmittedOdersByUserId(applicationUser.Id, false).Result;
+                    info.SubmittedOrdersTerritory = _territoryService.GetTerritoryByUserId(applicationUser.Id);
+                }
+                    //SubmittInfo info = new SubmittInfo();
+                    //info.holdModels = new List<HoldModel>();
+                    //List<SubmittedOrdersTerritories> submittedOrdersTerritories = new List<SubmittedOrdersTerritories>();
+               //var unsubmittedOrdersGroup = unSubmittedOrders.GroupBy(o => o.Customer.zone.Territory.userId).ToList();
+                //foreach (var territoryModel in territoryModels)
+                //{
+                //    SubmittedOrdersTerritories item = new SubmittedOrdersTerritories();
+                //    item.territorryModel = territoryModel.First();
+                //    submittedOrdersTerritories.Add(item);
+                //}
                 HoldModel holdModel = new HoldModel();
                 foreach (var order in unSubmittedOrders)
                 {
@@ -433,7 +474,6 @@ namespace PriorityApp.Controllers.CustomerService
 
                 info.holdModels = info.holdModels.GroupBy(h => h.userId).Select(x => x.First()).ToList();
                 info.ordersTosubmit = unSubmittedOrders;
-                info.submittedOrdersTerritories = submittedOrdersTerritories;
                 info.OrdersCount = unSubmittedOrders.Count();
 
                 return View("SubmitView", info);
@@ -593,15 +633,34 @@ namespace PriorityApp.Controllers.CustomerService
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult ShowSubmittedOrders(GeoFilterModel Model)
+        public async Task<ActionResult> ShowSubmittedOrders(GeoFilterModel Model)
         {
             try
             {
                 List<OrderModel2> orderModels = new List<OrderModel2>();
                 List<CustomerModel> customerModels = new List<CustomerModel>();
                 DateTime selectedPriorityDate = Model.SelectedPriorityDate.Date;
-
-                if (Model.ZoneSelectedId != -1)
+                AspNetUser applicationUser = await _userManager.GetUserAsync(User);
+                TerritoryModel territoryModelSales = null;
+                var roles = _userManager.GetRolesAsync(applicationUser).Result.ToList();
+                if (roles.Contains("Sales"))
+                {
+                    territoryModelSales = _territoryService.GetTerritoryByUserId(applicationUser.Id);
+                    Model.TerritorySelectedId = territoryModelSales.Id;
+                    Model.HoldModel = _holdService.GetHold(Model.SelectedPriorityDate.Date, territoryModelSales.userId);
+                    Model.Priorities = _priorityService.GetAllPrioritiesExceptExtra().Result.ToList();
+                }
+                else
+                {
+                    Model.SubRegions = _regionService.GetAllISubRegions().Result;
+                    Model.SubRegions.Insert(0, new Service.Models.MasterModels.SubRegionModel { Id = -1, Name = "Select SubRegion" });
+                    Model.States = _stateService.GetStatesBySubRegionId(Model.SubRegionSelectedId).Result;
+                    Model.States.Insert(0, new StateModel { Id = -1, Name = "Select State" });
+                    Model.SubRegionSelectedId = -1;
+                    Model.Territories = _territoryService.GetAllTerritoriesByStateId(Model.StateSelectedId).Result;
+                    Model.Territories.Insert(0, new TerritoryModel { Id = -1, Name = "Select Territory" });
+                }
+                if (Model.ZoneSelectedId > 0)
                 {
 
                     customerModels = _deliveryCustomerService.GetCutomersByZoneId(Model.ZoneSelectedId).Result;
@@ -632,13 +691,13 @@ namespace PriorityApp.Controllers.CustomerService
                 Model.OrderModel = new OrderModel();
                 Model.OrderModel.orders = orderModels;
                 Model.Customers = customerModels;
-                Model.SubRegions = _regionService.GetAllISubRegions().Result;
-                Model.SubRegions.Insert(0, new Service.Models.MasterModels.SubRegionModel { Id = -1, Name = "Select SubRegion" });
-                Model.States = _stateService.GetStatesBySubRegionId(Model.SubRegionSelectedId).Result;
-                Model.States.Insert(0, new StateModel { Id = -1, Name = "Select State" });
-                Model.SubRegionSelectedId = -1;
-                Model.Territories = _territoryService.GetAllTerritoriesByStateId(Model.StateSelectedId).Result;
-                Model.Territories.Insert(0, new TerritoryModel { Id = -1, Name = "Select Territory" });
+                //Model.SubRegions = _regionService.GetAllISubRegions().Result;
+                //Model.SubRegions.Insert(0, new Service.Models.MasterModels.SubRegionModel { Id = -1, Name = "Select SubRegion" });
+                //Model.States = _stateService.GetStatesBySubRegionId(Model.SubRegionSelectedId).Result;
+                //Model.States.Insert(0, new StateModel { Id = -1, Name = "Select State" });
+                //Model.SubRegionSelectedId = -1;
+                //Model.Territories = _territoryService.GetAllTerritoriesByStateId(Model.StateSelectedId).Result;
+                //Model.Territories.Insert(0, new TerritoryModel { Id = -1, Name = "Select Territory" });
                 itemModels = _itemService.GetAllItems().Result;
                 itemModels.Insert(0, new ItemModel { Id = -1, Name = "All" });
                 Model.Items = itemModels;
@@ -712,6 +771,7 @@ namespace PriorityApp.Controllers.CustomerService
         {
             OrderModel2 updateModel = _orderService.GetOrder(id);
             updateModel.Submitted = false;
+            //updateModel.SubmitTime = null;
             bool updateOrderResult = _orderService.UpdateOrder(updateModel).Result;
             if (updateOrderResult == true)
             {
@@ -720,7 +780,7 @@ namespace PriorityApp.Controllers.CustomerService
             else
             {
             }
-            return RedirectToAction("ShowPickupSubmittedOrders");
+            return RedirectToAction("ShowSubmittedOrders");
         }
         public GeoFilterModel StartData()
         {
@@ -728,6 +788,8 @@ namespace PriorityApp.Controllers.CustomerService
             {
                 GeoFilterModel geoFilterModel = new GeoFilterModel { };
                 List<ItemModel> itemModels = new List<ItemModel>();
+                AspNetUser applicationUser = _userManager.GetUserAsync(User).Result;
+                List<string> roles = (List<string>)_userManager.GetRolesAsync(applicationUser).Result;
 
                 var subRegionModels = _regionService.GetAllISubRegions().Result;
                 subRegionModels.Insert(0, new SubRegionModel { Id = -1, Name = "select SubRegion" });
@@ -741,6 +803,13 @@ namespace PriorityApp.Controllers.CustomerService
                 geoFilterModel.SubRegionSelectedId = -1;
 
                 geoFilterModel.SelectedPriorityDate = DateTime.Today;
+                if(roles.Contains("Sales"))
+                {
+                    TerritoryModel territoryModel = _territoryService.GetTerritoryByUserId(applicationUser.Id);
+                    geoFilterModel.Zones = _zoneService.GetListOfZonesByTerritoryId(territoryModel.Id);
+                    geoFilterModel.Zones.Insert(0, new ZoneModel { Id = -1, Name = "select Zone" });
+
+                }
                 return geoFilterModel;
             }
             catch (Exception e)

@@ -4,6 +4,7 @@
 @{
 }
 @inject UserManager<AspNetUser> userManager
+@inject SignInManager<AspNetUser> SignInManager
 
 @model PriorityApp.Service.Models.GeoFilterModel
 
@@ -26,7 +27,7 @@
         border-collapse: collapse;
         border-spacing: 0;
         border: 5px solid #ddd;
-        width:100%;
+        width: 100%;
     }
 
     th, td {
@@ -48,8 +49,12 @@
 <script src="~/DataTable/jquery-3.5.1.js"></script>
 <script src="~/DataTable/jquery.dataTables.min.js"></script>
 <link rel="stylesheet" href="~/DataTable/jquery.dataTables.min.css">
-<script src="/lib/jquery/dist/jquery.js"></script>
 
+@*<script>
+    $(document).ready(function () {
+        $('#example').DataTable();
+    });
+</script>*@
 <script type="text/javascript">
     $(document).ready(function () {
         $('#SubRegionSelectedId').change(function () {
@@ -117,28 +122,11 @@
     });
 </script>
 
-
-<style>
-
-    table {
-        margin-bottom: 20px;
-    }
-
-    .selectFilter {
-        margin-left: 40px;
-    }
-
-    .searchbtn {
-        margin: 20px 20px 20px 40px;
-        border-radius: 10px;
-        width: 200px;
-    }
-</style>
 <script>
     $(document).ready(function () {
         var table = $('#example').DataTable({
-            "scrollY": "700px",
-            "scrollX": "200px",
+            //"scrollY": "1000px",
+            //"scrollX": "700px",
 
             "paging": false
         });
@@ -155,6 +143,22 @@
     });
 
 </script>
+<style>
+
+    table {
+        margin-bottom: 20px;
+    }
+
+    .selectFilter {
+        margin-left: 40px;
+    }
+
+    .searchbtn {
+        margin: 20px 20px 20px 40px;
+        border-radius: 10px;
+        width: 200px;
+    }
+</style>
 
 <form asp-controller="CSDeliveryOrder" asp-action="ShowSubmittedOrders" method="post" class="form-horizontal" role="form">
     <div class="alert-danger" asp-validation-summary="ModelOnly"></div>
@@ -174,65 +178,66 @@
             </div>
         </div>
         <div class="form-row" style="width:100%">
+            @if (!roles.Contains("Sales"))
+            {
+                @if (Model.SubRegions == null)
+                {
+                    <div class="col-xs-12 col-sm-6 col-md-6 col-lg-2 selectFilter" style="display:inline-block">
+                        <label class="control-label">Region</label>
+                        <select id="SubRegionSelectedId" name="SubRegionSelectedId" asp-for="SubRegionSelectedId"
+                                class="form-select form-select-lg mb-3"
+                                asp-items="@(new SelectList(string.Empty, "Id", "Name"))"></select>
+                    </div>
+                }
+                else
+                {
+                    <div class="col-xs-12 col-sm-6 col-md-6 col-lg-2 selectFilter" style="display:inline-block">
+                        <label class="control-label">Region</label>
+                        <select id="SubRegionSelectedId" name="SubRegionSelectedId" asp-for="SubRegionSelectedId"
+                                class="form-select form-select-lg mb-3"
+                                asp-items="@(new SelectList(Model.SubRegions, "Id", "Name"))"></select>
+                    </div>
+                }
+                @if (Model.States == null)
+                {
+                    <div class="col-xs-12 col-sm-6 col-md-6 col-lg-2 selectFilter" style="display:inline-block">
+                        <label class="control-label">State</label>
+                        <select id="StateSelectedId" name="StateSelectedId" asp-for="StateSelectedId"
+                                class="form-select form-select-lg mb-3"
+                                asp-items="@(new SelectList(string.Empty, "Id", "Name"))"></select>
+                    </div>
+                }
+                else
+                {
+                    <div class="col-xs-12 col-sm-6 col-md-6 col-lg-2 selectFilter" style="display:inline-block">
+                        <label class="control-label">State</label>
+                        <select id="StateSelectedId" name="StateSelectedId" asp-for="StateSelectedId"
+                                class="form-select form-select-lg mb-3"
+                                asp-items="@(new SelectList(Model.States, "Id", "Name"))"></select>
+                    </div>
+                }
 
-            @if (Model.SubRegions == null)
-            {
-                <div class="col-xs-12 col-sm-6 col-md-6 col-lg-2 selectFilter" style="display:inline-block">
-                    <label class="control-label">Region</label>
-                    <select id="SubRegionSelectedId" name="SubRegionSelectedId" asp-for="SubRegionSelectedId"
-                            class="form-select form-select-lg mb-3"
-                            asp-items="@(new SelectList(string.Empty, "Id", "Name"))"></select>
-                </div>
-            }
-            else
-            {
-                <div class="col-xs-12 col-sm-6 col-md-6 col-lg-2 selectFilter" style="display:inline-block">
-                    <label class="control-label">Region</label>
-                    <select id="SubRegionSelectedId" name="SubRegionSelectedId" asp-for="SubRegionSelectedId"
-                            class="form-select form-select-lg mb-3"
-                            asp-items="@(new SelectList(Model.SubRegions, "Id", "Name"))"></select>
-                </div>
-            }
-            @if (Model.States == null)
-            {
-                <div class="col-xs-12 col-sm-6 col-md-6 col-lg-2 selectFilter" style="display:inline-block">
-                    <label class="control-label">State</label>
-                    <select id="StateSelectedId" name="StateSelectedId" asp-for="StateSelectedId"
-                            class="form-select form-select-lg mb-3"
-                            asp-items="@(new SelectList(string.Empty, "Id", "Name"))"></select>
-                </div>
-            }
-            else
-            {
-                <div class="col-xs-12 col-sm-6 col-md-6 col-lg-2 selectFilter" style="display:inline-block">
-                    <label class="control-label">State</label>
-                    <select id="StateSelectedId" name="StateSelectedId" asp-for="StateSelectedId"
-                            class="form-select form-select-lg mb-3"
-                            asp-items="@(new SelectList(Model.States, "Id", "Name"))"></select>
-                </div>
-            }
+                @if (Model.Territories == null)
+                {
+                    <div class="col-xs-12 col-sm-6 col-md-6 col-lg-2 selectFilter" style="display:inline-block">
+                        <label class="control-label">Territory</label>
 
-            @if (Model.Territories == null)
-            {
-                <div class="col-xs-12 col-sm-6 col-md-6 col-lg-2 selectFilter" style="display:inline-block">
-                    <label class="control-label">Territory</label>
+                        <select id="TerritorySelectedId" name="TerritorySelectedId" asp-for="TerritorySelectedId"
+                                class="form-select form-select-lg mb-3"
+                                asp-items="@(new SelectList(string.Empty, "Id", "Name"))"></select>
+                    </div>
+                }
+                else
+                {
+                    <div class="col-xs-12 col-sm-6 col-md-6 col-lg-2 selectFilter" style="display:inline-block">
+                        <label class="control-label">Territory</label>
 
-                    <select id="TerritorySelectedId" name="TerritorySelectedId" asp-for="TerritorySelectedId"
-                            class="form-select form-select-lg mb-3"
-                            asp-items="@(new SelectList(string.Empty, "Id", "Name"))"></select>
-                </div>
+                        <select id="TerritorySelectedId" name="TerritorySelectedId" asp-for="TerritorySelectedId"
+                                class="form-select form-select-lg mb-3"
+                                asp-items="@(new SelectList(Model.Territories, "Id", "Name"))"></select>
+                    </div>
+                }
             }
-            else
-            {
-                <div class="col-xs-12 col-sm-6 col-md-6 col-lg-2 selectFilter" style="display:inline-block">
-                    <label class="control-label">Territory</label>
-
-                    <select id="TerritorySelectedId" name="TerritorySelectedId" asp-for="TerritorySelectedId"
-                            class="form-select form-select-lg mb-3"
-                            asp-items="@(new SelectList(Model.Territories, "Id", "Name"))"></select>
-                </div>
-            }
-
             @if (Model.Zones == null)
             {
                 <div class="col-xs-12 col-sm-6 col-md-6 col-lg-2 selectFilter" style="display:inline-block">
@@ -268,9 +273,11 @@
                 <th>Order Number</th>
                 <th>line</th>
                 <th> Item </th>
-                <th> POD Details</th>
-                <th> Zone</th>
-                <th> State</th>
+                <th> POD Number</th>
+                <th> POD Name</th>
+                <th> POD Address</th>
+                <th> POD Zone</th>
+                <th> POD  State</th>
                 <th>Qty</th>
                 <th> Priority</th>
                 <th>Truck</th>
@@ -313,22 +320,28 @@
                     <input class="form-check-input" asp-for="OrderModel.orders[index].ItemId" type="hidden" />
                 </td>
 
-                <td class="skip-filter">
-                    <a class="nav-link collapsed" data-bs-target="#@podDetailsId" data-bs-toggle="collapse" href="#">
-                        <i></i><i class="bi bi-chevron-down ms-auto"></i>
-                    </a>
-                    <ul id="@podDetailsId" class="nav-content collapse ">
-                        <div>
-                            @Html.DisplayFor(model => model.OrderModel.orders[index].PODNumber)
+                <td>
+                    @Html.DisplayFor(model => model.OrderModel.orders[index].PODNumber)
+                    <input class="form-check-input" asp-for="OrderModel.orders[index].PODNumber" type="hidden" />
 
-                        </div>
-                        <div>
-                            @Html.DisplayFor(model => model.OrderModel.orders[index].PODName) <br />
-                        </div>
-                        <div>
-                            @Html.DisplayFor(model => model.OrderModel.orders[index].PODZoneAddress)
-                        </div>
-                    </ul>
+                </td>
+                <td>
+                    @Html.DisplayFor(model => model.OrderModel.orders[index].PODName)
+                    <input class="form-check-input" asp-for="OrderModel.orders[index].PODName" type="hidden" />
+
+                </td>
+                <td>
+                    @Html.DisplayFor(model => model.OrderModel.orders[index].PODZoneAddress)
+                    <input class="form-check-input" asp-for="OrderModel.orders[index].PODZoneAddress" type="hidden" />
+
+                </td>
+                <td>
+                    @Html.DisplayFor(model => model.OrderModel.orders[index].PODZoneName)
+                    <input class="form-check-input" asp-for="OrderModel.orders[index].PODZoneName" type="hidden" />
+                </td>
+                <td>
+                    @Html.DisplayFor(model => model.OrderModel.orders[index].PODZoneState)
+                    <input class="form-check-input" asp-for="OrderModel.orders[index].PODZoneState" type="hidden" />
                 </td>
 
                 <td>
@@ -365,23 +378,31 @@
                 @if ((Model.OrderModel.orders[index].Submitted == false) && (Model.OrderModel.orders[index].SubmitTime != null))
                 {
 
-            <td>
-                <a class="btn btn-danger" asp-action="OrderCancel" asp-route-id="@Model.OrderModel.orders[index].Id">Cancel</a>
-            </td>
- }
-        else
-        {
+                    <td>
+                        <a class="btn btn-danger" asp-action="OrderCancel" asp-route-id="@Model.OrderModel.orders[index].Id">Cancel</a>
+                    </td>
+                }
+                else
+                {
 
-            <td>
-                <a class="btn btn-danger disabled" asp-action="" asp-route-id="@Model.OrderModel.orders[index].Id">Cancel</a>
-            </td>
-}
+                    <td>
+                        <a class="btn btn-danger disabled" asp-action="" asp-route-id="@Model.OrderModel.orders[index].Id">Cancel</a>
+                    </td>
+                }
                 @if ((Model.OrderModel.orders[index].Submitted == true) && (Model.OrderModel.orders[index].Dispatched == false))
                 {
 
-            <td>
-                <a class="far fa-edit btn btn-info" value="@Model.OrderModel.orders[index].Id" id=@UnlockId asp-action="UnLockOrder" asp-route-id="@Model.OrderModel.orders[index].Id">Unlock</a>
-            </td>}
+                    <td>
+                        <a class="far fa-edit btn btn-info" value="@Model.OrderModel.orders[index].Id" id=@UnlockId asp-action="UnLockOrder" asp-route-id="@Model.OrderModel.orders[index].Id">Unlock</a>
+                    </td>
+                }
+                else
+                {
+
+                    <td>
+                        <a class="far fa-edit btn btn-info disabled" value="@Model.OrderModel.orders[index].Id" id=@UnlockId asp-action="UnLockOrder" asp-route-id="@Model.OrderModel.orders[index].Id">Unlock</a>
+                    </td>
+                }
 
             </tr>
                     <input class="form-check-input" asp-for="@Model.SubRegionSelectedId" type="hidden" />
@@ -395,14 +416,14 @@
             }
             @if (Model.HoldModel != null)
             {
-        <div>
-            <span> Summation</span>
-            <input id="ordersQuantitySum" type="number" value="@Model.ordersQuantitySum" disabled  style="margin:10px 20px 20px 0; width:90px" />
-            <span>Remaining Quantity</span>
-            <input id="remaining" type="number" disabled value="@Model.HoldModel.ReminingQuantity"  style="margin:10px 20px 20px 0; width:90px"/>
-            <span>Territory Qouta</span>
-            <input id="remaining" type="number" disabled value="@Model.HoldModel.QuotaQuantity"  style="margin:10px 20px 20px 0; width:90px"/>
-        </div>
+                <div>
+                    <span> Summation</span>
+                    <input id="ordersQuantitySum" type="number" value="@Model.ordersQuantitySum" disabled style="margin:10px 20px 20px 0; width:90px" />
+                    <span>Remaining Quantity</span>
+                    <input id="remaining" type="number" disabled value="@Model.HoldModel.ReminingQuantity" style="margin:10px 20px 20px 0; width:90px" />
+                    <span>Territory Qouta</span>
+                    <input id="remaining" type="number" disabled value="@Model.HoldModel.QuotaQuantity" style="margin:10px 20px 20px 0; width:90px" />
+                </div>
             }
 
         </tbody>

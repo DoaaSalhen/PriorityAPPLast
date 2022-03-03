@@ -65,5 +65,14 @@ namespace PriorityApp.Service.Implementation
         {
             throw new NotImplementedException();
         }
+
+        public async Task<List<PriorityModel>> GetAllPrioritiesExceptExtra()
+        {
+            var priorities = _repository.Find(i => i.IsVisible == true && i.Id != 4).ToList();
+            var models = new List<PriorityModel>();
+            models = _mapper.Map<List<PriorityModel>>(priorities);
+            return models;
+        }
+
     }
 }

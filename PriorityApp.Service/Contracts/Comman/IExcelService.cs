@@ -17,5 +17,7 @@ namespace PriorityApp.Service.Contracts.Comman
 
         public MemoryStream WritePickUpTemplateToExcel(List<ItemModel> models, List<CustomerModel> customerModels);
         public MemoryStream WritQuotaTemplateToExcel(List<AspNetUser> salesUsers);
+        public MemoryStream ExportQuotaToExcel(List<HoldModel> models);
+
     }
 }

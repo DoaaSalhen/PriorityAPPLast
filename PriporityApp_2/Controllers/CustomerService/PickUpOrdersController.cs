@@ -77,12 +77,6 @@ namespace PriorityApp.Controllers.CustomerService
         // GET: PickUpOrdersController
         public ActionResult Index()
         {
-            FilterModel filterModel = new FilterModel();
-            filterModel.SubRegionSelectedId = -1;
-            filterModel.StateSelectedId = -1;
-            filterModel.TerritorySelectedId = -1;
-            filterModel.ZoneSelectedId = -1;
-
             AddPickUpOrderModel addPickUpOrderModel = new AddPickUpOrderModel();
             addPickUpOrderModel.Items = _itemService.GetItemsByType("Bags").Result.ToList();
             var subRegionModels = _regionService.GetAllISubRegions().Result;
@@ -90,7 +84,6 @@ namespace PriorityApp.Controllers.CustomerService
             addPickUpOrderModel.SubRegions = subRegionModels;
             addPickUpOrderModel.SubRegionSelectedId = -1;
             addPickUpOrderModel.SelectedPriorityDate = DateTime.Today;
-
             return View(addPickUpOrderModel);
         }
 
@@ -170,14 +163,36 @@ namespace PriorityApp.Controllers.CustomerService
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult SearchForCustomers(AddPickUpOrderModel Model)
+        public async Task<ActionResult> SearchForCustomers(AddPickUpOrderModel Model)
         {
             try
             {
                 List<CustomerModel> customerModels = new List<CustomerModel>();
                 List<PickUpOrder> pickUpOrders = new List<PickUpOrder>();
                 DateTime selectedPriorityDate = Model.SelectedPriorityDate.Date;
+                AspNetUser applicationUser = await _userManager.GetUserAsync(User);
+                TerritoryModel territoryModelSales = null;
+                var roles = _userManager.GetRolesAsync(applicationUser).Result.ToList();
+                if (roles.Contains("Sales"))
+                {
+                    territoryModelSales = _territoryService.GetTerritoryByUserId(applicationUser.Id);
+                    Model.TerritorySelectedId = territoryModelSales.Id;
+                    Model.HoldModel = _holdService.GetHold(Model.SelectedPriorityDate.Date, territoryModelSales.userId);
+                    Model.Priorities = _priorityService.GetAllPrioritiesExceptExtra().Result.ToList();
 
+                }
+                else
+                {
+                    Model.Priorities = _priorityService.GetAllPriorities().Result.ToList();
+                    TerritoryModel territoryModel = _territoryService.GetTerritory(Model.TerritorySelectedId);
+                    Model.HoldModel = _holdService.GetHold(Model.SelectedPriorityDate.Date, territoryModel.userId);
+                    Model.SubRegions = _regionService.GetAllISubRegions().Result;
+                    Model.SubRegions.Insert(0, new Service.Models.MasterModels.SubRegionModel { Id = -1, Name = "Select Region" });
+                    Model.States = _stateService.GetStatesBySubRegionId(Model.SubRegionSelectedId).Result;
+                    Model.States.Insert(0, new StateModel { Id = -1, Name = "Select State" });
+                    Model.Territories = _territoryService.GetAllTerritoriesByStateId(Model.StateSelectedId).Result;
+                    Model.Territories.Insert(0, new TerritoryModel { Id = -1, Name = "Select Territory" });
+                }
                 if (Model.ZoneSelectedId > 0)
                 {
 
@@ -208,17 +223,17 @@ namespace PriorityApp.Controllers.CustomerService
                 Model.Customers = customerModels;
                 Model.Items = items;
                 Model.Priorities = _priorityService.GetAllPriorities().Result.ToList();
-                TerritoryModel territoryModel = _territoryService.GetTerritory(Model.TerritorySelectedId);
-                Model.HoldModel = _holdService.GetHold(Model.SelectedPriorityDate.Date, territoryModel.userId);
+                //TerritoryModel territoryModel = _territoryService.GetTerritory(Model.TerritorySelectedId);
+                //Model.HoldModel = _holdService.GetHold(Model.SelectedPriorityDate.Date, territoryModel.userId);
                 Model.holdTotalAssignedQuantity = Model.HoldModel.QuotaQuantity - Model.HoldModel.ReminingQuantity;
                 Model.SubRegions = _regionService.GetAllISubRegions().Result;
 
-                Model.SubRegions.Insert(0, new Service.Models.MasterModels.SubRegionModel { Id = -2, Name = "Select SubRegion" });
-                Model.States = _stateService.GetStatesBySubRegionId(Model.SubRegionSelectedId).Result;
-                Model.States.Insert(0, new StateModel { Id = -1, Name = "Select State" });
+                //Model.SubRegions.Insert(0, new Service.Models.MasterModels.SubRegionModel { Id = -2, Name = "Select SubRegion" });
+                //Model.States = _stateService.GetStatesBySubRegionId(Model.SubRegionSelectedId).Result;
+                //Model.States.Insert(0, new StateModel { Id = -1, Name = "Select State" });
 
-                Model.Territories = _territoryService.GetAllTerritoriesByStateId(Model.StateSelectedId).Result;
-                Model.Territories.Insert(0, new TerritoryModel { Id = -1, Name = "Select Territory" });
+                //Model.Territories = _territoryService.GetAllTerritoriesByStateId(Model.StateSelectedId).Result;
+                //Model.Territories.Insert(0, new TerritoryModel { Id = -1, Name = "Select Territory" });
                 return View("index", Model);
             }
             catch (Exception e)
@@ -389,7 +404,8 @@ namespace PriorityApp.Controllers.CustomerService
                 subRegionModels.Insert(0, new SubRegionModel { Id = -1, Name = "select SubRegion" });
                 uploadPickUpModel.SubRegions = subRegionModels;
                 uploadPickUpModel.SubRegionSelectedId = -1;
-
+                AspNetUser applicationUser = await _userManager.GetUserAsync(User);
+                List<string> roles = _userManager.GetRolesAsync(applicationUser).Result.ToList();
                 string ExcelConnectionString = this._configuration.GetConnectionString("ExcelCon");
                 string SqlConnectionString = this._configuration.GetConnectionString("SqlCon");
                 bool addResult = false;
@@ -405,8 +421,6 @@ namespace PriorityApp.Controllers.CustomerService
                     //Save the uploaded Excel file.
                     string fileName = Path.GetFileName(postedFile.FileName);
                     string filePath = Path.Combine(path, fileName);
-                    AspNetUser applicationUser = _userManager.GetUserAsync(User).Result;
-                    List<string> roles = (List<string>)_userManager.GetRolesAsync(applicationUser).Result;
                     using (FileStream stream = new FileStream(filePath, FileMode.Create))
                     {
                         postedFile.CopyTo(stream);
@@ -420,11 +434,11 @@ namespace PriorityApp.Controllers.CustomerService
                         if (dt.Columns.Contains("Zone"))
                         {
 
-                            newDT = _pickUpCustomerService.PreprocessInsertedPickOrders(dt, 8);
+                            newDT = _pickUpCustomerService.PreprocessInsertedPickOrders(dt, 8,roles );
                         }
                         else
                         {
-                            newDT = _pickUpCustomerService.PreprocessInsertedPickOrders(dt, 6);
+                            newDT = _pickUpCustomerService.PreprocessInsertedPickOrders(dt, 6, roles);
                         }
                         string Message = "";
                         if (newDT != null)
@@ -581,12 +595,12 @@ namespace PriorityApp.Controllers.CustomerService
             {
                 GeoFilterModel geoFilterModel = new GeoFilterModel { };
                 List<ItemModel> itemModels = new List<ItemModel>();
-
+                AspNetUser applicationUser = _userManager.GetUserAsync(User).Result;
+                List<string> roles = (List<string>)_userManager.GetRolesAsync(applicationUser).Result;
                 var subRegionModels = _regionService.GetAllISubRegions().Result;
                 subRegionModels.Insert(0, new SubRegionModel { Id = -1, Name = "select SubRegion" });
                 geoFilterModel.SubRegions = subRegionModels;
                 itemModels = _itemService.GetItemsByType("Bags").Result;
-
                 itemModels.Insert(0, new ItemModel { Id = -1, Name = "All" });
                 geoFilterModel.Items = itemModels;
                 geoFilterModel.ItemSelectedId = -1;
@@ -594,6 +608,13 @@ namespace PriorityApp.Controllers.CustomerService
                 geoFilterModel.SubRegions = subRegionModels;
                 geoFilterModel.SubRegionSelectedId = -1;
                 geoFilterModel.SelectedPriorityDate = DateTime.Today;
+                if (roles.Contains("Sales"))
+                {
+                    TerritoryModel territoryModel = _territoryService.GetTerritoryByUserId(applicationUser.Id);
+                    geoFilterModel.Zones = _zoneService.GetListOfZonesByTerritoryId(territoryModel.Id);
+                    geoFilterModel.Zones.Insert(0, new ZoneModel { Id = -1, Name = "select Zone" });
+
+                }
                 return geoFilterModel;
             }
             catch (Exception e)
@@ -614,7 +635,7 @@ namespace PriorityApp.Controllers.CustomerService
                 AspNetUser applicationUser = _userManager.GetUserAsync(User).Result;
                 List<string> roles = (List<string>)_userManager.GetRolesAsync(applicationUser).Result;
                 List<ItemModel> items = _itemService.GetItemsByType("Bags").Result.ToList();
-                MemoryStream memoryStream = null;
+                MemoryStream memoryStream = _excelService.WritePickUpTemplateToExcel(items, null);
                 if (roles.Contains("Sales"))
                 {
                     TerritoryModel territoryModel = _territoryService.GetTerritoryByUserId(applicationUser.Id);
@@ -624,7 +645,7 @@ namespace PriorityApp.Controllers.CustomerService
 
                     memoryStream = _excelService.WritePickUpTemplateToExcel(items, territoryCustomers);
                 }
-                else if(Model.TerritorySelectedId != -1)
+                else if(Model.TerritorySelectedId >0)
                 {
                     TerritoryModel territoryModel = _territoryService.GetTerritory(Model.TerritorySelectedId);
 

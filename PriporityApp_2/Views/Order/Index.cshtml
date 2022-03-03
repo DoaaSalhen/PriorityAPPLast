@@ -32,6 +32,10 @@
         margin-right: 40px;
         margin-top: 0px;
     }
+
+    input[type=number] {
+        width: 50px;
+    }
 </style>
 @*<script src="~/DataTable/jquery-3.5.1.js"></script>*@
 @*<script src="~/DataTable/jquery.dataTables.min.js"></script>
@@ -45,7 +49,7 @@
 @*<link rel="stylesheet" href="~/css/newStyleSheet.css">*@
 
 <script src="~/DataTable/jquery-3.5.1.js"></script>
-@*<script src="~/DataTable/jquery.dataTables.min.js"></script>*@
+<script src="~/DataTable/jquery.dataTables.min.js"></script>
 <link rel="stylesheet" href="~/DataTable/jquery.dataTables.min.css">
 @*<script src="/lib/jquery/dist/jquery.js"></script>*@
 
@@ -54,7 +58,9 @@
 {
 
     <script>
-                    var holdReminingQuantity3 = @Model.HoldModel.ReminingQuantity;
+        var holdReminingQuantity3 = @Model.HoldModel.ReminingQuantity;
+        var holdAssignedQuantity3 = @Model.holdTotalAssignedQuantity;
+         var holdExtraQuantity3 = @Model.HoldModel.ExtraQuantity;
 
     </script>
 }
@@ -127,115 +133,131 @@
             else
             {
                 $('#ZoneSelectedId').html(zoneItems);
-
             }
         });
 
     });
-
-
     var AssignedValuesArray = [];
     var SavedValuesArray = [];
     var totalQuantity = 0;
-
-    function QuantityValidation(orderQuantity, radioButtonListId, index, priorityQuantityId, holdReminingQuantity2, savedBefore, savedPriorityQuantity, savedPriorityId)
-    {
+    var extraQuantity = 0;
+    var ExtraValuesArray = [];
+    function QuantityValidation(orderQuantity, radioButtonListId, index, priorityQuantityId, holdReminingQuantity2, savedBefore, savedPriorityQuantity, savedPriorityId, holdTotalAssignedQuantity, holdtotalExtraQuantity) {
 
         var tempholdReminingQuantity3 = holdReminingQuantity3;
         var insertedQuantity = priorityQuantityId.value;
         var selectedPriorityId = radioButtonListId.value;
-
-        if (selectedPriorityId != 2) {
-            var compareResult = compareInsertedQuantityVSOrderQuantity(insertedQuantity, orderQuantity);
-            if (compareResult == true)
-            {
-                if (savedBefore == true && SavedValuesArray[index] == undefined)
-                {
-                    if (savedPriorityId == 3)
-                    {
-                        holdReminingQuantity3 = holdReminingQuantity3 + savedPriorityQuantity;
-                        tempholdReminingQuantity3 = tempholdReminingQuantity3 + savedPriorityQuantity;
-                    }
-                        SavedValuesArray[index] = 1;
-                        document.getElementById("remaining").value = tempholdReminingQuantity3;
-                        document.getElementById("calculatedRemainingQuantity").value = tempholdReminingQuantity3;
-                        document.getElementById('test').value = tempholdReminingQuantity3;
+        var tempholdAssignedQuantity3 = holdAssignedQuantity3;
+        var tempholdExtraQuantity3 = holdExtraQuantity3;
+        var compareResult = true;
+        //var compareResult = compareInsertedQuantityVSOrderQuantity(insertedQuantity, orderQuantity);
+        if (compareResult == true) {
+            if (savedBefore == true && SavedValuesArray[index] == undefined) {
+                if (savedPriorityId == 3) {
+                    holdReminingQuantity3 = holdReminingQuantity3 + savedPriorityQuantity;
+                    tempholdReminingQuantity3 = tempholdReminingQuantity3 + savedPriorityQuantity;
+                    holdAssignedQuantity3 = holdAssignedQuantity3 - savedPriorityQuantity;
+                    tempholdAssignedQuantity3 = tempholdAssignedQuantity3 - savedPriorityQuantity;
+                }
+                if (savedPriorityId == 4) {
+                    tempholdExtraQuantity3 = tempholdExtraQuantity3 - savedPriorityQuantity;
+                    holdExtraQuantity3 = holdExtraQuantity3 - savedPriorityQuantity;
 
                 }
-
-                if (selectedPriorityId != 4)
-                {
-                    AssignedValuesArray[index] = insertedQuantity;
-                }
-                else
-                {
-                    AssignedValuesArray[index] = 0;
-
-                 }
-                //alert(SavedValuesArray[index]);
-                totalQuantity = AssignedValuesArray.reduce(function (a, b) { return parseFloat(a) + parseFloat(b); });
-                var totalCheckResult = checkTotalQuantityVsHoldRemainingQuantity(tempholdReminingQuantity3, totalQuantity);
-                if (totalCheckResult == false) {
-                    alert("you do not have enough quantity");
-                    resetIfFalse(index, priorityQuantityId, radioButtonListId, tempholdReminingQuantity3);
-                }
+                SavedValuesArray[index] = 1;
+                document.getElementById("remaining").value = tempholdReminingQuantity3;
+                document.getElementById("calculatedRemainingQuantity").value = tempholdReminingQuantity3;
+                document.getElementById('test').value = tempholdReminingQuantity3;
+                document.getElementById("extra").value = tempholdExtraQuantity3;
             }
-            else {
-                alert("please you must insert quantity less than or equal order quantity");
-                resetIfFalse(index, priorityQuantityId, radioButtonListId, holdReminingQuantity2);
+
+            if (selectedPriorityId == 3) {
+                AssignedValuesArray[index] = insertedQuantity;
+                ExtraValuesArray[index] = 0;
+
+            }
+            if (selectedPriorityId == 4) {
+                AssignedValuesArray[index] = 0;
+                ExtraValuesArray[index] = insertedQuantity;
+
+            }
+            else if (selectedPriorityId == 2) {
+                AssignedValuesArray[index] = 0;
+                ExtraValuesArray[index] = 0;
+            }
+            extraQuantity = ExtraValuesArray.reduce(function (a, b) { return parseFloat(a) + parseFloat(b); });
+            document.getElementById("extra").value = parseFloat(tempholdExtraQuantity3) + parseFloat(extraQuantity);
+            totalQuantity = AssignedValuesArray.reduce(function (a, b) { return parseFloat(a) + parseFloat(b); });
+            var totalCheckResult = checkTotalQuantityVsHoldRemainingQuantity(tempholdReminingQuantity3, totalQuantity, tempholdAssignedQuantity3);
+            if (totalCheckResult == false) {
+                alert("you do not have enough quantity");
+                resetIfFalse(index, priorityQuantityId, radioButtonListId, tempholdReminingQuantity3, tempholdAssignedQuantity3);
             }
         }
-        else {
-            alert("please you must select priority");
-            //resetIfFalse(priorityQuantityId, radioButtonListId);
-
-        }
+        //else {
+        //    alert("please you must insert quantity less than or equal order quantity");
+        //    resetIfFalse(index, priorityQuantityId, radioButtonListId, holdReminingQuantity2, tempholdAssignedQuantity3);
+        //}
 
     }
 
-    function resetIfFalse(index, priorityQuantityId, radioButtonListId, holdReminingQuantity3)
-    {
+    function resetIfFalse(index, priorityQuantityId, radioButtonListId, holdReminingQuantity3, holdTotalAssignedQuantity) {
         priorityQuantityId.value = 0;
         radioButtonListId.value = 2;
         AssignedValuesArray[index] = 0;
         totalQuantity = AssignedValuesArray.reduce(function (a, b) { return parseFloat(a) + parseFloat(b); });
-        document.getElementById("total").value =Math.abs(totalQuantity);
-        checkTotalQuantityVsHoldRemainingQuantity(holdReminingQuantity3, totalQuantity);
+        document.getElementById("total").value = holdTotalAssignedQuantity + Math.abs(totalQuantity);
+        checkTotalQuantityVsHoldRemainingQuantity(holdReminingQuantity3, totalQuantity, holdTotalAssignedQuantity);
     }
 
-    function compareInsertedQuantityVSOrderQuantity(insertedQuantity, orderQuantity)
-    {
-        if (insertedQuantity <= orderQuantity)
-        {
+    function compareInsertedQuantityVSOrderQuantity(insertedQuantity, orderQuantity) {
+        if (insertedQuantity <= orderQuantity) {
             return true;
         }
-        else
-        {
+        else {
             return false;
         }
     }
-        function checkTotalQuantityVsHoldRemainingQuantity(holdReminingQuantity2, totalQuantity)
-        {
+    function checkTotalQuantityVsHoldRemainingQuantity(holdReminingQuantity2, totalQuantity, tempholdAssignedQuantity3) {
 
-            holdReminingQuantity2 = holdReminingQuantity2 - totalQuantity;
+        holdReminingQuantity2 = holdReminingQuantity2 - totalQuantity;
 
-            document.getElementById("remaining").value = holdReminingQuantity2;
+        document.getElementById("remaining").value = holdReminingQuantity2;
 
-            document.getElementById("total").value = Math.abs(totalQuantity);
+        document.getElementById("total").value = tempholdAssignedQuantity3 + Math.abs(totalQuantity);
 
-            document.getElementById("calculatedRemainingQuantity").value = holdReminingQuantity2;
-            document.getElementById('test').value = holdReminingQuantity2;
+        document.getElementById("calculatedRemainingQuantity").value = holdReminingQuantity2;
+        document.getElementById('test').value = holdReminingQuantity2;
 
 
-            if (holdReminingQuantity2 >= 0)
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
+        if (holdReminingQuantity2 >= 0) {
+            return true;
+        }
+        else {
+            return false;
+        }
     }
+</script>
+
+<script>
+    $(document).ready(function () {
+        var table = $('#example').DataTable({
+            //"scrollY": "1000px",
+            //"scrollX": "700px",
+
+            "paging": false
+        });
+
+        $('a.toggle-vis').on('click', function (e) {
+            e.preventDefault();
+
+            // Get the column API object
+            var column = table.column($(this).attr('data-column'));
+
+            // Toggle the visibility
+            column.visible(!column.visible());
+        });
+    });
 
 </script>
 <style>
@@ -253,30 +275,14 @@
         border-radius: 10px;
         width: 200px;
     }
+
+    input[type=number] {
+        width: 50px;
+        height: 25px;
+    }
 </style>
-<script>
-    $(document).ready(function () {
-        var table = $('#example').DataTable({
-            "scrollY": "700px",
-            "scrollX": "200px",
 
-            "paging": false
-        });
-
-        $('a.toggle-vis').on('click', function (e) {
-            e.preventDefault();
-
-            // Get the column API object
-            var column = table.column($(this).attr('data-column'));
-
-            // Toggle the visibility
-            column.visible(!column.visible());
-        });
-    });
-
-</script>
-
-<form asp-controller="Order" asp-action="SearchForOrders" method="post" class="form-horizontal" role="form">
+<form asp-controller="CSDeliveryOrder" asp-action="SearchForOrders" method="post" class="form-horizontal" role="form">
     <div class="alert-danger" asp-validation-summary="ModelOnly"></div>
     <div class="form-group">
         <div class="form-row">
@@ -302,8 +308,7 @@
                     <select id="ZoneSelectedId" name="ZoneSelectedId" asp-for="ZoneSelectedId"
                             class="form-select form-select-lg mb-3"
                             asp-items="@(new SelectList(string.Empty, "Id", "Name"))"></select>
-                </div>
-            }
+                </div> }
             else
             {
                 <div class="col-xs-12 col-sm-6 col-md-6 col-lg-2 selectFilter" style="display:inline-block">
@@ -311,8 +316,7 @@
                     <select id="ZoneSelectedId" name="ZoneSelectedId" asp-for="ZoneSelectedId"
                             class="form-select form-select-lg mb-3"
                             asp-items="@(new SelectList(Model.Zones, "Id", "Name"))"></select>
-                </div>
-            }
+                </div>      }
             <input type="submit" value="Search" class="btn btn-primary btn-lg searchbtn" />
 
         </div>
@@ -322,8 +326,9 @@
 
 </form>
 
+
 @*<div class="row FormMaindiv">*@
-<form asp-action="SaveOrders" class="CreateForm" asp-controller="CSDeliveryOrder" method="post">
+<form class="CreateForm" asp-controller="CSDeliveryOrder" method="post">
     <table id="example" class="display table table-striped" style="text-align: center; width:100%">
         <thead class="table-dark">
             <tr>
@@ -331,17 +336,15 @@
                 <th>Order Number</th>
                 <th>line</th>
                 <th> Item </th>
-                <th> POD Number</th>
-                <th> POD Name</th>
-                <th> Address</th>
-                <th> Zone</th>
-                <th> State</th>
+                <th> POD Zone</th>
+                <th> POD  State</th>
                 <th> O.Qty</th>
                 <th> Priority</th>
                 <th>Qty</th>
                 <th>Comment</th>
                 <th>Truck</th>
                 <th>Status</th>
+                <th> POD Details</th>
                 <th></th>
 
 
@@ -356,13 +359,15 @@
                     <script>
                          var holdReminingQuantity2 = @Model.HoldModel.ReminingQuantity;
                     </script>
-                    holdReminingQuantity = Model.HoldModel.ReminingQuantity;
+ holdReminingQuantity = Model.HoldModel.ReminingQuantity;
                     @for (int index = 0; index < Model.OrderModel.orders.Count; index++)
                     {
                         string radioButtonListId = "";
                         radioButtonListId = "RBLI" + index;
                         string priorityQuantityId = "";
                         priorityQuantityId = "PQ" + index;
+                        string podDetailsId = "POD" + index;
+
 
                         <tr>
                             <td>
@@ -395,18 +400,6 @@
                             </td>
 
                             <td>
-                                @Html.DisplayFor(model => model.OrderModel.orders[index].PODNumber)
-                                <input class="form-check-input" asp-for="OrderModel.orders[index].PODNumber" type="hidden" />
-                            </td>
-                            <td>
-                                @Html.DisplayFor(model => model.OrderModel.orders[index].PODName)
-                                <input class="form-check-input" asp-for="OrderModel.orders[index].PODName" type="hidden" />
-                            </td>
-                            <td>
-                                @Html.DisplayFor(model => model.OrderModel.orders[index].PODZoneAddress)
-                                <input class="form-check-input" asp-for="OrderModel.orders[index].PODZoneAddress" type="hidden" />
-                            </td>
-                            <td>
                                 @Html.DisplayFor(model => model.OrderModel.orders[index].PODZoneName)
                                 <input class="form-check-input" asp-for="OrderModel.orders[index].PODZoneName" type="hidden" />
                             </td>
@@ -425,7 +418,7 @@
                             {
                                 <td>
                                     <select id="@radioButtonListId" name="OrderModel.orders[@index].PriorityId" disabled asp-for="OrderModel.orders[index].PriorityId"
-                                            asp-items="@(new SelectList(Model.Priorities, "Id", "Name"))" onchange="QuantityValidation(@Model.OrderModel.orders[index].OrderQuantity, @radioButtonListId, @index, @priorityQuantityId, @holdReminingQuantity, false, 0)"></select>
+                                            asp-items="@(new SelectList(Model.Priorities, "Id", "Name"))" onchange="QuantityValidation(@Model.OrderModel.orders[index].OrderQuantity, @radioButtonListId, @index, @priorityQuantityId, @holdReminingQuantity, false, 0,@Model.HoldModel.QuotaQuantity)"></select>
 
 
                                 </td>
@@ -441,49 +434,58 @@
                                 <td>
                                     <input class="form-check-input" asp-for="OrderModel.orders[index].Comment" type="text" style="width:100px" disabled value="@Model.OrderModel.orders[index].Comment" />
                                 </td>
-                            }
+ }
                             else if (Model.OrderModel.orders[index].SavedBefore == true && Model.OrderModel.orders[index].Submitted == false)
                             {
-                                <td>
+                                <!--<td>
                                     <select id="@radioButtonListId" name="OrderModel.orders[@index].PriorityId" asp-for="OrderModel.orders[index].PriorityId"
-                                            asp-items="@(new SelectList(Model.Priorities, "Id", "Name"))" onchange="QuantityValidation(@Model.OrderModel.orders[index].OrderQuantity, @radioButtonListId, @index, @priorityQuantityId, @holdReminingQuantity, true, @Model.OrderModel.orders[index].PriorityQuantity, @Model.OrderModel.orders[index].PriorityId)"></select>
+                                            asp-items="@(new SelectList(Model.Priorities, "Id", "Name"))" onchange="QuantityValidation(@Model.OrderModel.orders[index].OrderQuantity, @radioButtonListId, @index, @priorityQuantityId, @holdReminingQuantity, true, @Model.OrderModel.orders[index].PriorityQuantity, @Model.OrderModel.orders[index].PriorityId, @Model.HoldModel.QuotaQuantity)"></select>
 
 
-                                </td>
-                                @*<td style="width:200px">
+                                </td>--> @*<td style="width:200px">
                                         <div> <input class="form-check-input" id=@radioButtonListId asp-for="OrderModel.orders[index].PriorityId" type="radio" value="2" disabled style="margin-left:40px" onchange="QuantityValidation(@Model.OrderModel.orders[index].OrderQuantity, @radioButtonListId, @index, @priorityQuantityId, @holdReminingQuantity, true, @Model.OrderModel.orders[index].PriorityQuantity, @Model.OrderModel.orders[index].PriorityId)" /><label style="margin-left:60px">No</label></div>
                                         <div> <input class="form-check-input" id=@radioButtonListId asp-for="OrderModel.orders[index].PriorityId" type="radio" value="3" style="margin-left:40px" onchange="QuantityValidation(@Model.OrderModel.orders[index].OrderQuantity, @radioButtonListId, @index, @priorityQuantityId, @holdReminingQuantity, true, @Model.OrderModel.orders[index].PriorityQuantity, @Model.OrderModel.orders[index].PriorityId)" /><label style="margin-left:60px">Norm</label></div>
                                         <div> <input class="form-check-input" id=@radioButtonListId asp-for="OrderModel.orders[index].PriorityId" type="radio" value="4" style="margin-left:40px" onchange="QuantityValidation(@Model.OrderModel.orders[index].OrderQuantity, @radioButtonListId, @index, @priorityQuantityId, @holdReminingQuantity, true, @Model.OrderModel.orders[index].PriorityQuantity, @Model.OrderModel.orders[index].PriorityId)" /><label style="margin-left:60px">Extra</label></div>
                                     </td>*@
-                                <td style="width:300px">
-                                    <input class="form-check-input qty" id=@priorityQuantityId asp-for="OrderModel.orders[index].PriorityQuantity" type="Number" style="width:100px" value="@Model.OrderModel.orders[index].PriorityQuantity" onchange="QuantityValidation(@Model.OrderModel.orders[index].OrderQuantity, @radioButtonListId, @index, @priorityQuantityId, @holdReminingQuantity, true, @Model.OrderModel.orders[index].PriorityQuantity, @Model.OrderModel.orders[index].PriorityId)" />
+                                <!--<td style="width:300px">
+                                    <input class="form-check-input qty" id=@priorityQuantityId asp-for="OrderModel.orders[index].PriorityQuantity" type="Number" style="width:100px" value="@Model.OrderModel.orders[index].PriorityQuantity" onchange="QuantityValidation(@Model.OrderModel.orders[index].OrderQuantity, @radioButtonListId, @index, @priorityQuantityId, @holdReminingQuantity, true, @Model.OrderModel.orders[index].PriorityQuantity, @Model.OrderModel.orders[index].PriorityId, @Model.HoldModel.QuotaQuantity)" />
 
+                                </td>-->
+                                <td>
+                                    <select id="@radioButtonListId" name="OrderModel.orders[@index].PriorityId" asp-for="OrderModel.orders[index].PriorityId"
+                                            asp-items="@(new SelectList(Model.Priorities, "Id", "Name"))" onchange="QuantityValidation(@Model.OrderModel.orders[index].OrderQuantity, @radioButtonListId, @index, @priorityQuantityId, @holdReminingQuantity, true, @Model.OrderModel.orders[index].PriorityQuantity, @Model.OrderModel.orders[index].PriorityId, @Model.holdTotalAssignedQuantity, @Model.HoldModel.ExtraQuantity)"></select>
+
+                                </td>
+                                <td style="width:300px">
+                                    <input class="form-check-input qty" id=@priorityQuantityId asp-for="OrderModel.orders[index].PriorityQuantity" type="Number" style="width:100px" value="@Model.OrderModel.orders[index].PriorityQuantity" onchange="QuantityValidation(@Model.OrderModel.orders[index].OrderQuantity, @radioButtonListId, @index, @priorityQuantityId, @holdReminingQuantity, true, @Model.OrderModel.orders[index].PriorityQuantity, @Model.OrderModel.orders[index].PriorityId, @Model.holdTotalAssignedQuantity, @Model.HoldModel.ExtraQuantity)" />
                                 </td>
                                 <td>
                                     <input class="form-check-input" asp-for="OrderModel.orders[index].Comment" type="text" style="width:100px" value="@Model.OrderModel.orders[index].Comment" />
                                 </td>
-                            }
+ }
                             else
                             {
                                 <td>
                                     <select id="@radioButtonListId" name="OrderModel.orders[@index].PriorityId" asp-for="OrderModel.orders[index].PriorityId"
-                                            asp-items="@(new SelectList(Model.Priorities, "Id", "Name"))" onchange="QuantityValidation(@Model.OrderModel.orders[index].OrderQuantity, @radioButtonListId, @index, @priorityQuantityId, @holdReminingQuantity, false, 0, 2);"></select>
+                                            asp-items="@(new SelectList(Model.Priorities, "Id", "Name"))" onchange="QuantityValidation(@Model.OrderModel.orders[index].OrderQuantity, @radioButtonListId, @index, @priorityQuantityId, @holdReminingQuantity, false, 0,0, @Model.holdTotalAssignedQuantity, @Model.HoldModel.ExtraQuantity)"></select>
 
                                 </td>
+                                <td style="width:300px">
+                                    <input class="form-check-input qty" id=@priorityQuantityId asp-for="OrderModel.orders[index].PriorityQuantity" type="Number" style="width:100px" value="@Model.OrderModel.orders[index].OrderQuantity" onchange="QuantityValidation(@Model.OrderModel.orders[index].OrderQuantity, @radioButtonListId, @index, @priorityQuantityId, @holdReminingQuantity, false,0, 0,  @Model.holdTotalAssignedQuantity,@Model.HoldModel.ExtraQuantity)" />
 
+                                </td>
                                 @*<td style="width:200px">
                                         <div><input class="form-check-input" id=@radioButtonListId asp-for="OrderModel.orders[index].PriorityId" type="radio" value="2" disabled style="margin-left:40px" onchange="QuantityValidation(@Model.OrderModel.orders[index].OrderQuantity, @radioButtonListId, @index, @priorityQuantityId, @holdReminingQuantity, false, 0, 2);" /><label style="margin-left:60px">No</label></div>
                                         <div><input class="form-check-input" id=@radioButtonListId asp-for="OrderModel.orders[index].PriorityId" type="radio" value="3" style="margin-left:40px" onchange="QuantityValidation(@Model.OrderModel.orders[index].OrderQuantity, @radioButtonListId, @index, @priorityQuantityId, @holdReminingQuantity, false, 0, 2)" /><label style="margin-left:60px">Norm</label></div>
                                         <div><input class="form-check-input" id=@radioButtonListId asp-for="OrderModel.orders[index].PriorityId" type="radio" value="4" style="margin-left:40px" onchange="QuantityValidation(@Model.OrderModel.orders[index].OrderQuantity, @radioButtonListId, @index, @priorityQuantityId, @holdReminingQuantity, false, 0, 2)" /><label style="margin-left:60px">Extra</label></div>
-                                    </td>*@
-                                <td style="width:300px">
-                                    <input class="form-check-input qty" id=@priorityQuantityId asp-for="OrderModel.orders[index].PriorityQuantity" type="Number" style="width:100px" value="@Model.OrderModel.orders[index].OrderQuantity" onchange="QuantityValidation(@Model.OrderModel.orders[index].OrderQuantity, @radioButtonListId, @index, @priorityQuantityId, @holdReminingQuantity, false, 0, 2)" />
+                                    </td>*@ @*<td style="width:300px">
+                                        <input class="form-check-input qty" id=@priorityQuantityId asp-for="OrderModel.orders[index].PriorityQuantity" type="Number" style="width:100px" value="@Model.OrderModel.orders[index].OrderQuantity" onchange="QuantityValidation(@Model.OrderModel.orders[index].OrderQuantity, @radioButtonListId, @index, @priorityQuantityId, @holdReminingQuantity, false, 0, 2, @Model.HoldModel.QuotaQuantity)" />
 
-                                </td>
-                                <td>
-                                    <input class="form-check-input" asp-for="OrderModel.orders[index].Comment" type="text" style="width:100px" value="@Model.OrderModel.orders[index].Comment" />
-                                </td>
-                            }
+                                    </td>*@
+                                    <td>
+                                        <input class="form-check-input" asp-for="OrderModel.orders[index].Comment" type="text" style="width:100px" value="@Model.OrderModel.orders[index].Comment" />
+                                    </td>
+}
                             <td style="width:150px">
                                 @Html.DisplayFor(model => model.OrderModel.orders[index].Truck)
                                 <input class="form-check-input" style="margin-left:60px" asp-for="OrderModel.orders[index].Truck" type="hidden" />
@@ -492,7 +494,23 @@
                                 @Html.DisplayFor(model => model.OrderModel.orders[index].Status)
                                 <input class="form-check-input" asp-for="OrderModel.orders[index].Status" type="hidden" />
                             </td>
+                            <td class="skip-filter">
+                                <a class="nav-link collapsed" data-bs-target="#@podDetailsId" data-bs-toggle="collapse" href="#">
+                                    <i></i><i class="bi bi-chevron-down ms-auto"></i>
+                                </a>
+                                <ul id="@podDetailsId" class="nav-content collapse ">
+                                    <div>
+                                        @Html.DisplayFor(model => model.OrderModel.orders[index].PODNumber)
 
+                                    </div>
+                                    <div>
+                                        @Html.DisplayFor(model => model.OrderModel.orders[index].PODName) <br />
+                                    </div>
+                                    <div>
+                                        @Html.DisplayFor(model => model.OrderModel.orders[index].PODZoneAddress)
+                                    </div>
+                                </ul>
+                            </td>
                             <td></td>
 
                             <input class="form-check-input" asp-for="OrderModel.orders[index].Submitted" type="hidden" />
@@ -508,11 +526,20 @@
                             <input type="hidden" asp-for="orderType" value=1 />
 
                         </tr>
-                        
-                    }
+                        @*<input class="form-check-input" asp-for="OrderModel.holdModel.ReminingQuantity" type="hidden" style="width:100px" />*@ @*<input class="form-check-input" asp-for="OrderModel.holdModel.PriorityDate" type="hidden" style="width:100px" />
+                            <input class="form-check-input" asp-for="OrderModel.holdModel.territoryId" type="hidden" style="width:100px" />
+                            <input class="form-check-input" asp-for="OrderModel.holdModel.QuotaQuantity" type="hidden" style="width:100px" />
 
 
-                }
+
+
+                            <input class="form-check-input" asp-for="HoldModel.PriorityDate" type="hidden" style="width:100px" />
+
+                            <input class="form-check-input" asp-for="HoldModel.territoryId" type="hidden" style="width:100px" />
+
+                            <input class="form-check-input" asp-for="HoldModel.QuotaQuantity" type="hidden" style="width:100px" />
+                            <input id="calculatedRemainingQuantity" class="form-check-input" asp-for="HoldModel.ReminingQuantity" type="hidden" style="width:100px" />
+                            @Html.Hidden("test", Model.HoldModel.ReminingQuantity)*@} }
                 else
                 {
                     <script>
@@ -520,7 +547,7 @@
                         document.getElementById("NoQouta").hidden = false;
 
                     </script>
-                }
+ }
 
             }
             else
@@ -530,20 +557,22 @@
                     document.getElementById("NOOrdersSpain").hidden = false;
 
                 </script>
-            }
+   }
 
             @if (Model.HoldModel != null)
             {
                 <div>
                     <span>Territory Qouta</span>
-                    <input id="Quota" type="number" disabled value="@Model.HoldModel.QuotaQuantity" style="margin:10px 20px 20px 0" />
+                    <input id="Quota" type="number" disabled value="@Model.HoldModel.QuotaQuantity" style="margin:10px 20px 20px 0; width:90px" />
                     <span>Remaining Quantity</span>
-                    <input id="remaining" type="number" disabled value="@Model.HoldModel.ReminingQuantity" style="margin:10px 20px 20px 0" />
-                    <span> Total</span>
-                    <input id="total" type="number" value="0" disabled style="margin:10px 20px 20px 0" />
+                    <input id="remaining" type="number" disabled value="@Model.HoldModel.ReminingQuantity" style="margin:10px 20px 20px 0; width:90px" />
+                    <span> Total Assigned</span>
+                    <input id="total" type="number" value="@Model.holdTotalAssignedQuantity" disabled style="margin:10px 20px 20px 0; width:90px" />
+                    <span> Total extra</span>
+                    <input id="extra" type="number" value="@Model.HoldModel.ExtraQuantity" disabled style="margin:10px 20px 20px 0; width:90px" />
 
                 </div>
-            }
+      }
 
         </tbody>
     </table>
@@ -552,10 +581,10 @@
 
 
     <div class="form-group" style="margin-top:20px">
-        <input type="submit" value="Save" class="btn btn-primary btn-lg searchbtn" style="margin:auto" />
+        <input type="submit" value="Save" asp-action="SaveOrders" class="btn btn-primary btn-lg searchbtn" style="margin:auto" />
     </div>
     <div class="form-group" style="margin-top:40px">
-        <input type="submit" value="Submit" asp-action="SubmitOrdersForSalesman" asp-controller="OrderComman" class="btn btn-primary btn-lg searchbtn" style="margin:auto" />
+        <input type="submit" value="Submit" asp-action="SubmitOrders" asp-controller="CSDeliveryOrder" class="btn btn-primary btn-lg searchbtn" style="margin:auto" />
     </div>
 </form>
 

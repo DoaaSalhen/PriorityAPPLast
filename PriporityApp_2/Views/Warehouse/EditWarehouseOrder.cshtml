@@ -3,10 +3,13 @@
 *@
 @{ }
 @model PriorityApp.Service.Models.MasterModels.WarehouseOrderModel
+@inject UserManager<AspNetUser> userManager
 
 @{ ViewData["Title"] = "Index";
     Layout = "~/Views/Shared/NiceAdmin/_CSLayout.cshtml";
-    float holdReminingQuantity = 0; }
+    float holdReminingQuantity = 0;
+    var user = await userManager.GetUserAsync(User);
+    var roles = await userManager.GetRolesAsync(user);}
 <style>
     table {
         border-collapse: collapse;
@@ -37,12 +40,12 @@
 @if (Model.HoldModel != null)
 {
 
-<script>
+    <script>
     var holdReminingQuantity3 = @Model.HoldModel.ReminingQuantity;
     var holdAssignedQuantity3 = @Model.holdTotalAssignedQuantity;
     var holdExtraQuantity3 = @Model.HoldModel.ExtraQuantity;
 
-</script>
+    </script>
 }
 
 <script>
@@ -216,26 +219,26 @@
     }
 </style>
 @*<script>
-    $(document).ready(function () {
-        var table = $('#example').DataTable({
-            "scrollY": "700px",
-            "scrollX": "200px",
+        $(document).ready(function () {
+            var table = $('#example').DataTable({
+                "scrollY": "700px",
+                "scrollX": "200px",
 
-            "paging": false
+                "paging": false
+            });
+
+            $('a.toggle-vis').on('click', function (e) {
+                e.preventDefault();
+
+                // Get the column API object
+                var column = table.column($(this).attr('data-column'));
+
+                // Toggle the visibility
+                column.visible(!column.visible());
+            });
         });
 
-        $('a.toggle-vis').on('click', function (e) {
-            e.preventDefault();
-
-            // Get the column API object
-            var column = table.column($(this).attr('data-column'));
-
-            // Toggle the visibility
-            column.visible(!column.visible());
-        });
-    });
-
-</script>*@
+    </script>*@
 
 <form asp-controller="Warehouse" asp-action="SearchForOrders" method="post" class="form-horizontal" role="form">
     <div class="alert-danger" asp-validation-summary="ModelOnly"></div>
@@ -245,61 +248,63 @@
                 <label class="control-label" style="display:block">Priority Date</label>
                 <input type="date" class="form-select-lg mb-4" id="SelectedPriorityDate" asp-for="SelectedPriorityDate" />
             </div>
-
-            @if (Model.SubRegions == null)
+            @if (!roles.Contains("Sales"))
             {
-<div class="col-xs-12 col-sm-6 col-md-6 col-lg-2 selectFilter" style="display:inline-block">
-    <label class="control-label">SubRegion</label>
-    <select id="SubRegionSelectedId" name="SubRegionSelectedId" asp-for="SubRegionSelectedId"
-            class="form-select form-select-lg mb-3"
-            asp-items="@(new SelectList(string.Empty, "Id", "Name"))"></select>
-</div> }
-else
-{
-<div class="col-xs-12 col-sm-6 col-md-6 col-lg-2 selectFilter" style="display:inline-block">
-    <label class="control-label">SubRegion</label>
-    <select id="SubRegionSelectedId" name="SubRegionSelectedId" asp-for="SubRegionSelectedId"
-            class="form-select form-select-lg mb-3"
-            asp-items="@(new SelectList(Model.SubRegions, "Id", "Name"))"></select>
-</div>      }
-            @if (Model.States == null)
-            {
-<div class="col-xs-12 col-sm-6 col-md-6 col-lg-2 selectFilter" style="display:inline-block">
-    <label class="control-label">State</label>
-    <select id="StateSelectedId" name="StateSelectedId" asp-for="StateSelectedId"
-            class="form-select form-select-lg mb-3"
-            asp-items="@(new SelectList(string.Empty, "Id", "Name"))"></select>
-</div> }
-else
-{
-<div class="col-xs-12 col-sm-6 col-md-6 col-lg-2 selectFilter" style="display:inline-block">
-    <label class="control-label">State</label>
-    <select id="StateSelectedId" name="StateSelectedId" asp-for="StateSelectedId"
-            class="form-select form-select-lg mb-3"
-            asp-items="@(new SelectList(Model.States, "Id", "Name"))"></select>
-</div>      }
+                @if (Model.SubRegions == null)
+                {
+                    <div class="col-xs-12 col-sm-6 col-md-6 col-lg-2 selectFilter" style="display:inline-block">
+                        <label class="control-label">SubRegion</label>
+                        <select id="SubRegionSelectedId" name="SubRegionSelectedId" asp-for="SubRegionSelectedId"
+                                class="form-select form-select-lg mb-3"
+                                asp-items="@(new SelectList(string.Empty, "Id", "Name"))"></select>
+                    </div> }
+                else
+                {
+                    <div class="col-xs-12 col-sm-6 col-md-6 col-lg-2 selectFilter" style="display:inline-block">
+                        <label class="control-label">SubRegion</label>
+                        <select id="SubRegionSelectedId" name="SubRegionSelectedId" asp-for="SubRegionSelectedId"
+                                class="form-select form-select-lg mb-3"
+                                asp-items="@(new SelectList(Model.SubRegions, "Id", "Name"))"></select>
+                    </div>}
+                @if (Model.States == null)
+                {
+                    <div class="col-xs-12 col-sm-6 col-md-6 col-lg-2 selectFilter" style="display:inline-block">
+                        <label class="control-label">State</label>
+                        <select id="StateSelectedId" name="StateSelectedId" asp-for="StateSelectedId"
+                                class="form-select form-select-lg mb-3"
+                                asp-items="@(new SelectList(string.Empty, "Id", "Name"))"></select>
+                    </div> }
+                else
+                {
+                    <div class="col-xs-12 col-sm-6 col-md-6 col-lg-2 selectFilter" style="display:inline-block">
+                        <label class="control-label">State</label>
+                        <select id="StateSelectedId" name="StateSelectedId" asp-for="StateSelectedId"
+                                class="form-select form-select-lg mb-3"
+                                asp-items="@(new SelectList(Model.States, "Id", "Name"))"></select>
+                    </div>}
 
-            @if (Model.Territories == null)
-            {
-<div class="col-xs-12 col-sm-6 col-md-6 col-lg-2 selectFilter" style="display:inline-block">
-    <label class="control-label">Territory</label>
+                @if (Model.Territories == null)
+                {
+                    <div class="col-xs-12 col-sm-6 col-md-6 col-lg-2 selectFilter" style="display:inline-block">
+                        <label class="control-label">Territory</label>
 
-    <select id="TerritorySelectedId" name="TerritorySelectedId" asp-for="TerritorySelectedId"
-            class="form-select form-select-lg mb-3"
-            asp-items="@(new SelectList(string.Empty, "Id", "Name"))"></select>
-</div> }
-else
-{
-<div class="col-xs-12 col-sm-6 col-md-6 col-lg-2 selectFilter" style="display:inline-block">
-    <label class="control-label">Territory</label>
+                        <select id="TerritorySelectedId" name="TerritorySelectedId" asp-for="TerritorySelectedId"
+                                class="form-select form-select-lg mb-3"
+                                asp-items="@(new SelectList(string.Empty, "Id", "Name"))"></select>
+                    </div> }
+                else
+                {
+                    <div class="col-xs-12 col-sm-6 col-md-6 col-lg-2 selectFilter" style="display:inline-block">
+                        <label class="control-label">Territory</label>
 
-    <select id="TerritorySelectedId" name="TerritorySelectedId" asp-for="TerritorySelectedId"
-            class="form-select form-select-lg mb-3"
-            asp-items="@(new SelectList(Model.Territories, "Id", "Name"))"></select>
-</div>      }
+                        <select id="TerritorySelectedId" name="TerritorySelectedId" asp-for="TerritorySelectedId"
+                                class="form-select form-select-lg mb-3"
+                                asp-items="@(new SelectList(Model.Territories, "Id", "Name"))"></select>
+                    </div>}
+            }
 
-            <input type="submit" value="Search" class="btn btn-primary btn-lg searchbtn" />
-        </div>
+                <input type="submit" value="Search" class="btn btn-primary btn-lg searchbtn" />
+            </div>
 
     </div>
 
@@ -327,158 +332,160 @@ else
                 if (Model.HoldModel != null)
                 {
 
-<script>
+                    <script>
                          var holdReminingQuantity2 = @Model.HoldModel.ReminingQuantity;
-</script>
- holdReminingQuantity = Model.HoldModel.ReminingQuantity;
-@for (int index = 0; index < Model.warehouseOrderHoldModels.Count; index++)
-{
-    string radioButtonListId = "";
-    radioButtonListId = "RBLI" + index;
-    string priorityQuantityId = "";
-    priorityQuantityId = "PQ" + index;
+                    </script>
+                    holdReminingQuantity = Model.HoldModel.ReminingQuantity;
+                    @for (int index = 0; index < Model.warehouseOrderHoldModels.Count; index++)
+                    {
+                        string radioButtonListId = "";
+                        radioButtonListId = "RBLI" + index;
+                        string priorityQuantityId = "";
+                        priorityQuantityId = "PQ" + index;
 
-<tr>
-    <td>
-        @Html.DisplayFor(model => model.warehouseOrderHoldModels[index].Order.Customer.CustomerName)
-        <input class="form-check-input" asp-for="warehouseOrderHoldModels[index].Order.CustomerId" type="hidden" />
-        <input class="form-check-input" asp-for="warehouseOrderHoldModels[index].Order.Id" type="hidden" />
-
-        <input type="hidden" asp-for="SelectedPriorityDate" />
-        <input type="hidden" asp-for="TerritorySelectedId" />
-    </td>
-
-
-
-
-    @if (Model.warehouseOrderHoldModels[index].Order.Submitted == true)
-    {
-
-<td>
-    @Html.DisplayFor(model => model.warehouseOrderHoldModels[index].Order.Item.Name)
-</td>
+                        <tr>
                             <td>
-                                <select id="@radioButtonListId" name="warehouseOrderHoldModels[@index].Order.PriorityId" disabled asp-for="warehouseOrderHoldModels[index].Order.PriorityId"
-                                        asp-items="@(new SelectList(Model.Priorities, "Id", "Name"))" onchange="QuantityValidation(@Model.warehouseOrderHoldModels[index].Order.OrderQuantity, @radioButtonListId, @index, @priorityQuantityId, @holdReminingQuantity, false, 0)"></select>
+                                @Html.DisplayFor(model => model.warehouseOrderHoldModels[index].Order.Customer.CustomerName)
+                                <input class="form-check-input" asp-for="warehouseOrderHoldModels[index].Order.CustomerId" type="hidden" />
+                                <input class="form-check-input" asp-for="warehouseOrderHoldModels[index].Order.Id" type="hidden" />
+
+                                <input type="hidden" asp-for="SelectedPriorityDate" />
+                                <input type="hidden" asp-for="TerritorySelectedId" />
                             </td>
-                                                        <td>
-                                                            <input class="form-check-input qty" asp-for="warehouseOrderHoldModels[index].Order.PriorityQuantity" disabled type="Number" style="width:100px" />
 
-                                                        </td>
-                                                                                    <td>
-                                                                                        <input class="form-check-input" asp-for="warehouseOrderHoldModels[index].Order.Comment" disabled type="text" style="width:100px" value="@Model.warehouseOrderHoldModels[index].Order.Comment" />
-                                                                                    </td>
-                                                                                                                <td>
-                                                                                                                    <input class="form-check-input" asp-for="warehouseOrderHoldModels[index].Order.Truck" type="number" style="width:100px" disabled value="@Model.warehouseOrderHoldModels[index].Order.Truck" />
-                                                                                                                </td>
+
+
+
+                            @if (Model.warehouseOrderHoldModels[index].Order.Submitted == true)
+                            {
+
+                                <td>
+                                    @Html.DisplayFor(model => model.warehouseOrderHoldModels[index].Order.Item.Name)
+                                </td>
+                                <td>
+                                    <select id="@radioButtonListId" name="warehouseOrderHoldModels[@index].Order.PriorityId" disabled asp-for="warehouseOrderHoldModels[index].Order.PriorityId"
+                                            asp-items="@(new SelectList(Model.Priorities, "Id", "Name"))" onchange="QuantityValidation(@Model.warehouseOrderHoldModels[index].Order.OrderQuantity, @radioButtonListId, @index, @priorityQuantityId, @holdReminingQuantity, false, 0)"></select>
+                                </td>
+                                <td>
+                                    <input class="form-check-input qty" asp-for="warehouseOrderHoldModels[index].Order.PriorityQuantity" disabled type="Number" style="width:100px" />
+
+                                </td>
+                                <td>
+                                    <input class="form-check-input" asp-for="warehouseOrderHoldModels[index].Order.Comment" disabled type="text" style="width:100px" value="@Model.warehouseOrderHoldModels[index].Order.Comment" />
+                                </td>
+                                <td>
+                                    <input class="form-check-input" asp-for="warehouseOrderHoldModels[index].Order.Truck" type="number" style="width:100px" disabled value="@Model.warehouseOrderHoldModels[index].Order.Truck" />
+                                </td>
+                            }
+                            else if (Model.warehouseOrderHoldModels[index].Order.SavedBefore == true && Model.warehouseOrderHoldModels[index].Order.Submitted == false)
+                            {
+
+
+                                <td>
+
+                                    <select id="warehouseOrderHoldModels[@index].Order.ItemId" name="warehouseOrderHoldModels[@index].Order.ItemId" asp-for="warehouseOrderHoldModels[index].Order.ItemId"
+                                            class="form-select form-select-lg mb-3" asp-items="@(new SelectList(Model.Items, "Id", "Name"))"></select>
+                                </td>
+                                <td>
+                                    <select id="@radioButtonListId" asp-for="warehouseOrderHoldModels[index].Order.PriorityId" name="warehouseOrderHoldModels[@index].Order.PriorityId" asp-items="@(new SelectList(Model.Priorities, "Id", "Name"))" onchange="QuantityValidation(0, @radioButtonListId, @index, @priorityQuantityId, @holdReminingQuantity, true, @Model.warehouseOrderHoldModels[index].Order.PriorityQuantity, @Model.warehouseOrderHoldModels[index].Order.PriorityId, @Model.holdTotalAssignedQuantity, @Model.HoldModel.ExtraQuantity)"></select>
+                                </td>
+                                <td>
+                                    <input class="form-check-input qty" id=@priorityQuantityId asp-for="warehouseOrderHoldModels[index].Order.PriorityQuantity" type="Number" style="width:100px" value="@Model.warehouseOrderHoldModels[index].Order.PriorityQuantity" onchange="QuantityValidation(0,@radioButtonListId, @index, @priorityQuantityId, @holdReminingQuantity, true, @Model.warehouseOrderHoldModels[index].Order.PriorityQuantity, @Model.warehouseOrderHoldModels[index].Order.PriorityId, @Model.holdTotalAssignedQuantity, @Model.HoldModel.ExtraQuantity)" />
+
+                                </td>
+                                <td>
+                                    <input class="form-check-input" asp-for="warehouseOrderHoldModels[index].Order.Comment" type="text" style="width:100px" value="@Model.warehouseOrderHoldModels[index].Order.Comment" />
+                                </td>
+                                <td>
+                                    <input class="form-check-input" asp-for="warehouseOrderHoldModels[index].Order.Truck" type="number" style="width:100px" value="@Model.warehouseOrderHoldModels[index].Order.Truck" />
+                                </td>
  }
-                                                                                                            else if (Model.warehouseOrderHoldModels[index].Order.SavedBefore == true && Model.warehouseOrderHoldModels[index].Order.Submitted == false)
-                                                                                                            {
+                            else
+                            {
+                                <td>
 
+                                    <select id="warehouseOrderHoldModels[@index].Order.ItemId" name="warehouseOrderHoldModels[@index].Order.ItemId" asp-for="warehouseOrderHoldModels[index].Order.ItemId"
+                                            class="form-select form-select-lg mb-3" asp-items="@(new SelectList(Model.Items, "Id", "Name"))"></select>
+                                </td>
 
-                                                                                    <td>
+                                <td>
+                                    <select id="@radioButtonListId" name="warehouseOrderHoldModels[@index].Order.PriorityId" asp-for="warehouseOrderHoldModels[index].Order.PriorityId" asp-items="@(new SelectList(Model.Priorities, "Id", "Name"))" onchange="QuantityValidation(0, @radioButtonListId, @index, @priorityQuantityId, @holdReminingQuantity, true, @Model.warehouseOrderHoldModels[index].Order.PriorityQuantity, @Model.warehouseOrderHoldModels[index].Order.PriorityId, @Model.holdTotalAssignedQuantity, @Model.HoldModel.ExtraQuantity)"></select>
 
-                                                                                        <select id="warehouseOrderHoldModels[@index].Order.ItemId" name="warehouseOrderHoldModels[@index].Order.ItemId" asp-for="warehouseOrderHoldModels[index].Order.ItemId"
-                                                                                                class="form-select form-select-lg mb-3" asp-items="@(new SelectList(Model.Items, "Id", "Name"))"></select>
-                                                                                    </td>
-                                                                                                                <td>
-                                                                                                                    <select id="@radioButtonListId" asp-for="warehouseOrderHoldModels[index].Order.PriorityId" name="warehouseOrderHoldModels[@index].Order.PriorityId" asp-items="@(new SelectList(Model.Priorities, "Id", "Name"))" onchange="QuantityValidation(0, @radioButtonListId, @index, @priorityQuantityId, @holdReminingQuantity, true, @Model.warehouseOrderHoldModels[index].Order.PriorityQuantity, @Model.warehouseOrderHoldModels[index].Order.PriorityId, @Model.holdTotalAssignedQuantity, @Model.HoldModel.ExtraQuantity)"></select>
-                                                                                                                </td>
-                                                                                                                                            <td>
-                                                                                                                                                <input class="form-check-input qty" id=@priorityQuantityId asp-for="warehouseOrderHoldModels[index].Order.PriorityQuantity" type="Number" style="width:100px" value="@Model.warehouseOrderHoldModels[index].Order.PriorityQuantity" onchange="QuantityValidation(0,@radioButtonListId, @index, @priorityQuantityId, @holdReminingQuantity, true, @Model.warehouseOrderHoldModels[index].Order.PriorityQuantity, @Model.warehouseOrderHoldModels[index].Order.PriorityId, @Model.holdTotalAssignedQuantity, @Model.HoldModel.ExtraQuantity)" />
+                                </td>
+                                <td style="width:300px">
+                                    <input class="form-check-input qty" id=@priorityQuantityId asp-for="warehouseOrderHoldModels[index].Order.PriorityQuantity" type="Number" style="width:100px" value="@Model.warehouseOrderHoldModels[index].Order.PriorityQuantity" onchange="QuantityValidation(0, @radioButtonListId, @index, @priorityQuantityId, @holdReminingQuantity, true, @Model.warehouseOrderHoldModels[index].Order.PriorityQuantity, @Model.warehouseOrderHoldModels[index].Order.PriorityId, @Model.holdTotalAssignedQuantity, @Model.HoldModel.ExtraQuantity)" />
 
-                                                                                                                                            </td>
-                                                                                                                                                                        <td>
-                                                                                                                                                                            <input class="form-check-input" asp-for="warehouseOrderHoldModels[index].Order.Comment" type="text" style="width:100px" value="@Model.warehouseOrderHoldModels[index].Order.Comment" />
-                                                                                                                                                                        </td>
-                                                                                                                                                                                                    <td>
-                                                                                                                                                                                                        <input class="form-check-input" asp-for="warehouseOrderHoldModels[index].Order.Truck" type="number" style="width:100px" value="@Model.warehouseOrderHoldModels[index].Order.Truck" />
-                                                                                                                                                                                                    </td> }
-                                                                                                                                                                                                                            else
-                                                                                                                                                                                                                            {
-                                                                                                                                                                                                    <td>
+                                </td>
+                                <td>
+                                    <input class="form-check-input" asp-for="warehouseOrderHoldModels[index].Order.Comment" type="text" style="width:100px" value="@Model.warehouseOrderHoldModels[index].Order.Comment" />
+                                </td>
+                                <td>
+                                    <input class="form-check-input" asp-for="warehouseOrderHoldModels[index].Order.Truck" type="number" style="width:100px" value="@Model.warehouseOrderHoldModels[index].Order.Truck" />
+                                </td>
+}
 
-                                                                                                                                                                                                        <select id="warehouseOrderHoldModels[@index].Order.ItemId" name="warehouseOrderHoldModels[@index].Order.ItemId" asp-for="warehouseOrderHoldModels[index].Order.ItemId"
-                                                                                                                                                                                                                class="form-select form-select-lg mb-3" asp-items="@(new SelectList(Model.Items, "Id", "Name"))"></select>
-                                                                                                                                                                                                    </td>
+                            <td>
+                                @Html.DisplayFor(model => model.warehouseOrderHoldModels[index].Order.Status)
+                                <input class="form-check-input" asp-for="warehouseOrderHoldModels[index].Order.Status" type="hidden" />
+                            </td>
 
-                                                                                                                                                                                                                                <td>
-                                                                                                                                                                                                                                    <select id="@radioButtonListId" name="warehouseOrderHoldModels[@index].Order.PriorityId" asp-for="warehouseOrderHoldModels[index].Order.PriorityId" asp-items="@(new SelectList(Model.Priorities, "Id", "Name"))" onchange="QuantityValidation(0, @radioButtonListId, @index, @priorityQuantityId, @holdReminingQuantity, true, @Model.warehouseOrderHoldModels[index].Order.PriorityQuantity, @Model.warehouseOrderHoldModels[index].Order.PriorityId, @Model.holdTotalAssignedQuantity, @Model.HoldModel.ExtraQuantity)"></select>
+                            <td></td>
+                            <input class="form-check-input" asp-for="@Model.orderType" value="3" type="hidden" />
 
-                                                                                                                                                                                                                                </td>
-                                                                                                                                                                                                                                                            <td style="width:300px">
-                                                                                                                                                                                                                                                                <input class="form-check-input qty" id=@priorityQuantityId asp-for="warehouseOrderHoldModels[index].Order.PriorityQuantity" type="Number" style="width:100px" value="@Model.warehouseOrderHoldModels[index].Order.PriorityQuantity" onchange="QuantityValidation(0, @radioButtonListId, @index, @priorityQuantityId, @holdReminingQuantity, true, @Model.warehouseOrderHoldModels[index].Order.PriorityQuantity, @Model.warehouseOrderHoldModels[index].Order.PriorityId, @Model.holdTotalAssignedQuantity, @Model.HoldModel.ExtraQuantity)" />
+                            <input class="form-check-input" asp-for="warehouseOrderHoldModels[index].Order.Submitted" type="hidden" />
+                            <input class="form-check-input" asp-for="warehouseOrderHoldModels[index].Order.SavedBefore" type="hidden" />
+                            <input class="form-check-input" asp-for="HoldModel.PriorityDate" type="hidden" style="width:100px" />
 
-                                                                                                                                                                                                                                                            </td>
-                                                                                                                                                                                                                                                                                        <td>
-                                                                                                                                                                                                                                                                                            <input class="form-check-input" asp-for="warehouseOrderHoldModels[index].Order.Comment" type="text" style="width:100px" value="@Model.warehouseOrderHoldModels[index].Order.Comment" />
-                                                                                                                                                                                                                                                                                        </td>
-                                                                                                                                                                                                                                                                                                                    <td>
-                                                                                                                                                                                                                                                                                                                        <input class="form-check-input" asp-for="warehouseOrderHoldModels[index].Order.Truck" type="number" style="width:100px" value="@Model.warehouseOrderHoldModels[index].Order.Truck" />
-                                                                                                                                                                                                                                                                                                                    </td>}
+                            <input class="form-check-input" asp-for="HoldModel.userId" type="hidden" style="width:100px" />
+                            <input class="form-check-input" asp-for="HoldModel.PriorityDate" type="hidden" style="width:100px" />
 
-    <td>
-        @Html.DisplayFor(model => model.warehouseOrderHoldModels[index].Order.Status)
-        <input class="form-check-input" asp-for="warehouseOrderHoldModels[index].Order.Status" type="hidden" />
-    </td>
+                            <input class="form-check-input" asp-for="HoldModel.QuotaQuantity" type="hidden" style="width:100px" />
+                            <input id="calculatedRemainingQuantity" class="form-check-input" asp-for="HoldModel.ReminingQuantity" type="hidden" style="width:100px" />
+                            @Html.Hidden("test", Model.HoldModel.ReminingQuantity)
 
-    <td></td>
-    <input class="form-check-input" asp-for="@Model.orderType" value="3" type="hidden" />
-
-    <input class="form-check-input" asp-for="warehouseOrderHoldModels[index].Order.Submitted" type="hidden" />
-    <input class="form-check-input" asp-for="warehouseOrderHoldModels[index].Order.SavedBefore" type="hidden" />
-    <input class="form-check-input" asp-for="HoldModel.PriorityDate" type="hidden" style="width:100px" />
-
-    <input class="form-check-input" asp-for="HoldModel.userId" type="hidden" style="width:100px" />
-    <input class="form-check-input" asp-for="HoldModel.PriorityDate" type="hidden" style="width:100px" />
-
-    <input class="form-check-input" asp-for="HoldModel.QuotaQuantity" type="hidden" style="width:100px" />
-    <input id="calculatedRemainingQuantity" class="form-check-input" asp-for="HoldModel.ReminingQuantity" type="hidden" style="width:100px" />
-    @Html.Hidden("test", Model.HoldModel.ReminingQuantity)
-
-</tr>
+                        </tr>
 
 
                         <input class="form-check-input" asp-for="HoldModel.PriorityDate" type="hidden" style="width:100px" />
 
-                                                <input class="form-check-input" asp-for="HoldModel.userId" type="hidden" style="width:100px" />
+                        <input class="form-check-input" asp-for="HoldModel.userId" type="hidden" style="width:100px" />
 
-                                                                        <input class="form-check-input" asp-for="HoldModel.QuotaQuantity" type="hidden" style="width:100px" />
-                                                                                                <input id="calculatedRemainingQuantity" class="form-check-input" asp-for="HoldModel.ReminingQuantity" type="hidden" style="width:100px" />
-                                                                                                                        @Html.Hidden("test", Model.HoldModel.ReminingQuantity)} }
-else
-{
-<script>
+                        <input class="form-check-input" asp-for="HoldModel.QuotaQuantity" type="hidden" style="width:100px" />
+                        <input id="calculatedRemainingQuantity" class="form-check-input" asp-for="HoldModel.ReminingQuantity" type="hidden" style="width:100px" />
+                        @Html.Hidden("test", Model.HoldModel.ReminingQuantity)} }
+                else
+                {
+                    <script>
 
-    document.getElementById("NoQouta").hidden = false;
+                        document.getElementById("NoQouta").hidden = false;
 
-</script>
- }
+                    </script>
+                }
 
-}
-else
-{
-<script>
+            }
+            else
+            {
+                <script>
 
-    document.getElementById("NOOrdersSpain").hidden = false;
+                    document.getElementById("NOOrdersSpain").hidden = false;
 
-</script>
-}
+                </script>
+            }
 
             @if (Model.HoldModel != null)
             {
-<span>Territory Qouta</span>
+                <span>Territory Qouta</span>
                 <input id="Quota" type="number" disabled value="@Model.HoldModel.QuotaQuantity" style="margin:10px 20px 20px 0" />
-                                <span>Remaining Quantity</span>
-                                                <input id="remaining" type="number" disabled value="@Model.HoldModel.ReminingQuantity" style="margin:10px 20px 20px 0" />
-                                                                <span> Total Assigned</span>
-                                                                                <input id="total" type="number" value="@Model.holdTotalAssignedQuantity" disabled style="margin:10px 20px 20px 0" />
-                                                                                                <span> Total extra</span>
-                                                                                                                <input id="extra" type="number" value="@Model.HoldModel.ExtraQuantity" disabled style="margin:10px 20px 20px 0" />
+                <span>Remaining Quantity</span>
+                <input id="remaining" type="number" disabled value="@Model.HoldModel.ReminingQuantity" style="margin:10px 20px 20px 0" />
+                <span> Total Assigned</span>
+                <input id="total" type="number" value="@Model.holdTotalAssignedQuantity" disabled style="margin:10px 20px 20px 0" />
+                <span> Total extra</span>
+                <input id="extra" type="number" value="@Model.HoldModel.ExtraQuantity" disabled style="margin:10px 20px 20px 0" />
 
-                                                                                                                                <span id="NOOrdersSpain" hidden>No search result</span>
-                                                                                                                                                <span id="NoQouta" hidden>there is no Qouta for selected priority date</span>
-}
+                <span id="NOOrdersSpain" hidden>No search result</span>
+                <span id="NoQouta" hidden>there is no Qouta for selected priority date</span>
+            }
 
 
         </tbody>
