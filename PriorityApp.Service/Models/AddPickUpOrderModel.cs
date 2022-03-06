@@ -20,7 +20,7 @@ namespace PriorityApp.Service.Models
         public int PriorityId { get; set; }
 
         public List<PickUpOrder> pickUpOrders { get; set; }
-
+        public List<long> selectedCustomers { get; set; }
 
 
         public List<MainRegionModel> MainRegions { get; set; }
@@ -29,6 +29,9 @@ namespace PriorityApp.Service.Models
         public List<TerritoryModel> Territories { get; set; }
         public List<ZoneModel> Zones { get; set; }
         public List<CustomerModel> Customers { get; set; }
+
+        public List<CustomerModel> TerritoryAllCustomers { get; set; }
+
         public List<ItemModel> Items { get; set; }
         public List<PriorityModel> Priorities { get; set; }
 

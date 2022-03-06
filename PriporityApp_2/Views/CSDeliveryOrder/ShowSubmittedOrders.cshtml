@@ -17,6 +17,15 @@
     var roles = await userManager.GetRolesAsync(user);
     var tempModel = Model;
 }
+@if (ViewBag.Message != null)
+{
+    <div style="background-color: #00e600; height: 60px; box-shadow: 5px; margin: 0px 20px 20px 50px; text-align:center; font-size:x-large">@ViewBag.Message</div> }
+else if (ViewBag.Error != null)
+{
+
+    <div style="background-color: #ff3333; height: 60px; box-shadow: 5px; margin: 0px 20px 20px 50px; text-align: center; font-size: x-large">@ViewBag.Error</div>///////////////////////////////*@ <!--<div class="modal">--> <!-- Modal content -->
+
+}
 <style>
     #NOOrdersSpain {
         margin: auto;
@@ -51,10 +60,10 @@
 <link rel="stylesheet" href="~/DataTable/jquery.dataTables.min.css">
 
 @*<script>
-    $(document).ready(function () {
-        $('#example').DataTable();
-    });
-</script>*@
+        $(document).ready(function () {
+            $('#example').DataTable();
+        });
+    </script>*@
 <script type="text/javascript">
     $(document).ready(function () {
         $('#SubRegionSelectedId').change(function () {
@@ -298,113 +307,113 @@
                     string podDetailsId = "POD" + index;
 
 
-            <tr>
+                    <tr>
 
 
-                <td>
-                    @Html.DisplayFor(model => model.OrderModel.orders[index].Customer.CustomerName)
-                    <input class="form-check-input" asp-for="OrderModel.orders[index].CustomerId" type="hidden" />
-                    <input class="form-check-input" asp-for="OrderModel.orders[index].Id" type="hidden" />
-                </td>
-                <td>
-                    @Html.DisplayFor(model => model.OrderModel.orders[index].OrderNumber)
-                    <input class="form-check-input" asp-for="OrderModel.orders[index].OrderNumber" type="hidden" />
-                </td>
-                <td>
-                    @Html.DisplayFor(model => model.OrderModel.orders[index].LineID)
-                    <input class="form-check-input" asp-for="OrderModel.orders[index].LineID" type="hidden" />
-                </td>
+                        <td>
+                            @Html.DisplayFor(model => model.OrderModel.orders[index].Customer.CustomerName)
+                            <input class="form-check-input" asp-for="OrderModel.orders[index].CustomerId" type="hidden" />
+                            <input class="form-check-input" asp-for="OrderModel.orders[index].Id" type="hidden" />
+                        </td>
+                        <td>
+                            @Html.DisplayFor(model => model.OrderModel.orders[index].OrderNumber)
+                            <input class="form-check-input" asp-for="OrderModel.orders[index].OrderNumber" type="hidden" />
+                        </td>
+                        <td>
+                            @Html.DisplayFor(model => model.OrderModel.orders[index].LineID)
+                            <input class="form-check-input" asp-for="OrderModel.orders[index].LineID" type="hidden" />
+                        </td>
 
-                <td>
-                    @Html.DisplayFor(model => model.OrderModel.orders[index].ItemId)
-                    <input class="form-check-input" asp-for="OrderModel.orders[index].ItemId" type="hidden" />
-                </td>
+                        <td>
+                            @Html.DisplayFor(model => model.OrderModel.orders[index].ItemId)
+                            <input class="form-check-input" asp-for="OrderModel.orders[index].ItemId" type="hidden" />
+                        </td>
 
-                <td>
-                    @Html.DisplayFor(model => model.OrderModel.orders[index].PODNumber)
-                    <input class="form-check-input" asp-for="OrderModel.orders[index].PODNumber" type="hidden" />
+                        <td>
+                            @Html.DisplayFor(model => model.OrderModel.orders[index].PODNumber)
+                            <input class="form-check-input" asp-for="OrderModel.orders[index].PODNumber" type="hidden" />
 
-                </td>
-                <td>
-                    @Html.DisplayFor(model => model.OrderModel.orders[index].PODName)
-                    <input class="form-check-input" asp-for="OrderModel.orders[index].PODName" type="hidden" />
+                        </td>
+                        <td>
+                            @Html.DisplayFor(model => model.OrderModel.orders[index].PODName)
+                            <input class="form-check-input" asp-for="OrderModel.orders[index].PODName" type="hidden" />
 
-                </td>
-                <td>
-                    @Html.DisplayFor(model => model.OrderModel.orders[index].PODZoneAddress)
-                    <input class="form-check-input" asp-for="OrderModel.orders[index].PODZoneAddress" type="hidden" />
+                        </td>
+                        <td>
+                            @Html.DisplayFor(model => model.OrderModel.orders[index].PODZoneAddress)
+                            <input class="form-check-input" asp-for="OrderModel.orders[index].PODZoneAddress" type="hidden" />
 
-                </td>
-                <td>
-                    @Html.DisplayFor(model => model.OrderModel.orders[index].PODZoneName)
-                    <input class="form-check-input" asp-for="OrderModel.orders[index].PODZoneName" type="hidden" />
-                </td>
-                <td>
-                    @Html.DisplayFor(model => model.OrderModel.orders[index].PODZoneState)
-                    <input class="form-check-input" asp-for="OrderModel.orders[index].PODZoneState" type="hidden" />
-                </td>
+                        </td>
+                        <td>
+                            @Html.DisplayFor(model => model.OrderModel.orders[index].PODZoneName)
+                            <input class="form-check-input" asp-for="OrderModel.orders[index].PODZoneName" type="hidden" />
+                        </td>
+                        <td>
+                            @Html.DisplayFor(model => model.OrderModel.orders[index].PODZoneState)
+                            <input class="form-check-input" asp-for="OrderModel.orders[index].PODZoneState" type="hidden" />
+                        </td>
 
-                <td>
-                    @Html.DisplayFor(model => model.OrderModel.orders[index].PODZoneName)
-                    <input class="form-check-input" asp-for="OrderModel.orders[index].PODZoneName" type="hidden" />
-                </td>
-                <td>
-                    @Html.DisplayFor(model => model.OrderModel.orders[index].PODZoneState)
-                    <input class="form-check-input" asp-for="OrderModel.orders[index].PODZoneState" type="hidden" />
-                </td>
-                <td>
-                    @Html.DisplayFor(model => model.OrderModel.orders[index].PriorityQuantity)
-                    <input class="form-check-input" asp-for="OrderModel.orders[index].PriorityQuantity" type="hidden" />
-                </td>
-                <td>
-                    @Html.DisplayFor(model => model.OrderModel.orders[index].Priority.Name)
-                    <input class="form-check-input" asp-for="OrderModel.orders[index].Priority.Name" type="hidden" />
-                </td>
+                        <td>
+                            @Html.DisplayFor(model => model.OrderModel.orders[index].PODZoneName)
+                            <input class="form-check-input" asp-for="OrderModel.orders[index].PODZoneName" type="hidden" />
+                        </td>
+                        <td>
+                            @Html.DisplayFor(model => model.OrderModel.orders[index].PODZoneState)
+                            <input class="form-check-input" asp-for="OrderModel.orders[index].PODZoneState" type="hidden" />
+                        </td>
+                        <td>
+                            @Html.DisplayFor(model => model.OrderModel.orders[index].PriorityQuantity)
+                            <input class="form-check-input" asp-for="OrderModel.orders[index].PriorityQuantity" type="hidden" />
+                        </td>
+                        <td>
+                            @Html.DisplayFor(model => model.OrderModel.orders[index].Priority.Name)
+                            <input class="form-check-input" asp-for="OrderModel.orders[index].Priority.Name" type="hidden" />
+                        </td>
 
-                <td>
-                    @Html.DisplayFor(model => model.OrderModel.orders[index].Comment)
-                    <input class="form-check-input" asp-for="OrderModel.orders[index].Comment" type="hidden" />
-                </td>
+                        <td>
+                            @Html.DisplayFor(model => model.OrderModel.orders[index].Comment)
+                            <input class="form-check-input" asp-for="OrderModel.orders[index].Comment" type="hidden" />
+                        </td>
 
-                <td>
-                    @Html.DisplayFor(model => model.OrderModel.orders[index].Status)
-                    <input class="form-check-input" asp-for="OrderModel.orders[index].Status" type="hidden" />
-                </td>
-                <td>
-                    @Html.DisplayFor(model => model.OrderModel.orders[index].Comment)
-                    <input class="form-check-input" asp-for="OrderModel.orders[index].Comment" type="hidden" />
-                </td>
+                        <td>
+                            @Html.DisplayFor(model => model.OrderModel.orders[index].Status)
+                            <input class="form-check-input" asp-for="OrderModel.orders[index].Status" type="hidden" />
+                        </td>
+                        <td>
+                            @Html.DisplayFor(model => model.OrderModel.orders[index].Comment)
+                            <input class="form-check-input" asp-for="OrderModel.orders[index].Comment" type="hidden" />
+                        </td>
 
-                @if ((Model.OrderModel.orders[index].Submitted == false) && (Model.OrderModel.orders[index].SubmitTime != null))
-                {
+                        @if ((Model.OrderModel.orders[index].Submitted == false) && (Model.OrderModel.orders[index].SubmitTime != null))
+                        {
 
-                    <td>
-                        <a class="btn btn-danger" asp-action="OrderCancel" asp-route-id="@Model.OrderModel.orders[index].Id">Cancel</a>
-                    </td>
-                }
-                else
-                {
+                            <td>
+                                <a class="btn btn-danger" asp-action="OrderCancel" asp-route-id="@Model.OrderModel.orders[index].Id">Cancel</a>
+                            </td>
+                        }
+                        else
+                        {
 
-                    <td>
-                        <a class="btn btn-danger disabled" asp-action="" asp-route-id="@Model.OrderModel.orders[index].Id">Cancel</a>
-                    </td>
-                }
-                @if ((Model.OrderModel.orders[index].Submitted == true) && (Model.OrderModel.orders[index].Dispatched == false))
-                {
+                            <td>
+                                <a class="btn btn-danger disabled" asp-action="" asp-route-id="@Model.OrderModel.orders[index].Id">Cancel</a>
+                            </td>
+                        }
+                        @if ((Model.OrderModel.orders[index].Submitted == true) && (Model.OrderModel.orders[index].Dispatched == false))
+                        {
 
-                    <td>
-                        <a class="far fa-edit btn btn-info" value="@Model.OrderModel.orders[index].Id" id=@UnlockId asp-action="UnLockOrder" asp-route-id="@Model.OrderModel.orders[index].Id">Unlock</a>
-                    </td>
-                }
-                else
-                {
+                            <td>
+                                <a class="far fa-edit btn btn-info" value="@Model.OrderModel.orders[index].Id" id=@UnlockId asp-action="UnLockOrder" asp-route-id="@Model.OrderModel.orders[index].Id">Unlock</a>
+                            </td>
+                        }
+                        else
+                        {
 
-                    <td>
-                        <a class="far fa-edit btn btn-info disabled" value="@Model.OrderModel.orders[index].Id" id=@UnlockId asp-action="UnLockOrder" asp-route-id="@Model.OrderModel.orders[index].Id">Unlock</a>
-                    </td>
-                }
+                            <td>
+                                <a class="far fa-edit btn btn-info disabled" value="@Model.OrderModel.orders[index].Id" id=@UnlockId asp-action="UnLockOrder" asp-route-id="@Model.OrderModel.orders[index].Id">Unlock</a>
+                            </td>
+                        }
 
-            </tr>
+                    </tr>
                     <input class="form-check-input" asp-for="@Model.SubRegionSelectedId" type="hidden" />
 
                     <input class="form-check-input" asp-for="@Model.StateSelectedId" type="hidden" />

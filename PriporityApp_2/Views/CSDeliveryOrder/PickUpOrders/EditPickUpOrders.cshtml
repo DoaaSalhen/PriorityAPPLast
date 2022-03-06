@@ -15,6 +15,15 @@
     var roles = await userManager.GetRolesAsync(user);
 
 }
+@if (ViewBag.Message != null)
+{
+    <div style="background-color: #00e600; height: 60px; box-shadow: 5px; margin: 0px 20px 20px 50px; text-align:center; font-size:x-large">@ViewBag.Message</div> }
+else if (ViewBag.Error != null)
+{
+
+    <div style="background-color: #ff3333; height: 60px; box-shadow: 5px; margin: 0px 20px 20px 50px; text-align: center; font-size: x-large">@ViewBag.Error</div>///////////////////////////////*@ <!--<div class="modal">--> <!-- Modal content -->
+
+}
 <style>
     table {
         border-collapse: collapse;
@@ -442,10 +451,10 @@
                             @if (Model.OrderModel.orders[index].Submitted == true)
                             {
                                 @*<td style="width:200px">
-                                <div><input class="form-check-input" id=@radioButtonListId asp-for="OrderModel.orders[index].PriorityId" type="radio" value="2" disabled style="" onchange="QuantityValidation(0, @radioButtonListId, @index, @priorityQuantityId, @holdReminingQuantity, false, 0)" /><label>No</label></div>
-                                <div> <input class="form-check-input" id=@radioButtonListId asp-for="OrderModel.orders[index].PriorityId" type="radio" value="3" disabled style="" onchange="QuantityValidation(0, @radioButtonListId, @index, @priorityQuantityId, @holdReminingQuantity, false, 0)" /><label>Norm</label></div>
-                                <div><input class="form-check-input" id=@radioButtonListId asp-for="OrderModel.orders[index].PriorityId" type="radio" value="4" disabled style="" onchange="QuantityValidation(0, @radioButtonListId, @index, @priorityQuantityId, @holdReminingQuantity, false, 0)" /><label>Extra</label></div>
-                            </td>*@
+                                        <div><input class="form-check-input" id=@radioButtonListId asp-for="OrderModel.orders[index].PriorityId" type="radio" value="2" disabled style="" onchange="QuantityValidation(0, @radioButtonListId, @index, @priorityQuantityId, @holdReminingQuantity, false, 0)" /><label>No</label></div>
+                                        <div> <input class="form-check-input" id=@radioButtonListId asp-for="OrderModel.orders[index].PriorityId" type="radio" value="3" disabled style="" onchange="QuantityValidation(0, @radioButtonListId, @index, @priorityQuantityId, @holdReminingQuantity, false, 0)" /><label>Norm</label></div>
+                                        <div><input class="form-check-input" id=@radioButtonListId asp-for="OrderModel.orders[index].PriorityId" type="radio" value="4" disabled style="" onchange="QuantityValidation(0, @radioButtonListId, @index, @priorityQuantityId, @holdReminingQuantity, false, 0)" /><label>Extra</label></div>
+                                    </td>*@
                                 <td>
                                     <select id="@radioButtonListId" name="OrderModel.orders[@index].PriorityId" disabled asp-for="OrderModel.orders[index].PriorityId"
                                             asp-items="@(new SelectList(Model.Priorities, "Id", "Name"))" onchange="QuantityValidation(@Model.OrderModel.orders[index].OrderQuantity, @radioButtonListId, @index, @priorityQuantityId, @holdReminingQuantity, false, 0)"></select>
@@ -464,10 +473,10 @@
                             else if (Model.OrderModel.orders[index].SavedBefore == true && Model.OrderModel.orders[index].Submitted == false)
                             {
                                 @*<td style="width:200px">
-                                <div> <input id=@radioButtonListId asp-for="OrderModel.orders[index].PriorityId" type="radio" value="2" disabled style="margin-left:40px" onchange="QuantityValidation(0,@radioButtonListId, @index, @priorityQuantityId, @holdReminingQuantity, true, @Model.OrderModel.orders[index].PriorityQuantity, @Model.OrderModel.orders[index].PriorityId)" /><label style="margin-left:60px">No</label></div>
-                                <div> <input id=@radioButtonListId asp-for="OrderModel.orders[index].PriorityId" type="radio" value="3" style="margin-left:40px" onchange="QuantityValidation(0,@radioButtonListId, @index, @priorityQuantityId, @holdReminingQuantity, true, @Model.OrderModel.orders[index].PriorityQuantity, @Model.OrderModel.orders[index].PriorityId)" /><label style="margin-left:60px">Norm</label></div>
-                                <div> <input id=@radioButtonListId asp-for="OrderModel.orders[index].PriorityId" type="radio" value="4" style="margin-left:40px" onchange="QuantityValidation(0, @radioButtonListId, @index, @priorityQuantityId, @holdReminingQuantity, true, @Model.OrderModel.orders[index].PriorityQuantity, @Model.OrderModel.orders[index].PriorityId)" /><label style="margin-left:60px">Extra</label></div>
-                            </td>*@
+                                        <div> <input id=@radioButtonListId asp-for="OrderModel.orders[index].PriorityId" type="radio" value="2" disabled style="margin-left:40px" onchange="QuantityValidation(0,@radioButtonListId, @index, @priorityQuantityId, @holdReminingQuantity, true, @Model.OrderModel.orders[index].PriorityQuantity, @Model.OrderModel.orders[index].PriorityId)" /><label style="margin-left:60px">No</label></div>
+                                        <div> <input id=@radioButtonListId asp-for="OrderModel.orders[index].PriorityId" type="radio" value="3" style="margin-left:40px" onchange="QuantityValidation(0,@radioButtonListId, @index, @priorityQuantityId, @holdReminingQuantity, true, @Model.OrderModel.orders[index].PriorityQuantity, @Model.OrderModel.orders[index].PriorityId)" /><label style="margin-left:60px">Norm</label></div>
+                                        <div> <input id=@radioButtonListId asp-for="OrderModel.orders[index].PriorityId" type="radio" value="4" style="margin-left:40px" onchange="QuantityValidation(0, @radioButtonListId, @index, @priorityQuantityId, @holdReminingQuantity, true, @Model.OrderModel.orders[index].PriorityQuantity, @Model.OrderModel.orders[index].PriorityId)" /><label style="margin-left:60px">Extra</label></div>
+                                    </td>*@
                                 <td>
                                     <select id="@radioButtonListId" name="OrderModel.orders[@index].PriorityId" asp-for="OrderModel.orders[index].PriorityId"
                                             asp-items="@(new SelectList(Model.Priorities, "Id", "Name"))" onchange="QuantityValidation(0, @radioButtonListId, @index, @priorityQuantityId, @holdReminingQuantity, true, @Model.OrderModel.orders[index].PriorityQuantity, @Model.OrderModel.orders[index].PriorityId, @Model.holdTotalAssignedQuantity, @Model.HoldModel.ExtraQuantity)"></select>

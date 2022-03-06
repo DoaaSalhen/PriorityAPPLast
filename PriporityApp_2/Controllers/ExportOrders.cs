@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using @enum;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using PriorityApp.Service.Contracts;
 using PriorityApp.Service.Contracts.Comman;
@@ -18,16 +19,20 @@ namespace PriorityApp.Controllers
 
         private readonly IOrderService _orderService;
         private readonly IOrderCategoryService _orderCategoryService;
-        
-
+        private readonly IWarehouseOrderHoldService _warehouseOrderHoldService;
+        private readonly ITerritoryService _territoryService;
 
         public ExportOrders(IExcelService excelService,
             IOrderService orderService,
-            IOrderCategoryService orderCategoryService)
+            IOrderCategoryService orderCategoryService,
+            IWarehouseOrderHoldService warehouseOrderHoldService,
+            ITerritoryService territoryService)
         {
             _excelService = excelService;
             _orderService = orderService;
             _orderCategoryService = orderCategoryService;
+            _warehouseOrderHoldService = warehouseOrderHoldService;
+            _territoryService = territoryService;
         }
 
         // GET: ExportOrders
@@ -61,10 +66,16 @@ namespace PriorityApp.Controllers
                 if(Model.OrderCategorySelectedId != 0)
                 {
                     orders = orders.Where(o => o.OrderCategoryId == Model.OrderCategorySelectedId).ToList();
-
+                    
                 }
-                
+                for (int index =0; index< orders.Count; index++)
+                {
+                    if(orders[index].OrderCategoryId == (int)CommanData.OrderCategory.Warehouse)
+                    {
+                        orders[index].Customer.zone.Territory = _territoryService.GetTerritoryByUserId(_warehouseOrderHoldService.GetWarehouseOrderHold(orders[index].Id).HolduserId);
 
+                    }
+                }
 
                 MemoryStream memoryStream = _excelService.ExportToExcel(orders);
 

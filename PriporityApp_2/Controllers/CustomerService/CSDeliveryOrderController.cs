@@ -42,6 +42,8 @@ namespace PriorityApp.Controllers.CustomerService
         private readonly ILogger<CSDeliveryOrderController> _logger;
         private readonly IHubContext<NotificationHub> _hub;
         private readonly IEmailSender _emailSender;
+        private readonly IWarehouseOrderHoldService _warehouseOrderHoldService;
+
 
         GeoFilterModel geoFilterModel = new GeoFilterModel { };
 
@@ -60,7 +62,8 @@ namespace PriorityApp.Controllers.CustomerService
                                IExcelService excelService,
                                ILogger<CSDeliveryOrderController> logger,
                                IHubContext<NotificationHub> hub,
-                               IEmailSender emailSender)
+                               IEmailSender emailSender,
+                               IWarehouseOrderHoldService warehouseOrderHoldService)
         {
             _regionService = regionService;
             _stateService = stateService;
@@ -78,6 +81,7 @@ namespace PriorityApp.Controllers.CustomerService
             _logger = logger;
             _hub = hub;
             _emailSender = emailSender;
+            _warehouseOrderHoldService = warehouseOrderHoldService;
         }
 
         List<ItemModel> itemModels = new List<ItemModel>();
@@ -217,74 +221,88 @@ namespace PriorityApp.Controllers.CustomerService
                     Model.Territories = _territoryService.GetAllTerritoriesByStateId(Model.StateSelectedId).Result;
                     Model.Territories.Insert(0, new TerritoryModel { Id = -1, Name = "Select Territory" });
                 }
-                if (Model.ZoneSelectedId >0 )
-                {
-                    customerModels = _deliveryCustomerService.GetCutomersByZoneId(Model.ZoneSelectedId).Result;
-                    Model.Zones = _zoneService.GetListOfZonesByTerritoryId(Model.TerritorySelectedId);
-                    Model.Zones.Insert(0, new ZoneModel { Id = -1, Name = "select Zone" });
-                }
-                else
-                {
-                    List<ZoneModel> zoneModels = _zoneService.GetListOfZonesByTerritoryId(Model.TerritorySelectedId);
-                    List<int> zoneIds = zoneModels.Select(z => z.Id).ToList();
-
-                    customerModels = _deliveryCustomerService.GetCutomersByListOfZoneIds(zoneIds).Result;
-                    Model.Zones = zoneModels;
-                    Model.Zones.Insert(0, new ZoneModel { Id = -1, Name = "select Zone" });
-                }
-
-                List<long> customerNumbers = customerModels.Select(c => c.Id).ToList();
-                //orderModels = _orderService.GetOdersByListOfCustomerNumbers(customerNumbers, selectedPriorityDate).Result.ToList();
-                if (Model.orderType == (int)CommanData.OrderCategory.Delivery)
-                {
-                    orderModels = _orderService.GetOdersByListOfCustomerNumbers(customerNumbers, selectedPriorityDate).Result.Where(o => o.OrderCategoryId == (int)CommanData.OrderCategory.Delivery && o.Submitted == false).ToList();
-
-                }
-                else if (Model.orderType == (int)CommanData.OrderCategory.Pickup && Model.viewCase == "show")
-                {
-                    orderModels = _orderService.GetSubmittedOdersByListOfCustomerNumbers(customerNumbers, selectedPriorityDate, selectedPriorityDate).Result.Where(o => o.OrderCategoryId == Model.orderType).ToList();
-                }
-                else if (Model.orderType == (int)CommanData.OrderCategory.Pickup && Model.viewCase == "edit")
-                {
-                    orderModels = _orderService.GetOdersByListOfCustomerNumbers(customerNumbers, selectedPriorityDate).Result.Where(o => o.OrderCategoryId == Model.orderType && o.Submitted == false).ToList();
-                }
-                if (Model.ItemSelectedId != -1)
-                {
-                    orderModels = orderModels.Where(o => o.ItemId == Model.ItemSelectedId).ToList();
-
-                }
-
-                Model.OrderModel = new OrderModel();
-                Model.OrderModel.orders = orderModels.OrderBy(o=>o.OrderNumber).ToList();
-                Model.Customers = customerModels;
-                //Model.Priorities = _priorityService.GetAllPriorities().Result.ToList();
-                //TerritoryModel territoryModel = _territoryService.GetTerritory(Model.TerritorySelectedId);
-                //Model.HoldModel = _holdService.GetHold(Model.SelectedPriorityDate.Date, territoryModel.userId);
-                Model.OrderModel.holdModel = Model.HoldModel;
-                Model.holdTotalAssignedQuantity = Model.HoldModel.QuotaQuantity - Model.HoldModel.ReminingQuantity;
-                //Model.SubRegions = _regionService.GetAllISubRegions().Result;
-                ////Model.SubRegionSelectedId = -1;
-
-                //Model.SubRegions.Insert(0, new Service.Models.MasterModels.SubRegionModel { Id = -1, Name = "Select Region" });
-                //Model.States = _stateService.GetStatesBySubRegionId(Model.SubRegionSelectedId).Result;
-                //Model.States.Insert(0, new StateModel { Id = -1, Name = "Select State" });
-
-                //Model.Territories = _territoryService.GetAllTerritoriesByStateId(Model.StateSelectedId).Result;
-                //Model.Territories.Insert(0, new TerritoryModel { Id = -1, Name = "Select Territory" });
                 itemModels = _itemService.GetAllItems().Result;
                 itemModels.Insert(0, new ItemModel { Id = -1, Name = "All" });
                 Model.Items = itemModels;
                 Model.ItemSelectedId = -1;
-
-                if (Model.orderType == (int)CommanData.OrderCategory.Delivery)
+                if (Model.HoldModel != null)
                 {
-                    return View("index", Model);
+                    if (Model.ZoneSelectedId > 0)
+                    {
+                        customerModels = _deliveryCustomerService.GetCutomersByZoneId(Model.ZoneSelectedId).Result;
+                        Model.Zones = _zoneService.GetListOfZonesByTerritoryId(Model.TerritorySelectedId);
+                        Model.Zones.Insert(0, new ZoneModel { Id = -1, Name = "select Zone" });
+                    }
+                    else
+                    {
+                        List<ZoneModel> zoneModels = _zoneService.GetListOfZonesByTerritoryId(Model.TerritorySelectedId);
+                        List<int> zoneIds = zoneModels.Select(z => z.Id).ToList();
+
+                        customerModels = _deliveryCustomerService.GetCutomersByListOfZoneIds(zoneIds).Result;
+                        Model.Zones = zoneModels;
+                        Model.Zones.Insert(0, new ZoneModel { Id = -1, Name = "select Zone" });
+                    }
+
+                    List<long> customerNumbers = customerModels.Select(c => c.Id).ToList();
+                    //orderModels = _orderService.GetOdersByListOfCustomerNumbers(customerNumbers, selectedPriorityDate).Result.ToList();
+                    if (Model.orderType == (int)CommanData.OrderCategory.Delivery)
+                    {
+                        orderModels = _orderService.GetOdersByListOfCustomerNumbers(customerNumbers, selectedPriorityDate).Result.Where(o => o.OrderCategoryId == (int)CommanData.OrderCategory.Delivery && o.Submitted == false).ToList();
+
+                    }
+                    else if (Model.orderType == (int)CommanData.OrderCategory.Pickup && Model.viewCase == "show")
+                    {
+                        orderModels = _orderService.GetSubmittedOdersByListOfCustomerNumbers(customerNumbers, selectedPriorityDate, selectedPriorityDate).Result.Where(o => o.OrderCategoryId == Model.orderType).ToList();
+                    }
+                    else if (Model.orderType == (int)CommanData.OrderCategory.Pickup && Model.viewCase == "edit")
+                    {
+                        orderModels = _orderService.GetOdersByListOfCustomerNumbers(customerNumbers, selectedPriorityDate).Result.Where(o => o.OrderCategoryId == Model.orderType && o.Submitted == false).ToList();
+                    }
+                    if (Model.ItemSelectedId != -1)
+                    {
+                        orderModels = orderModels.Where(o => o.ItemId == Model.ItemSelectedId).ToList();
+
+                    }
+
+                    Model.OrderModel = new OrderModel();
+                    Model.OrderModel.orders = orderModels.OrderBy(o => o.OrderNumber).ToList();
+                    Model.Customers = customerModels;
+                    //Model.Priorities = _priorityService.GetAllPriorities().Result.ToList();
+                    //TerritoryModel territoryModel = _territoryService.GetTerritory(Model.TerritorySelectedId);
+                    //Model.HoldModel = _holdService.GetHold(Model.SelectedPriorityDate.Date, territoryModel.userId);
+                    Model.OrderModel.holdModel = Model.HoldModel;
+                    Model.holdTotalAssignedQuantity = Model.HoldModel.QuotaQuantity - Model.HoldModel.ReminingQuantity;
+                    //Model.SubRegions = _regionService.GetAllISubRegions().Result;
+                    ////Model.SubRegionSelectedId = -1;
+
+                    //Model.SubRegions.Insert(0, new Service.Models.MasterModels.SubRegionModel { Id = -1, Name = "Select Region" });
+                    //Model.States = _stateService.GetStatesBySubRegionId(Model.SubRegionSelectedId).Result;
+                    //Model.States.Insert(0, new StateModel { Id = -1, Name = "Select State" });
+
+                    //Model.Territories = _territoryService.GetAllTerritoriesByStateId(Model.StateSelectedId).Result;
+                    //Model.Territories.Insert(0, new TerritoryModel { Id = -1, Name = "Select Territory" });
+
+                    if (Model.orderType == (int)CommanData.OrderCategory.Delivery)
+                    {
+                        return View("index", Model);
+                    }
+                    else
+                    {
+                        return View(@"PickUpOrders\EditPickUpOrders", Model);
+                    }
                 }
                 else
                 {
-                    return View(@"PickUpOrders\EditPickUpOrders", Model);
+                    ViewBag.Error = "There Is No Quota for This Priority Date";
+                    if (Model.orderType == (int)CommanData.OrderCategory.Delivery)
+                    {
+                        return View("index",Model);
+                    }
+                    else
+                    {
+                        return View(@"PickUpOrders\EditPickUpOrders", Model);
+                    }
                 }
-
 
             }
             catch
@@ -293,8 +311,121 @@ namespace PriorityApp.Controllers.CustomerService
             }
         }
 
+        public async Task<JsonResult> SaveOrders2(OrderDetails orderModel)
+        {
+            AspNetUser applicationUser = await _userManager.GetUserAsync(User);
+            try
+            {
+                bool updateOrderResult = false;
+                int SavedOrderCount = 0;
+                bool AllOrdersSaved = true;
 
+                HoldModel DBholdModel = _holdService.GetHold(orderModel.PriorityDate, orderModel.UserId);
+                OrderModel2 updateModel = _orderService.GetOrder((long)orderModel.Id);
+                if (updateModel.SavedBefore == true)
+                {
+                    float changeRate = (float)orderModel.PriorityQuantity - (float)updateModel.PriorityQuantity;
 
+                    if (orderModel.PriorityId == (int)CommanData.Priorities.Norm && updateModel.PriorityId == (int)CommanData.Priorities.Norm)
+                    {
+                        DBholdModel.ReminingQuantity = DBholdModel.ReminingQuantity - changeRate;
+
+                    }
+                    else if (orderModel.PriorityId == (int)CommanData.Priorities.Norm && updateModel.PriorityId == (int)CommanData.Priorities.Extra)
+                    {
+                        DBholdModel.ReminingQuantity = (float)DBholdModel.ReminingQuantity - (float)orderModel.PriorityQuantity - changeRate;
+                        DBholdModel.ExtraQuantity = (float)DBholdModel.ExtraQuantity - (float)orderModel.PriorityQuantity + changeRate;
+                    }
+                    else if (orderModel.PriorityId == (int)CommanData.Priorities.Extra && updateModel.PriorityId == (int)CommanData.Priorities.Norm)
+                    {
+                        DBholdModel.ReminingQuantity = (float)DBholdModel.ReminingQuantity + (float)updateModel.PriorityQuantity - changeRate;
+                        DBholdModel.ExtraQuantity = (float)DBholdModel.ExtraQuantity + (float)updateModel.PriorityQuantity + changeRate;
+                    }
+
+                    else if (orderModel.PriorityId == (int)CommanData.Priorities.Extra && updateModel.PriorityId == (int)CommanData.Priorities.Extra)
+                    {
+                        DBholdModel.ExtraQuantity = DBholdModel.ExtraQuantity + changeRate;
+
+                    }
+                    else if (orderModel.PriorityId == (int)CommanData.Priorities.No && updateModel.PriorityId == (int)CommanData.Priorities.Norm)
+                    {
+                        DBholdModel.ReminingQuantity = (float)DBholdModel.ReminingQuantity + (float)updateModel.PriorityQuantity;
+                    }
+                    else if (orderModel.PriorityId == (int)CommanData.Priorities.No && updateModel.PriorityId == (int)CommanData.Priorities.Extra)
+                    {
+                        DBholdModel.ExtraQuantity = (float)DBholdModel.ExtraQuantity - (float)updateModel.PriorityQuantity;
+                    }
+                    else if (orderModel.PriorityId == (int)CommanData.Priorities.Norm && updateModel.PriorityId == (int)CommanData.Priorities.No)
+                    {
+                        DBholdModel.ReminingQuantity = (float)DBholdModel.ReminingQuantity - (float)updateModel.PriorityQuantity - changeRate;
+                    }
+                    else if (orderModel.PriorityId == (int)CommanData.Priorities.Extra && updateModel.PriorityId == (int)CommanData.Priorities.No)
+                    {
+                        DBholdModel.ExtraQuantity = (float)DBholdModel.ExtraQuantity + (float)updateModel.PriorityQuantity + changeRate;
+                    }
+                }
+
+                else if (updateModel.SavedBefore == false && (orderModel.PriorityId == (int)CommanData.Priorities.Norm))
+                {
+                    DBholdModel.ReminingQuantity = (float)DBholdModel.ReminingQuantity - (float)orderModel.PriorityQuantity;
+
+                }
+                else if (updateModel.SavedBefore == false && (orderModel.PriorityId == (int)CommanData.Priorities.Extra))
+                {
+                    DBholdModel.ExtraQuantity = (float)DBholdModel.ExtraQuantity + (float)orderModel.PriorityQuantity;
+
+                }
+                if (orderModel.PriorityId != (int)CommanData.Priorities.No)
+                {
+                    DBholdModel.TempReminingQuantity = DBholdModel.ReminingQuantity;
+                    updateModel.ItemId = orderModel.ItemId;
+                    updateModel.PriorityId = orderModel.PriorityId;
+                    updateModel.PriorityQuantity = orderModel.PriorityQuantity;
+                    updateModel.SavedBefore = true;
+                    updateModel.WHSavedID = applicationUser.Id;
+                    updateModel.Comment = orderModel.Comment;
+                    //updateModel.Truck = orderModel.Truck;
+                    updateModel.OrderCategoryId = (int)CommanData.OrderCategory.Delivery;
+                }
+                else if (updateModel.SavedBefore == true && orderModel.PriorityId == (int)CommanData.Priorities.No)
+                {
+                    DBholdModel.TempReminingQuantity = DBholdModel.ReminingQuantity;
+                    updateModel.PriorityId = orderModel.PriorityId;
+                    updateModel.SavedBefore = true;
+                    updateModel.Truck = "";
+                    updateModel.WHSavedID = applicationUser.Id;
+                    updateModel.PriorityQuantity = 0;
+                    updateModel.ItemId = orderModel.ItemId;
+                    updateModel.OrderCategoryId = (int)CommanData.OrderCategory.Delivery;
+                    updateModel.Comment = "";
+
+                }
+                updateOrderResult = _orderService.UpdateOrder2(updateModel, DBholdModel).Result;
+                if (updateOrderResult == true)
+                {
+                    SavedOrderCount = SavedOrderCount + 1;
+                }
+                else
+                {
+                    AllOrdersSaved = false;
+                }
+                updateOrderResult = false;
+            }
+            catch(Exception e)
+            {
+                return Json(false);
+
+            }
+            return Json(true);
+            }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> SaveDeliveryOrders(GeoFilterModel Model)
+        {
+            return RedirectToAction("Index");
+
+        }
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> SaveOrders(GeoFilterModel Model)
@@ -436,28 +567,58 @@ namespace PriorityApp.Controllers.CustomerService
                 if (!roles.Contains("Sales"))
                 {
                     unSubmittedOrders = _orderService.GetAllUnSubmittedOrdersByRole(roles, submitted).Result;
-                    List<long> customerIds = unSubmittedOrders.Select(o => o.CustomerId).ToList();
-                    List<int> zoneIds = _deliveryCustomerService.GetZoneIdsByListOfCustomerIds(customerIds);
-                    List<int> territoryIds = _zoneService.GetListOfTerritoryIdsByZoneIds(zoneIds);
-                     var territoryModels = _territoryService.GetAllTeritories().Result.Where(t => territoryIds.Contains(t.Id)).GroupBy(t => t.Id).ToList();
-                    var unsubmittedOrdersGroup = unSubmittedOrders.GroupBy(o => o.Customer.zone.Territory.userId).ToList();
-                    foreach (var territoryModel in territoryModels)
+                   
+                    for(int index=0; index < unSubmittedOrders.Count; index++)
                     {
-                        SubmittedOrdersTerritories item = new SubmittedOrdersTerritories();
-                        item.territorryModel = territoryModel.First();
+                        if(unSubmittedOrders[index].OrderCategoryId == (int)CommanData.OrderCategory.Warehouse)
+                        {
+
+                            WarehouseOrderHoldModel warehouseOrderHoldModel = _warehouseOrderHoldService.GetWarehouseOrderHold(unSubmittedOrders[index].Id);
+                            TerritoryModel WHTerritory = _territoryService.GetTerritoryByUserId(warehouseOrderHoldModel.HolduserId);
+                            unSubmittedOrders[index].Customer.zone.Territory = WHTerritory;
+                        }
+                    }
+                    //List<long> customerIds = unSubmittedOrders.Select(o => o.CustomerId).ToList();
+                    //List<int> zoneIds = _deliveryCustomerService.GetZoneIdsByListOfCustomerIds(customerIds);
+                    //List<int> territoryIds = _zoneService.GetListOfTerritoryIdsByZoneIds(zoneIds);
+                    //var territoryModels = _territoryService.GetAllTeritories().Result.Where(t => territoryIds.Contains(t.Id)).GroupBy(t => t.Id).ToList();
+                    var unsubmittedOrdersGroup = unSubmittedOrders.GroupBy(o => o.Customer.zone.Territory.userId).ToList();
+                    SubmittedOrdersTerritories item = new SubmittedOrdersTerritories();
+
+                    foreach (var unsubmittedOrderGroup in unsubmittedOrdersGroup)
+                    {
+                        item.territorryModel = _territoryService.GetTerritoryByUserId(unsubmittedOrderGroup.Key);
                         submittedOrdersTerritories.Add(item);
+                        //foreach (var order in unsubmittedOrderGroup)
+                        //{
+                        //    SubmittedOrdersTerritories item = new SubmittedOrdersTerritories();
+                        //    item.territorryModel = order.Customer.zone.Territory;
+                        //    submittedOrdersTerritories.Add(item);
+                        //}
                     }
                     info.submittedOrdersTerritories = submittedOrdersTerritories;
+
                 }
                 else
                 {
                     unSubmittedOrders = _orderService.GetSubmittedOdersByUserId(applicationUser.Id, false).Result;
                     info.SubmittedOrdersTerritory = _territoryService.GetTerritoryByUserId(applicationUser.Id);
+                    for (int index = 0; index < unSubmittedOrders.Count; index++)
+                    {
+                        if (unSubmittedOrders[index].OrderCategoryId == (int)CommanData.OrderCategory.Warehouse)
+                        {
+
+                            WarehouseOrderHoldModel warehouseOrderHoldModel = _warehouseOrderHoldService.GetWarehouseOrderHold(unSubmittedOrders[index].Id);
+                            TerritoryModel WHTerritory = _territoryService.GetTerritoryByUserId(warehouseOrderHoldModel.HolduserId);
+                            unSubmittedOrders[index].Customer.zone.Territory = WHTerritory;
+                        }
+                    }
                 }
-                    //SubmittInfo info = new SubmittInfo();
-                    //info.holdModels = new List<HoldModel>();
-                    //List<SubmittedOrdersTerritories> submittedOrdersTerritories = new List<SubmittedOrdersTerritories>();
-               //var unsubmittedOrdersGroup = unSubmittedOrders.GroupBy(o => o.Customer.zone.Territory.userId).ToList();
+
+                //SubmittInfo info = new SubmittInfo();
+                //info.holdModels = new List<HoldModel>();
+                //List<SubmittedOrdersTerritories> submittedOrdersTerritories = new List<SubmittedOrdersTerritories>();
+                //var unsubmittedOrdersGroup = unSubmittedOrders.GroupBy(o => o.Customer.zone.Territory.userId).ToList();
                 //foreach (var territoryModel in territoryModels)
                 //{
                 //    SubmittedOrdersTerritories item = new SubmittedOrdersTerritories();
@@ -652,6 +813,8 @@ namespace PriorityApp.Controllers.CustomerService
                 }
                 else
                 {
+                    TerritoryModel territoryModel = _territoryService.GetTerritory(Model.TerritorySelectedId);
+                    Model.HoldModel = _holdService.GetHold(Model.SelectedPriorityDate.Date, territoryModel.userId);
                     Model.SubRegions = _regionService.GetAllISubRegions().Result;
                     Model.SubRegions.Insert(0, new Service.Models.MasterModels.SubRegionModel { Id = -1, Name = "Select SubRegion" });
                     Model.States = _stateService.GetStatesBySubRegionId(Model.SubRegionSelectedId).Result;
@@ -660,49 +823,58 @@ namespace PriorityApp.Controllers.CustomerService
                     Model.Territories = _territoryService.GetAllTerritoriesByStateId(Model.StateSelectedId).Result;
                     Model.Territories.Insert(0, new TerritoryModel { Id = -1, Name = "Select Territory" });
                 }
-                if (Model.ZoneSelectedId > 0)
-                {
-
-                    customerModels = _deliveryCustomerService.GetCutomersByZoneId(Model.ZoneSelectedId).Result;
-                    Model.Zones = _zoneService.GetListOfZonesByTerritoryId(Model.TerritorySelectedId);
-                    Model.Zones.Insert(0, new ZoneModel { Id = -1, Name = "select Zone" });
-                }
-                else
-                {
-                    List<ZoneModel> zoneModels = _zoneService.GetListOfZonesByTerritoryId(Model.TerritorySelectedId);
-                    List<int> zoneIds = zoneModels.Select(z => z.Id).ToList();
-
-                    customerModels = _deliveryCustomerService.GetCutomersByListOfZoneIds(zoneIds).Result;
-                    Model.Zones = zoneModels;
-                    Model.Zones.Insert(0, new ZoneModel { Id = -1, Name = "select Zone" });
-                }
-
-                List<long> customerNumbers = customerModels.Select(c => c.Id).ToList();
-
-                orderModels = _orderService.GetSubmittedOdersByListOfCustomerNumbers(customerNumbers, selectedPriorityDate, selectedPriorityDate).Result.Where(o => o.OrderCategoryId == Model.orderType).ToList();
-
-                if (Model.ItemSelectedId != -1)
-                {
-                    orderModels = orderModels.Where(o => o.ItemId == Model.ItemSelectedId).ToList();
-                }
-                Model.ordersQuantitySum = (float)orderModels.Sum(o => o.PriorityQuantity);
-                TerritoryModel territoryModel = _territoryService.GetTerritory(Model.TerritorySelectedId);
-                Model.HoldModel = _holdService.GetHold(Model.SelectedPriorityDate.Date, territoryModel.userId);
-                Model.OrderModel = new OrderModel();
-                Model.OrderModel.orders = orderModels;
-                Model.Customers = customerModels;
-                //Model.SubRegions = _regionService.GetAllISubRegions().Result;
-                //Model.SubRegions.Insert(0, new Service.Models.MasterModels.SubRegionModel { Id = -1, Name = "Select SubRegion" });
-                //Model.States = _stateService.GetStatesBySubRegionId(Model.SubRegionSelectedId).Result;
-                //Model.States.Insert(0, new StateModel { Id = -1, Name = "Select State" });
-                //Model.SubRegionSelectedId = -1;
-                //Model.Territories = _territoryService.GetAllTerritoriesByStateId(Model.StateSelectedId).Result;
-                //Model.Territories.Insert(0, new TerritoryModel { Id = -1, Name = "Select Territory" });
                 itemModels = _itemService.GetAllItems().Result;
                 itemModels.Insert(0, new ItemModel { Id = -1, Name = "All" });
                 Model.Items = itemModels;
                 Model.ItemSelectedId = -1;
-                Model.holdTotalAssignedQuantity = Model.HoldModel.QuotaQuantity - Model.HoldModel.ReminingQuantity;
+            if(Model.HoldModel != null)
+                {
+                    Model.holdTotalAssignedQuantity = Model.HoldModel.QuotaQuantity - Model.HoldModel.ReminingQuantity;
+                    if (Model.ZoneSelectedId > 0)
+                    {
+
+                        customerModels = _deliveryCustomerService.GetCutomersByZoneId(Model.ZoneSelectedId).Result;
+                        Model.Zones = _zoneService.GetListOfZonesByTerritoryId(Model.TerritorySelectedId);
+                        Model.Zones.Insert(0, new ZoneModel { Id = -1, Name = "select Zone" });
+                    }
+                    else
+                    {
+                        List<ZoneModel> zoneModels = _zoneService.GetListOfZonesByTerritoryId(Model.TerritorySelectedId);
+                        List<int> zoneIds = zoneModels.Select(z => z.Id).ToList();
+
+                        customerModels = _deliveryCustomerService.GetCutomersByListOfZoneIds(zoneIds).Result;
+                        Model.Zones = zoneModels;
+                        Model.Zones.Insert(0, new ZoneModel { Id = -1, Name = "select Zone" });
+                    }
+
+                    List<long> customerNumbers = customerModels.Select(c => c.Id).ToList();
+
+                    orderModels = _orderService.GetSubmittedOdersByListOfCustomerNumbers(customerNumbers, selectedPriorityDate, selectedPriorityDate).Result.Where(o => o.OrderCategoryId == Model.orderType).ToList();
+
+                    if (Model.ItemSelectedId != -1)
+                    {
+                        orderModels = orderModels.Where(o => o.ItemId == Model.ItemSelectedId).ToList();
+                    }
+                    Model.ordersQuantitySum = (float)orderModels.Sum(o => o.PriorityQuantity);
+                    //TerritoryModel territoryModel = _territoryService.GetTerritory(Model.TerritorySelectedId);
+                    //Model.HoldModel = _holdService.GetHold(Model.SelectedPriorityDate.Date, territoryModel.userId);
+                    Model.OrderModel = new OrderModel();
+                    Model.OrderModel.orders = orderModels;
+                    Model.Customers = customerModels;
+                    //Model.SubRegions = _regionService.GetAllISubRegions().Result;
+                    //Model.SubRegions.Insert(0, new Service.Models.MasterModels.SubRegionModel { Id = -1, Name = "Select SubRegion" });
+                    //Model.States = _stateService.GetStatesBySubRegionId(Model.SubRegionSelectedId).Result;
+                    //Model.States.Insert(0, new StateModel { Id = -1, Name = "Select State" });
+                    //Model.SubRegionSelectedId = -1;
+                    //Model.Territories = _territoryService.GetAllTerritoriesByStateId(Model.StateSelectedId).Result;
+                    //Model.Territories.Insert(0, new TerritoryModel { Id = -1, Name = "Select Territory" });
+
+                }
+                else
+                {
+                    ViewBag.Error = "There Is No Quota for This Priority Date";
+                }
+
                 if (Model.orderType == (int)CommanData.OrderCategory.Delivery)
                 {
                     return View("ShowSubmittedOrders", Model);

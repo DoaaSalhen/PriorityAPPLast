@@ -207,8 +207,19 @@ namespace PriorityApp.Controllers.CustomerService
                 WarehouseOrderHoldModel warehouseOrderHoldModel = new WarehouseOrderHoldModel();
                 AspNetUser applicationUser = await _userManager.GetUserAsync(User);
                 OrderModel2 orderModel2 = new OrderModel2();
-                TerritoryModel territoryModel = _territoryService.GetTerritory(model.TerritorySelectedId);
-                var hold = _holdService.GetHold(model.HoldModel.PriorityDate, territoryModel.userId);
+                List<string> roles = (List<string>)_userManager.GetRolesAsync(applicationUser).Result;
+                TerritoryModel territoryModel = null;
+                if (roles.Contains("Sales"))
+                {
+                    territoryModel = _territoryService.GetTerritoryByUserId(applicationUser.Id);
+
+                }
+                else
+                {
+                    territoryModel = _territoryService.GetTerritory(model.TerritorySelectedId);
+
+                }
+                HoldModel hold = _holdService.GetHold(model.SelectedPriorityDate, territoryModel.userId);
                 if (hold != null)
                 {
                      Message = "there is an error";
@@ -352,20 +363,52 @@ namespace PriorityApp.Controllers.CustomerService
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult SearchForOrders(WarehouseOrderModel Model)
+        public async Task<ActionResult> SearchForOrders(WarehouseOrderModel Model)
         {
             try
             {
+                string userId;
                 List<OrderModel2> orderModels = new List<OrderModel2>();
                 List<CustomerModel> customerModels = new List<CustomerModel>();
                 DateTime selectedPriorityDate = Model.SelectedPriorityDate.Date;
-
-                string userId = _territoryService.GetTerritory(Model.TerritorySelectedId).userId;
+                AspNetUser applicationUser = await _userManager.GetUserAsync(User);
+                List<string> roles = (List<string>)_userManager.GetRolesAsync(applicationUser).Result;
+                if(!roles.Contains("Sales"))
+                {
+                     userId = _territoryService.GetTerritory(Model.TerritorySelectedId).userId;
+                }
+                else
+                {
+                     userId = applicationUser.Id;
+                }
                 HoldModel hold= _holdService.GetLastHoldByUserIdAndPriorityDate(userId, Model.SelectedPriorityDate);
                 List <WarehouseOrderHoldModel> warehouseOrderHoldModels = _warehouseOrderHoldService.GetWarehouseOrderHold(userId, Model.SelectedPriorityDate).ToList();
-                foreach(var warehouseOrderHoldModel in warehouseOrderHoldModels)
+                if (Model.ViewCase == "edit")
                 {
-                    warehouseOrderHoldModel.Order = _orderService.GetOrder(warehouseOrderHoldModel.OrderId);
+                    foreach (var warehouseOrderHoldModel in warehouseOrderHoldModels)
+                    {
+                        var order = _orderService.GetOrder(warehouseOrderHoldModel.OrderId);
+                        if(order.Submitted== false)
+                        {
+                            warehouseOrderHoldModel.Order = _orderService.GetOrder(warehouseOrderHoldModel.OrderId);
+                        }
+                        
+                    }
+                    warehouseOrderHoldModels = warehouseOrderHoldModels.Where(WH => WH.Order != null).ToList();
+                }
+                else
+                {
+                    foreach (var warehouseOrderHoldModel in warehouseOrderHoldModels.Where(WH => WH.Order.Submitted == true))
+                    {
+                        var order = _orderService.GetOrder(warehouseOrderHoldModel.OrderId);
+                        if (order.Submitted == true)
+                        {
+                            warehouseOrderHoldModel.Order = _orderService.GetOrder(warehouseOrderHoldModel.OrderId);
+                        }
+
+                    }
+                    warehouseOrderHoldModels = warehouseOrderHoldModels.Where(WH => WH.Order != null).ToList();
+
                 }
                 Model.warehouseOrderHoldModels = warehouseOrderHoldModels;
                 TerritoryModel territoryModel = _territoryService.GetTerritory(Model.TerritorySelectedId);

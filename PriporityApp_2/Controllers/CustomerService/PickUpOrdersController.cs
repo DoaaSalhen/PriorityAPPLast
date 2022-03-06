@@ -75,7 +75,7 @@ namespace PriorityApp.Controllers.CustomerService
             _priorityService = priorityService;
         }
         // GET: PickUpOrdersController
-        public ActionResult Index()
+        public async Task<ActionResult> Index()
         {
             AddPickUpOrderModel addPickUpOrderModel = new AddPickUpOrderModel();
             addPickUpOrderModel.Items = _itemService.GetItemsByType("Bags").Result.ToList();
@@ -84,6 +84,23 @@ namespace PriorityApp.Controllers.CustomerService
             addPickUpOrderModel.SubRegions = subRegionModels;
             addPickUpOrderModel.SubRegionSelectedId = -1;
             addPickUpOrderModel.SelectedPriorityDate = DateTime.Today;
+
+            AspNetUser applicationUser = await _userManager.GetUserAsync(User);
+            TerritoryModel territoryModelSales = null;
+            var roles = _userManager.GetRolesAsync(applicationUser).Result.ToList();
+            if (roles.Contains("Sales"))
+            {
+                List<CustomerModel> customerModels = new List<CustomerModel>();
+
+                territoryModelSales = _territoryService.GetTerritoryByUserId(applicationUser.Id);
+                addPickUpOrderModel.TerritorySelectedId = territoryModelSales.Id;
+
+                List<ZoneModel> zoneModels = _zoneService.GetListOfZonesByTerritoryId(addPickUpOrderModel.TerritorySelectedId);
+                List<int> zoneIds = zoneModels.Select(z => z.Id).ToList();
+                customerModels = _deliveryCustomerService.GetCutomersByListOfZoneIds(zoneIds).Result;
+                addPickUpOrderModel.TerritoryAllCustomers = customerModels;
+            }
+
             return View(addPickUpOrderModel);
         }
 
@@ -152,14 +169,105 @@ namespace PriorityApp.Controllers.CustomerService
             }
             else
             {
-                customerModels = _deliveryCustomerService.GetCutomersByZoneId(id).Result;
+
+                List<ZoneModel> zoneModels = _zoneService.GetListOfZonesByTerritoryId(id);
+                List<int> zoneIds = zoneModels.Select(z => z.Id).ToList();
+
+                customerModels = _deliveryCustomerService.GetCutomersByListOfZoneIds(zoneIds).Result;
 
                 customerModels.Insert(0, new CustomerModel { Id = -1, CustomerName = "select Customer" });
             }
-            return Json(new SelectList(customerModels, "Id", "CustomerNamer"));
+            return Json(new SelectList(customerModels, "Id", "CustomerName"));
 
         }
 
+        public async Task<ActionResult> getData(List<TestCustomer> selectedCustomers)
+        {
+            return View("index");
+        }
+
+
+        //[HttpPost]
+        //[ValidateAntiForgeryToken]
+        //public async Task<ActionResult> SearchForCustomers(AddPickUpOrderModel Model)
+        //{
+        //    try
+        //    {
+        //        List<CustomerModel> customerModels = new List<CustomerModel>();
+        //        List<PickUpOrder> pickUpOrders = new List<PickUpOrder>();
+        //        DateTime selectedPriorityDate = Model.SelectedPriorityDate.Date;
+        //        AspNetUser applicationUser = await _userManager.GetUserAsync(User);
+        //        TerritoryModel territoryModelSales = null;
+        //        var roles = _userManager.GetRolesAsync(applicationUser).Result.ToList();
+        //        if (roles.Contains("Sales"))
+        //        {
+        //            territoryModelSales = _territoryService.GetTerritoryByUserId(applicationUser.Id);
+        //            Model.TerritorySelectedId = territoryModelSales.Id;
+        //            Model.HoldModel = _holdService.GetHold(Model.SelectedPriorityDate.Date, territoryModelSales.userId);
+        //            Model.Priorities = _priorityService.GetAllPrioritiesExceptExtra().Result.ToList();
+
+        //        }
+        //        else
+        //        {
+        //            Model.Priorities = _priorityService.GetAllPriorities().Result.ToList();
+        //            TerritoryModel territoryModel = _territoryService.GetTerritory(Model.TerritorySelectedId);
+        //            Model.HoldModel = _holdService.GetHold(Model.SelectedPriorityDate.Date, territoryModel.userId);
+        //            Model.SubRegions = _regionService.GetAllISubRegions().Result;
+        //            Model.SubRegions.Insert(0, new Service.Models.MasterModels.SubRegionModel { Id = -1, Name = "Select Region" });
+        //            Model.States = _stateService.GetStatesBySubRegionId(Model.SubRegionSelectedId).Result;
+        //            Model.States.Insert(0, new StateModel { Id = -1, Name = "Select State" });
+        //            Model.Territories = _territoryService.GetAllTerritoriesByStateId(Model.StateSelectedId).Result;
+        //            Model.Territories.Insert(0, new TerritoryModel { Id = -1, Name = "Select Territory" });
+        //        }
+        //        if (Model.ZoneSelectedId > 0)
+        //        {
+
+        //            customerModels = _deliveryCustomerService.GetCutomersByZoneId(Model.ZoneSelectedId).Result;
+        //            Model.Zones = _zoneService.GetListOfZonesByTerritoryId(Model.TerritorySelectedId);
+        //            Model.Zones.Insert(0, new ZoneModel { Id = -1, Name = "select Zone" });
+        //        }
+        //        else
+        //        {
+        //            List<ZoneModel> zoneModels = _zoneService.GetListOfZonesByTerritoryId(Model.TerritorySelectedId);
+        //            List<int> zoneIds = zoneModels.Select(z => z.Id).ToList();
+
+        //            customerModels = _deliveryCustomerService.GetCutomersByListOfZoneIds(zoneIds).Result;
+        //            Model.Zones = zoneModels;
+        //            Model.Zones.Insert(0, new ZoneModel { Id = -1, Name = "select Zone" });
+        //        }
+        //        //foreach (var customer in customerModels)
+        //        //{
+        //        //    PickUpOrder pickUpOrder = new PickUpOrder();
+        //        //    pickUpOrder.Customer = customer;
+        //        //    pickUpOrder.PriorityId = 2;
+        //        //    pickUpOrder.ItemSelectedId = 1;
+        //        //    pickUpOrders.Add(pickUpOrder);
+        //        //}
+        //        //Model.pickUpOrders = pickUpOrders;
+        //        var items = _itemService.GetItemsByType("Bags").Result.ToList();
+        //        customerModels.ForEach(c => c.itemModels = items);
+        //        Model.Customers = customerModels;
+        //        Model.Items = items;
+        //        Model.Priorities = _priorityService.GetAllPriorities().Result.ToList();
+        //        //TerritoryModel territoryModel = _territoryService.GetTerritory(Model.TerritorySelectedId);
+        //        //Model.HoldModel = _holdService.GetHold(Model.SelectedPriorityDate.Date, territoryModel.userId);
+        //        Model.holdTotalAssignedQuantity = Model.HoldModel.QuotaQuantity - Model.HoldModel.ReminingQuantity;
+        //        Model.SubRegions = _regionService.GetAllISubRegions().Result;
+
+        //        //Model.SubRegions.Insert(0, new Service.Models.MasterModels.SubRegionModel { Id = -2, Name = "Select SubRegion" });
+        //        //Model.States = _stateService.GetStatesBySubRegionId(Model.SubRegionSelectedId).Result;
+        //        //Model.States.Insert(0, new StateModel { Id = -1, Name = "Select State" });
+
+        //        //Model.Territories = _territoryService.GetAllTerritoriesByStateId(Model.StateSelectedId).Result;
+        //        //Model.Territories.Insert(0, new TerritoryModel { Id = -1, Name = "Select Territory" });
+        //        return View("index", Model);
+        //    }
+        //    catch (Exception e)
+
+        //    {
+        //        return RedirectToAction("ERROR404");
+        //    }
+        //}
 
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -179,7 +287,7 @@ namespace PriorityApp.Controllers.CustomerService
                     Model.TerritorySelectedId = territoryModelSales.Id;
                     Model.HoldModel = _holdService.GetHold(Model.SelectedPriorityDate.Date, territoryModelSales.userId);
                     Model.Priorities = _priorityService.GetAllPrioritiesExceptExtra().Result.ToList();
-
+                   
                 }
                 else
                 {
@@ -193,47 +301,51 @@ namespace PriorityApp.Controllers.CustomerService
                     Model.Territories = _territoryService.GetAllTerritoriesByStateId(Model.StateSelectedId).Result;
                     Model.Territories.Insert(0, new TerritoryModel { Id = -1, Name = "Select Territory" });
                 }
-                if (Model.ZoneSelectedId > 0)
+                var items = _itemService.GetItemsByType("Bags").Result.ToList();
+                Model.Items = items;
+                List<ZoneModel> zoneModels = _zoneService.GetListOfZonesByTerritoryId(Model.TerritorySelectedId);
+                List<int> zoneIds = zoneModels.Select(z => z.Id).ToList();
+                customerModels = _deliveryCustomerService.GetCutomersByListOfZoneIds(zoneIds).Result;
+                Model.TerritoryAllCustomers = customerModels;
+                if (Model.HoldModel != null)
                 {
+                    List<CustomerModel> selectedCustomerModels = new List<CustomerModel>();
 
-                    customerModels = _deliveryCustomerService.GetCutomersByZoneId(Model.ZoneSelectedId).Result;
-                    Model.Zones = _zoneService.GetListOfZonesByTerritoryId(Model.TerritorySelectedId);
-                    Model.Zones.Insert(0, new ZoneModel { Id = -1, Name = "select Zone" });
+                    if (Model.selectedCustomers != null)
+                    {
+                        if (Model.ZoneSelectedId > 0)
+                        {
+
+                            selectedCustomerModels = _deliveryCustomerService.GetCutomersByZoneId(Model.ZoneSelectedId).Result;
+                            //Model.Zones = _zoneService.GetListOfZonesByTerritoryId(Model.TerritorySelectedId);
+                            //Model.Zones.Insert(0, new ZoneModel { Id = -1, Name = "select Zone" });
+                        }
+                        else
+                        {
+
+                            foreach (var selectedCustomer in Model.selectedCustomers)
+                            {
+                                selectedCustomerModels.Add(_deliveryCustomerService.GetDeliveryCustomer(selectedCustomer));
+                            }
+                            //customerModels = _deliveryCustomerService.GetCutomersByListOfZoneIds(zoneIds).Result;
+                            //Model.Zones = zoneModels;
+                            //Model.Zones.Insert(0, new ZoneModel { Id = -1, Name = "select Zone" });
+                        }
+                        Model.Zones = _zoneService.GetListOfZonesByTerritoryId(Model.TerritorySelectedId);
+                        Model.Zones.Insert(0, new ZoneModel { Id = -1, Name = "select Zone" });
+                        selectedCustomerModels.ForEach(c => c.itemModels = items);
+                        Model.Customers = selectedCustomerModels;
+                        Model.holdTotalAssignedQuantity = Model.HoldModel.QuotaQuantity - Model.HoldModel.ReminingQuantity;
+                    }
+                    else
+                    {
+                        ViewBag.Error = "There Is No Selected Customers";
+                    }
                 }
                 else
                 {
-                    List<ZoneModel> zoneModels = _zoneService.GetListOfZonesByTerritoryId(Model.TerritorySelectedId);
-                    List<int> zoneIds = zoneModels.Select(z => z.Id).ToList();
-
-                    customerModels = _deliveryCustomerService.GetCutomersByListOfZoneIds(zoneIds).Result;
-                    Model.Zones = zoneModels;
-                    Model.Zones.Insert(0, new ZoneModel { Id = -1, Name = "select Zone" });
+                    ViewBag.Error= "There Is No Quota for This Priority Date";
                 }
-                //foreach (var customer in customerModels)
-                //{
-                //    PickUpOrder pickUpOrder = new PickUpOrder();
-                //    pickUpOrder.Customer = customer;
-                //    pickUpOrder.PriorityId = 2;
-                //    pickUpOrder.ItemSelectedId = 1;
-                //    pickUpOrders.Add(pickUpOrder);
-                //}
-                //Model.pickUpOrders = pickUpOrders;
-                var items = _itemService.GetItemsByType("Bags").Result.ToList();
-                customerModels.ForEach(c => c.itemModels = items);
-                Model.Customers = customerModels;
-                Model.Items = items;
-                Model.Priorities = _priorityService.GetAllPriorities().Result.ToList();
-                //TerritoryModel territoryModel = _territoryService.GetTerritory(Model.TerritorySelectedId);
-                //Model.HoldModel = _holdService.GetHold(Model.SelectedPriorityDate.Date, territoryModel.userId);
-                Model.holdTotalAssignedQuantity = Model.HoldModel.QuotaQuantity - Model.HoldModel.ReminingQuantity;
-                Model.SubRegions = _regionService.GetAllISubRegions().Result;
-
-                //Model.SubRegions.Insert(0, new Service.Models.MasterModels.SubRegionModel { Id = -2, Name = "Select SubRegion" });
-                //Model.States = _stateService.GetStatesBySubRegionId(Model.SubRegionSelectedId).Result;
-                //Model.States.Insert(0, new StateModel { Id = -1, Name = "Select State" });
-
-                //Model.Territories = _territoryService.GetAllTerritoriesByStateId(Model.StateSelectedId).Result;
-                //Model.Territories.Insert(0, new TerritoryModel { Id = -1, Name = "Select Territory" });
                 return View("index", Model);
             }
             catch (Exception e)
@@ -242,7 +354,6 @@ namespace PriorityApp.Controllers.CustomerService
                 return RedirectToAction("ERROR404");
             }
         }
-
 
         [HttpPost]
         [ValidateAntiForgeryToken]

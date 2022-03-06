@@ -270,6 +270,7 @@
         document.getElementById("total").value = holdTotalAssignedQuantity + parseFloat(totalQuantity);
         document.getElementById("remaining").value = remainingQuantity - parseFloat(totalQuantity);
         document.getElementById("extra").value = ExtraQuantity + extraTotalQuantity;
+        document.getElementById("sum") = parseFloat(document.getElementById("total").value) + parseFloat(document.getElementById("extra").value);
 
     }
 

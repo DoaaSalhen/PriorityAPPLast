@@ -43,11 +43,11 @@ namespace PriorityApp.Service.Implementation
             return Task<bool>.FromResult<bool>(false);
         }
 
-        public WarehouseOrderHoldModel GetWarehouseOrderHold(long id)
+        public WarehouseOrderHoldModel GetWarehouseOrderHold(long orderId)
         {
             try
             {
-                var item = _repository.Find(WH => WH.OrderId == id );
+                WarehouseOrderHold item = _repository.Find(WH => WH.OrderId == orderId).First();
                 WarehouseOrderHoldModel model = _mapper.Map<WarehouseOrderHoldModel>(item);
                 return model;
             }

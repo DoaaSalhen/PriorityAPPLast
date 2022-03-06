@@ -249,6 +249,7 @@
                 <label class="control-label" style="display:block">Priority Date</label>
                 <input type="date" class="form-select-lg mb-4" id="SelectedPriorityDate" asp-for="SelectedPriorityDate" />
             </div>
+            <input type="hidden" asp-for="ViewCase"  value="edit" id="ViewCase"/>
             @if (!roles.Contains("Sales"))
             {
                 @if (Model.SubRegions == null)

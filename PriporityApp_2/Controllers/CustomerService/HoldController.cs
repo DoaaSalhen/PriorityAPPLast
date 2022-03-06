@@ -130,7 +130,7 @@ namespace PriorityApp.Controllers.CustomerService
             }
         }
 
-        [Authorize(Roles = "SuperAdmin, Admin, CustomerService")]
+        [Authorize(Roles = "SuperAdmin, Admin, CustomerService, Sales")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult ExportQuotaDaily(HoldModel model)

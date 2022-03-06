@@ -50,15 +50,8 @@
 <link rel="stylesheet" href="~/DataTable/jquery.dataTables.min.css">
 
 
-@if (ViewBag.Message != null)
-{
-    <div style="background-color: #00e600; height: 60px; box-shadow: 5px; margin: 0px 20px 20px 50px; text-align:center; font-size:x-large">@ViewBag.Message</div> }
-else if (ViewBag.Error != null)
-{
+@*<link rel="stylesheet" href="~/css/newStyleSheet.css">*@
 
-    <div style="background-color: #ff3333; height: 60px; box-shadow: 5px; margin: 0px 20px 20px 50px; text-align: center; font-size: x-large">@ViewBag.Error</div>///////////////////////////////*@ <!--<div class="modal">--> <!-- Modal content -->
-
-}
 
 
 @if (Model.HoldModel != null)
@@ -148,42 +141,22 @@ else if (ViewBag.Error != null)
             if ($(ddlsource).val() != -1) {
                 var url = '@Url.Content("~/")' + "PriorityTool/PickUpOrders/CustomerFilter";
                 $.getJSON(url, { id: $(ddlsource).val() }, function (data) {
-                    $('#selectedCustomers').empty();
-                    $.each(data, function (i, customer) {
-                        items += "<option value='" + customer.value + "'>" + customer.text + "</option>";
+                    $('#TerritorySelectedId').empty();
+                    $.each(data, function (i, territory) {
+                        items += "<option value='" + territory.value + "'>" + territory.text + "</option>";
                     });
-                    $('#selectedCustomers').html(items);
+                    $('#TerritorySelectedId').html(items);
                 });
             }
             else
             {
-                $('#selectedCustomers').html(items);
+                $('#TerritorySelectedId').html(items);
 
             }
 
         });
-        //var selectedCustomers = [];
-        //$('#CustomerSelectedId').change (function (e) {
-        //    alert($("#CustomerSelectedId option:selected:last").text());
-        //    //alert($(this).children("option:selected:last").val());
-        //    var customer = {
-        //        Id: $("#CustomerSelectedId option:selected:last").val(),
-        //        CustomerName: $("#CustomerSelectedId option:selected:last").text(),
-        //        }
-        //    alert(customer);
-        //    selectedCustomers.push(customer);
-        //});
-
-        @*$('#getCustomersId').click(function (e) {
-            alert(selectedCustomers.values());
-                var url = '@Url.Content("~/")' + "PriorityTool/PickUpOrders/getData";
-            $.getJSON(url, { selectedCustomers: selectedCustomers.values()}, function (data) {
 
 
-                });*@
-
-
-        //});
 
     });
 
@@ -379,7 +352,7 @@ else if (ViewBag.Error != null)
             <div class="col-xs-12 col-sm-6 col-md-6 col-lg-4 selectFilter" style="display:inline-block">
                 <label class="control-label" style="display:block">Priority Date</label>
                 <input class="form-select form-select-lg mb-3" type="date" id="SelectedPriorityDate" asp-for="SelectedPriorityDate" />
-                @*<input type="hidden" asp-for="orderType" value=2 />*@
+                @*<input type="hidden" asp-for="orderType" value=3 />*@
             </div>
         </div>
         <div class="form-row" style="width:100%">
@@ -426,7 +399,8 @@ else if (ViewBag.Error != null)
                         <select id="TerritorySelectedId" name="TerritorySelectedId" asp-for="TerritorySelectedId"
                                 class="form-select form-select-lg mb-3"
                                 asp-items="@(new SelectList(string.Empty, "Id", "Name"))"></select>
-                    </div> }
+                    </div> 
+                }
                 else
                 {
                     <div class="col-xs-12 col-sm-6 col-md-6 col-lg-2 selectFilter" style="display:inline-block">
@@ -437,33 +411,13 @@ else if (ViewBag.Error != null)
                                 asp-items="@(new SelectList(Model.Territories, "Id", "Name"))"></select>
                     </div>
                 }
-            }
-                @if (Model.Customers == null)
-                {
-                    <div class="col-xs-12 col-sm-6 col-md-6 col-lg-2 selectFilter" style="display:inline-block">
-                        <label class="control-label">Customers</label>
+                        }
 
-                        <select multiple id="selectedCustomers" name="selectedCustomers" asp-for="selectedCustomers"
-                                class="form-select form-select-lg mb-3"
-                                asp-items="@(new SelectList(string.Empty, "Id", "Name"))"></select>
-                    </div>
-                }
-                else
-                {
-                    <div class="col-xs-12 col-sm-6 col-md-6 col-lg-2 selectFilter" style="display:inline-block">
-                        <label class="control-label">Customers</label>
-
-                        <select multiple id="selectedCustomers" name="selectedCustomers" asp-for="selectedCustomers"
-                                class="form-select form-select-lg mb-3"
-                                asp-items="@(new SelectList(Model.TerritoryAllCustomers, "Id", "CustomerName"))"></select>
-                    </div>
-                }
-
-            
+               
+            <input type="submit" value="Search" class="btn btn-primary btn-lg searchbtn" />
 
         </div>
 
-        <input type="submit" value="Search" class="btn btn-primary btn-lg searchbtn" />
 
     </div>
 </form>
@@ -487,7 +441,7 @@ else if (ViewBag.Error != null)
             </tr>
         </thead>
         <tbody>
-            @if (Model.HoldModel != null && Model.Customers != null)
+            @if (Model.HoldModel != null)
             {
                 <script>
                          var holdReminingQuantity2 = @Model.HoldModel.ReminingQuantity;
@@ -502,13 +456,13 @@ else if (ViewBag.Error != null)
                     string customerId = "customerId" + index;
                     <tr>
                         @*<td>
-                                <select id="WarehouseModel2[@index].WarehouseSelectedId" name="WarehouseModel2[@index].WarehouseSelectedId" asp-for="WarehouseModel2[index].WarehouseSelectedId"
-                                        asp-items="@(new SelectList(Model.WarehouseModel2[index].WarehouseModels, "Id", "Name"))"></select>
+                        <select id="WarehouseModel2[@index].WarehouseSelectedId" name="WarehouseModel2[@index].WarehouseSelectedId" asp-for="WarehouseModel2[index].WarehouseSelectedId"
+                                asp-items="@(new SelectList(Model.WarehouseModel2[index].WarehouseModels, "Id", "Name"))"></select>
 
-                            </td>
-                            <td>
-                                <select class="@dropDownPriorityId form-control" id="WarehouseModel2[@index].PrioritySelectedId" name="WarehouseModel2[@index].PrioritySelectedId" asp-for="WarehouseModel2[index].PrioritySelectedId"
-                                        asp-items="@(new SelectList(Model.WarehouseModel2[index].priorityModels, "Id", "Name"))" onchange="calculateTotal(@index, @Model.HoldModel.ReminingQuantity)"></select>*@
+                    </td>
+                    <td>
+                        <select class="@dropDownPriorityId form-control" id="WarehouseModel2[@index].PrioritySelectedId" name="WarehouseModel2[@index].PrioritySelectedId" asp-for="WarehouseModel2[index].PrioritySelectedId"
+                                asp-items="@(new SelectList(Model.WarehouseModel2[index].priorityModels, "Id", "Name"))" onchange="calculateTotal(@index, @Model.HoldModel.ReminingQuantity)"></select>*@
 
 
                         @*</td>*@
@@ -570,10 +524,10 @@ else if (ViewBag.Error != null)
                     <span>Summation</span>
                     <input id="sum" type="number" value="@summation" disabled style="margin:10px 20px 20px 0; width:90px" />
 
-                    <span id="NOOrdersSpain" hidden>No search result</span>
-                    <span id="NoQouta" hidden>there is no Qouta for selected priority date</span>
+            <span id="NOOrdersSpain" hidden>No search result</span>
+            <span id="NoQouta" hidden>there is no Qouta for selected priority date</span>
 
-                </div>
+            </div>
 
             }
         </tbody>

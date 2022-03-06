@@ -95,7 +95,7 @@ namespace PriorityApp.Service.Implementation
         {
             try
             {
-                Territory territory = _repository.Find(x => x.userId == UserId).FirstOrDefault();
+                Territory territory = _repository.Find(x => x.userId == UserId, false, x=>x.State).FirstOrDefault();
                 TerritoryModel model = _mapper.Map<TerritoryModel>(territory);
                 return model;
             }
