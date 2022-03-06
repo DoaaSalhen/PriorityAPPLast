@@ -1,4 +1,5 @@
-﻿using System;
+﻿using PriorityApp.Service.Models.MasterModels;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -15,5 +16,8 @@ namespace PriorityApp.Service.Models
         public DateTime HoldPriorityDate { get; set; }
         public string HolduserId { get; set; }
         public List<WarehouseOrderHoldModel> WarehouseOrderHoldModels { get; set; }
+
+        public TerritoryModel Territory { get; set; }
+        public int TerritoryId { get; set; }
     }
 }

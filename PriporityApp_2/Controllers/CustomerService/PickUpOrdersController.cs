@@ -175,7 +175,6 @@ namespace PriorityApp.Controllers.CustomerService
 
                 customerModels = _deliveryCustomerService.GetCutomersByListOfZoneIds(zoneIds).Result;
 
-                customerModels.Insert(0, new CustomerModel { Id = -1, CustomerName = "select Customer" });
             }
             return Json(new SelectList(customerModels, "Id", "CustomerName"));
 
@@ -300,6 +299,7 @@ namespace PriorityApp.Controllers.CustomerService
                     Model.States.Insert(0, new StateModel { Id = -1, Name = "Select State" });
                     Model.Territories = _territoryService.GetAllTerritoriesByStateId(Model.StateSelectedId).Result;
                     Model.Territories.Insert(0, new TerritoryModel { Id = -1, Name = "Select Territory" });
+
                 }
                 var items = _itemService.GetItemsByType("Bags").Result.ToList();
                 Model.Items = items;

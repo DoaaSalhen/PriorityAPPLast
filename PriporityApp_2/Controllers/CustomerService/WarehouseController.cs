@@ -257,7 +257,8 @@ namespace PriorityApp.Controllers.CustomerService
                                     warehouseOrderHoldModel.OrderId = newOrderModel.Id;
                                     warehouseOrderHoldModel.HoldPriorityDate = hold.PriorityDate;
                                     warehouseOrderHoldModel.HolduserId = hold.userId;
-                                   await _warehouseOrderHoldService.CreateWarehouseOrderHold(warehouseOrderHoldModel);
+                                    warehouseOrderHoldModel.TerritoryId = territoryModel.Id;
+                                    await _warehouseOrderHoldService.CreateWarehouseOrderHold(warehouseOrderHoldModel);
 
                                 }
                             }
@@ -277,7 +278,8 @@ namespace PriorityApp.Controllers.CustomerService
                                     warehouseOrderHoldModel.OrderId1 = newOrderModel.Id;
                                     warehouseOrderHoldModel.HoldPriorityDate = hold.PriorityDate;
                                     warehouseOrderHoldModel.HolduserId = hold.userId;
-                                    await _warehouseOrderHoldService.CreateWarehouseOrderHold(warehouseOrderHoldModel);
+                                    warehouseOrderHoldModel.TerritoryId = territoryModel.Id;
+                                await _warehouseOrderHoldService.CreateWarehouseOrderHold(warehouseOrderHoldModel);
                             }
 
                         }
@@ -398,7 +400,7 @@ namespace PriorityApp.Controllers.CustomerService
                 }
                 else
                 {
-                    foreach (var warehouseOrderHoldModel in warehouseOrderHoldModels.Where(WH => WH.Order.Submitted == true))
+                    foreach (var warehouseOrderHoldModel in warehouseOrderHoldModels)
                     {
                         var order = _orderService.GetOrder(warehouseOrderHoldModel.OrderId);
                         if (order.Submitted == true)

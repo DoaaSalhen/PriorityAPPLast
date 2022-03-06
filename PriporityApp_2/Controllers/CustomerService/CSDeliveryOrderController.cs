@@ -574,7 +574,7 @@ namespace PriorityApp.Controllers.CustomerService
                         {
 
                             WarehouseOrderHoldModel warehouseOrderHoldModel = _warehouseOrderHoldService.GetWarehouseOrderHold(unSubmittedOrders[index].Id);
-                            TerritoryModel WHTerritory = _territoryService.GetTerritoryByUserId(warehouseOrderHoldModel.HolduserId);
+                            TerritoryModel WHTerritory = _territoryService.GetTerritory(warehouseOrderHoldModel.TerritoryId);
                             unSubmittedOrders[index].Customer.zone.Territory = WHTerritory;
                         }
                     }
@@ -609,7 +609,7 @@ namespace PriorityApp.Controllers.CustomerService
                         {
 
                             WarehouseOrderHoldModel warehouseOrderHoldModel = _warehouseOrderHoldService.GetWarehouseOrderHold(unSubmittedOrders[index].Id);
-                            TerritoryModel WHTerritory = _territoryService.GetTerritoryByUserId(warehouseOrderHoldModel.HolduserId);
+                            TerritoryModel WHTerritory = _territoryService.GetTerritory(warehouseOrderHoldModel.TerritoryId);
                             unSubmittedOrders[index].Customer.zone.Territory = WHTerritory;
                         }
                     }

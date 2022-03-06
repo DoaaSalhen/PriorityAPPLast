@@ -440,21 +440,21 @@ else if (ViewBag.Error != null)
             }
                 @if (Model.Customers == null)
                 {
-                    <div class="col-xs-12 col-sm-6 col-md-6 col-lg-2 selectFilter" style="display:inline-block">
+                    <div class="col-xs-12 col-sm-6 col-md-6 col-lg-4 selectFilter" style="display:inline-block">
                         <label class="control-label">Customers</label>
 
                         <select multiple id="selectedCustomers" name="selectedCustomers" asp-for="selectedCustomers"
-                                class="form-select form-select-lg mb-3"
+                                class="form-select form-select-lg mb-5"
                                 asp-items="@(new SelectList(string.Empty, "Id", "Name"))"></select>
                     </div>
                 }
                 else
                 {
-                    <div class="col-xs-12 col-sm-6 col-md-6 col-lg-2 selectFilter" style="display:inline-block">
+                    <div class="col-xs-12 col-sm-6 col-md-6 col-lg-4 selectFilter" style="display:inline-block">
                         <label class="control-label">Customers</label>
 
                         <select multiple id="selectedCustomers" name="selectedCustomers" asp-for="selectedCustomers"
-                                class="form-select form-select-lg mb-3"
+                                class="form-select form-select-lg mb-5"
                                 asp-items="@(new SelectList(Model.TerritoryAllCustomers, "Id", "CustomerName"))"></select>
                     </div>
                 }

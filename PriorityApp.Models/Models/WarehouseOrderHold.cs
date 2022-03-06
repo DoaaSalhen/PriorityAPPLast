@@ -1,4 +1,5 @@
-﻿using System;
+﻿using PriorityApp.Models.Models.MasterModels;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -18,6 +19,8 @@ namespace PriorityApp.Models.Models
 
         public DateTime HoldPriorityDate { get; set; }
         public string HolduserId { get; set; }
+        public Territory Territory { get; set; }
+        public int TerritoryId { get; set; }
 
 
 
