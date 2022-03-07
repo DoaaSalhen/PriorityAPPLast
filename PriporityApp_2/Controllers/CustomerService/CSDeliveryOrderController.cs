@@ -224,7 +224,7 @@ namespace PriorityApp.Controllers.CustomerService
                 itemModels = _itemService.GetAllItems().Result;
                 itemModels.Insert(0, new ItemModel { Id = -1, Name = "All" });
                 Model.Items = itemModels;
-                Model.ItemSelectedId = -1;
+                //Model.ItemSelectedId = -1;
                 if (Model.HoldModel != null)
                 {
                     if (Model.ZoneSelectedId > 0)
@@ -596,7 +596,7 @@ namespace PriorityApp.Controllers.CustomerService
                         //    submittedOrdersTerritories.Add(item);
                         //}
                     }
-                    info.submittedOrdersTerritories = submittedOrdersTerritories;
+                    info.submittedOrdersTerritories = submittedOrdersTerritories.Distinct< SubmittedOrdersTerritories>().ToList();
 
                 }
                 else

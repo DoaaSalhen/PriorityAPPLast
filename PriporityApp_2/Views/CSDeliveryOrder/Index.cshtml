@@ -177,10 +177,10 @@ else if (ViewBag.Error != null)
 
                 }
                 SavedValuesArray[index] = 1;
-                document.getElementById("remaining").value = tempholdReminingQuantity3;
-                document.getElementById("calculatedRemainingQuantity").value = tempholdReminingQuantity3;
-                document.getElementById('test').value = tempholdReminingQuantity3;
-                document.getElementById("extra").value = tempholdExtraQuantity3;
+                document.getElementById("remaining").value = tempholdReminingQuantity3.toFixed(2);
+                document.getElementById("calculatedRemainingQuantity").value = tempholdReminingQuantity3.toFixed(2);
+                document.getElementById('test').value = tempholdReminingQuantity3.toFixed(2);
+                document.getElementById("extra").value = tempholdExtraQuantity3.toFixed(2);
             }
 
             if (selectedPriorityId == 3) {
@@ -198,10 +198,11 @@ else if (ViewBag.Error != null)
                 ExtraValuesArray[index] = 0;
             }
             extraQuantity = ExtraValuesArray.reduce(function (a, b) { return parseFloat(a) + parseFloat(b); });
-            document.getElementById("extra").value = parseFloat(tempholdExtraQuantity3) + parseFloat(extraQuantity);
+            document.getElementById("extra").value = (parseFloat(tempholdExtraQuantity3) + parseFloat(extraQuantity)).toFixed(2);
             totalQuantity = AssignedValuesArray.reduce(function (a, b) { return parseFloat(a) + parseFloat(b); });
             var totalCheckResult = checkTotalQuantityVsHoldRemainingQuantity(tempholdReminingQuantity3, totalQuantity, tempholdAssignedQuantity3);
-            if (totalCheckResult == false) {
+            if (totalCheckResult == false)
+            {
                 alert("you do not have enough quantity");
                 resetIfFalse(index, priorityQuantityId, radioButtonListId, tempholdReminingQuantity3, tempholdAssignedQuantity3);
             }
@@ -210,7 +211,7 @@ else if (ViewBag.Error != null)
             alert("please you must insert quantity less than or equal order quantity");
             resetIfFalse(index, priorityQuantityId, radioButtonListId, holdReminingQuantity2, tempholdAssignedQuantity3);
         }
-        document.getElementById("sum").value = parseFloat(document.getElementById("extra").value) + parseFloat(document.getElementById("total").value);
+        document.getElementById("sum").value = (parseFloat(document.getElementById("extra").value) + parseFloat(document.getElementById("total").value)).toFixed(2);
 
         var Details =
         {
