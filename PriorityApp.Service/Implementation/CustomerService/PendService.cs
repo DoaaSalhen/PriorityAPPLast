@@ -121,12 +121,12 @@ namespace PriorityApp.Service.Implementation.CustomerService
                         sqlBulkCopy.DestinationTableName = "dbo.Orders";
 
                         //[OPTIONAL]: Map the Excel columns with that of the database table.
-                        sqlBulkCopy.ColumnMappings.Add("PriorityDATE", "PriorityDate");     //1
+                        sqlBulkCopy.ColumnMappings.Add("DATI", "PriorityDate");     //1
 
                         sqlBulkCopy.ColumnMappings.Add("SDPA8", "CustomerId");        //22
 
                         sqlBulkCopy.ColumnMappings.Add("SDDOCO", "OrderNumber");          //6
-                        sqlBulkCopy.ColumnMappings.Add("SDDCTO", "OrderDocument");       //7
+                       sqlBulkCopy.ColumnMappings.Add("SDDCTO", "OrderDocument");       //7
                         sqlBulkCopy.ColumnMappings.Add("SDLNID", "LineID");             //8
                         sqlBulkCopy.ColumnMappings.Add("DATE", "OrderDate");         //9  
                         sqlBulkCopy.ColumnMappings.Add("SDITM", "ItemId");           //10
@@ -184,10 +184,10 @@ namespace PriorityApp.Service.Implementation.CustomerService
                             if(priorityQuantitySum < OriginalQuantity)
                             {
                                 partialOrder.OrderNumber = mainOrder.OrderNumber;
-                                        partialOrder.CustomerId = mainOrder.CustomerId;
+                                partialOrder.CustomerId = mainOrder.CustomerId;
                                 partialOrder.ItemId = mainOrder.ItemId;
                                 partialOrder.OrderCategoryId = mainOrder.OrderCategoryId;
-                                    partialOrder.OrderDate = mainOrder.OrderDate;
+                                partialOrder.OrderDate = mainOrder.OrderDate;
                                 partialOrder.OrderDocument = mainOrder.OrderDocument;
                                 partialOrder.OrginalQuantity = mainOrder.OrginalQuantity;
                                 partialOrder.PODName = mainOrder.PODName;
@@ -285,11 +285,11 @@ namespace PriorityApp.Service.Implementation.CustomerService
                         row["OrderCategoryId"] = (int)CommanData.OrderCategory.Delivery;
                         double z = (double)row["QNTY"];
                        
-                        if (row["ABAC02"].ToString() == "EG04")
+                        if (row["ABAC02"].ToString().Trim() == "EG04")
                         {
                             row["ABAC02"] = 2;
                         }
-                        else if (row["ABAC02"].ToString() == "EG01" || row["ABAC02"].ToString() == "EG02" || row["ABAC02"].ToString() == "EG03")
+                        else if (row["ABAC02"].ToString().Trim() == "EG01" || row["ABAC02"].ToString().Trim() == "EG02" || row["ABAC02"].ToString().Trim() == "EG03")
                         {
                             row["ABAC02"] = 1;
                         }

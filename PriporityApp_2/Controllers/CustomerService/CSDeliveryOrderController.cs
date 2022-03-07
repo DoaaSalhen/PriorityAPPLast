@@ -265,7 +265,7 @@ namespace PriorityApp.Controllers.CustomerService
                     }
 
                     Model.OrderModel = new OrderModel();
-                    Model.OrderModel.orders = orderModels.OrderBy(o => o.OrderNumber).ToList();
+                    Model.OrderModel.orders = orderModels.OrderBy(o => o.Customer.CustomerName).ToList();
                     Model.Customers = customerModels;
                     //Model.Priorities = _priorityService.GetAllPriorities().Result.ToList();
                     //TerritoryModel territoryModel = _territoryService.GetTerritory(Model.TerritorySelectedId);
@@ -582,12 +582,12 @@ namespace PriorityApp.Controllers.CustomerService
                     //List<int> zoneIds = _deliveryCustomerService.GetZoneIdsByListOfCustomerIds(customerIds);
                     //List<int> territoryIds = _zoneService.GetListOfTerritoryIdsByZoneIds(zoneIds);
                     //var territoryModels = _territoryService.GetAllTeritories().Result.Where(t => territoryIds.Contains(t.Id)).GroupBy(t => t.Id).ToList();
-                    var unsubmittedOrdersGroup = unSubmittedOrders.GroupBy(o => o.Customer.zone.Territory.userId).ToList();
+                    var unsubmittedOrdersGroup = unSubmittedOrders.GroupBy(o => o.Customer.zone.Territory).ToList();
                     SubmittedOrdersTerritories item = new SubmittedOrdersTerritories();
 
                     foreach (var unsubmittedOrderGroup in unsubmittedOrdersGroup)
                     {
-                        item.territorryModel = _territoryService.GetTerritoryByUserId(unsubmittedOrderGroup.Key);
+                        item.territorryModel = _territoryService.GetTerritory(unsubmittedOrderGroup.Key.Id);
                         submittedOrdersTerritories.Add(item);
                         //foreach (var order in unsubmittedOrderGroup)
                         //{

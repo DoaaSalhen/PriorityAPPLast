@@ -51,7 +51,7 @@ namespace MVCCore.ImportExcel.Controllers
                 bool fixResult = false;
                 string ExcelConnectionString = this._configuration.GetConnectionString("ExcelCon");
                 string SqlConnectionString = this._configuration.GetConnectionString("SqlCon");
-
+                DataTable dt = null;
                 if (postedFile != null)
                 {
                     //Create a Folder.
@@ -69,7 +69,7 @@ namespace MVCCore.ImportExcel.Controllers
                         postedFile.CopyTo(stream);
                     }
 
-                    DataTable dt = _pendService.ReadExcelData(filePath, ExcelConnectionString);
+                    dt = _pendService.ReadExcelData(filePath, ExcelConnectionString);
                     dt = _pendService.Preprocess(dt,QuantityToDelete);
 
                     if (dt.Rows.Count != 0)
@@ -81,9 +81,14 @@ namespace MVCCore.ImportExcel.Controllers
                         fixResult = _pendService.FixDuplication();
                     }
                 }
+                int addedRows = 0;
                 if (fixResult == true)
                 {
-                    ViewBag.Message = " File Uploaded Successfully";
+                    foreach(DataRow row in dt.Rows)
+                    {
+                        addedRows = row.RowState != DataRowState.Deleted ? addedRows = addedRows+1 : addedRows;
+                    }
+                      ViewBag.Message = " File Uploaded Successfully && you have added "+addedRows + "new Orders";
                 }
                 else
                 {

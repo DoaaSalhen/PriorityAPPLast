@@ -17,7 +17,7 @@ namespace PriorityApp.Service.Models
         public string HolduserId { get; set; }
         public List<WarehouseOrderHoldModel> WarehouseOrderHoldModels { get; set; }
 
-        public TerritoryModel Territory { get; set; }
+        //public TerritoryModel Territory { get; set; }
         public int TerritoryId { get; set; }
     }
 }

@@ -19,7 +19,7 @@ namespace PriorityApp.Models.Models
 
         public DateTime HoldPriorityDate { get; set; }
         public string HolduserId { get; set; }
-        public Territory Territory { get; set; }
+        //public Territory Territory { get; set; }
         public int TerritoryId { get; set; }
 
 
