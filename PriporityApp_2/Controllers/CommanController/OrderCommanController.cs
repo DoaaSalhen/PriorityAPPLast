@@ -180,21 +180,21 @@ namespace PriorityApp.Controllers
             bool submitted = false;
             try
             {
-                AspNetUser applicationUser = _userManager.GetUserAsync(User).Result;
-                List<OrderModel2> unSubmittedOrders = _orderService.GetAllUnSubmittedOrdersByUserId(applicationUser.Id, submitted).Result;
+                //AspNetUser applicationUser = _userManager.GetUserAsync(User).Result;
+                //List<OrderModel2> unSubmittedOrders = _orderService.GetAllUnSubmittedOrdersByUserId(applicationUser.Id, submitted).Result;
 
-                var territoryModel = _territoryService.GetTerritoryByUserId(applicationUser.Id);
-                SubmittInfo info = new SubmittInfo();
-                SubmittedOrdersTerritories submittedOrdersTerritories = new SubmittedOrdersTerritories();
+                //var territoryModel = _territoryService.GetTerritoryByUserId(applicationUser.Id);
+                //SubmittInfo info = new SubmittInfo();
+                //SubmittedOrdersTerritories submittedOrdersTerritories = new SubmittedOrdersTerritories();
 
-                submittedOrdersTerritories.territorryModel = territoryModel;
-                submittedOrdersTerritories.NumberOfOrders = unSubmittedOrders.Count;
-                List<SubmittedOrdersTerritories> ListOfSubmittedOrdersTerritories = new List<SubmittedOrdersTerritories>();
-                ListOfSubmittedOrdersTerritories.Add(submittedOrdersTerritories);
-                info.submittedOrdersTerritories = ListOfSubmittedOrdersTerritories;
-                info.ordersTosubmit = unSubmittedOrders;
-                info.OrdersCount = unSubmittedOrders.Count();
-                return View(@"Orders\SubmitView", info);
+                //submittedOrdersTerritories.territorryModel = territoryModel;
+                //submittedOrdersTerritories.NumberOfOrders = unSubmittedOrders.Count;
+                //List<SubmittedOrdersTerritories> ListOfSubmittedOrdersTerritories = new List<SubmittedOrdersTerritories>();
+                //ListOfSubmittedOrdersTerritories.Add(submittedOrdersTerritories);
+                //info.submittedOrdersTerritories = ListOfSubmittedOrdersTerritories;
+                //info.ordersTosubmit = unSubmittedOrders;
+                //info.OrdersCount = unSubmittedOrders.Count();
+                //return View(@"Orders\SubmitView", info);
             }
             catch (Exception e)
             {

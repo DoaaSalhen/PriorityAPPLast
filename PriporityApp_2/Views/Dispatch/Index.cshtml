@@ -83,6 +83,8 @@
         for (var checkbox of checkboxes) {
             checkbox.checked = !checkbox.checked;
         }
+
+
     }
 
     function toFromDateCompare()
@@ -104,20 +106,8 @@
 <script>
     $(document).ready(function () {
         var table = $('#example').DataTable({
-            "scrollY": "500px",
-            "scrollX": "100px",
 
             "paging": false
-        });
-
-        $('a.toggle-vis').on('click', function (e) {
-            e.preventDefault();
-
-            // Get the column API object
-            var column = table.column($(this).attr('data-column'));
-
-            // Toggle the visibility
-            column.visible(!column.visible());
         });
     });
 </script>
@@ -286,14 +276,7 @@
                     @Html.DisplayFor(model => model.OrderModel.orders[index].PODZoneName)
                     <input class="form-check-input" asp-for="OrderModel.orders[index].PODZoneName" type="hidden" />
                 </td>
-                <td>
-                    @Html.DisplayFor(model => model.OrderModel.orders[index].PODZoneState)
-                    <input class="form-check-input" asp-for="OrderModel.orders[index].PODZoneState" type="hidden" />
-                </td>
-                <td>
-                    @Html.DisplayFor(model => model.OrderModel.orders[index].PODZoneName)
-                    <input class="form-check-input" asp-for="OrderModel.orders[index].PODZoneName" type="hidden" />
-                </td>
+       
                 <td>
                     @Html.DisplayFor(model => model.OrderModel.orders[index].PODZoneState)
                     <input class="form-check-input" asp-for="OrderModel.orders[index].PODZoneState" type="hidden" />

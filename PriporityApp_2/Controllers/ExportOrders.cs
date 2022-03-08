@@ -72,7 +72,7 @@ namespace PriorityApp.Controllers
                 {
                     if(orders[index].OrderCategoryId == (int)CommanData.OrderCategory.Warehouse)
                     {
-                        orders[index].Customer.zone.Territory = _territoryService.GetTerritoryByUserId(_warehouseOrderHoldService.GetWarehouseOrderHold(orders[index].Id).HolduserId);
+                        orders[index].Customer.zone.Territory = _territoryService.GetTerritory(_warehouseOrderHoldService.GetWarehouseOrderHold(orders[index].Id).TerritoryId);
 
                     }
                 }

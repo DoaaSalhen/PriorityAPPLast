@@ -178,7 +178,9 @@ namespace PriorityApp.Service.Implementation.CustomerService
                             {
                                 priorityQuantitySum = priorityQuantitySum + (float)order.PriorityQuantity;
                                 OriginalQuantity = (float) order.OrginalQuantity;
-                            mainOrder = order;
+                                mainOrder = order;
+                                order.OrderQuantity = order.PriorityQuantity;
+                                _orderRepository.Update(order);
                             }
                     }
                             if(priorityQuantitySum < OriginalQuantity)
@@ -196,6 +198,7 @@ namespace PriorityApp.Service.Implementation.CustomerService
                                 partialOrder.PODZoneName = mainOrder.PODZoneName;
                                 partialOrder.PODZoneState = mainOrder.PODZoneState;
                                 partialOrder.PriorityDate = DateTime.Today;
+                                partialOrder.PriorityId = (int)CommanData.Priorities.No;
                                 partialOrder.SavedBefore = false;
                                 partialOrder.Submitted = false;
                                 partialOrder.LineID = mainOrder.LineID;

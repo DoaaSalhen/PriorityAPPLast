@@ -455,7 +455,7 @@ else if (ViewBag.Error != null)
                                     <input class="form-check-input" asp-for="OrderModel.orders[index].Comment" disabled type="text" style="width:100px" value="@Model.OrderModel.orders[index].Comment" />
                                 </td>
                                 <td>
-                                    <input class="form-check-input" asp-for="OrderModel.orders[index].Truck" type="number" style="width:100px" disabled value="@Model.OrderModel.orders[index].Truck" />
+                                    <input class="form-check-input" asp-for="OrderModel.orders[index].Truck" type="text" style="width:100px" disabled value="@Model.OrderModel.orders[index].Truck" />
                                 </td>
                             }
                             else if (Model.OrderModel.orders[index].SavedBefore == true && Model.OrderModel.orders[index].Submitted == false)

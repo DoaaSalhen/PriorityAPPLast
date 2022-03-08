@@ -88,7 +88,7 @@ namespace PriorityApp.Service.Implementation
         {
             try
             {
-                var order = _repository.Find(o => o.Id == id, false, o=>o.Customer,o=>o.Item, o=>o.Priority).FirstOrDefault();
+                var order = _repository.Find(o => o.Id == id, false, o=>o.Customer.zone.Territory,o=>o.Item, o=>o.Priority).FirstOrDefault();
                 OrderModel2 model = new OrderModel2();
                 model = _mapper.Map <OrderModel2>(order);
                 return model;

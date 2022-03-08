@@ -61,9 +61,10 @@ namespace PriorityApp.Controllers.Sales
 
             AspNetUser applicationUser = await _userManager.GetUserAsync(User);
 
-            var territoryModel = _territoryService.GetTerritoryByUserId(applicationUser.Id);
-
-            List<ZoneModel> zoneModels = _zoneService.GetListOfZonesByTerritoryId(territoryModel.Id);
+            List<TerritoryModel> territoryModels = _territoryService.GetTerritoryByUserId(applicationUser.Id);
+            List<int> TerritoriesIds = new List<int>();
+            TerritoriesIds = territoryModels.Select(t => t.Id).ToList();
+            List<ZoneModel> zoneModels = _zoneService.GetListOfZonesByTerritoryIds(TerritoriesIds).Result;
             zoneModels.Insert(0, new ZoneModel { Id = -1, Name = "select zone" });
             geoFilterModel.Zones = zoneModels;
             itemModels = _itemService.GetAllItems().Result;
@@ -158,21 +159,23 @@ namespace PriorityApp.Controllers.Sales
             {
                 AspNetUser applicationUser = await _userManager.GetUserAsync(User);
 
-                var territoryModel = _territoryService.GetTerritoryByUserId(applicationUser.Id);
+                List<TerritoryModel> territoryModels = _territoryService.GetTerritoryByUserId(applicationUser.Id);
                 List<OrderModel2> orderModels = new List<OrderModel2>();
                 List<CustomerModel> customerModels = new List<CustomerModel>();
                 DateTime selectedPriorityDate = Model.SelectedPriorityDate.Date;
-
+                List<int> territoryIds = new List<int>();
+                territoryIds = territoryModels.Select(t => t.Id).ToList();
                 if (Model.ZoneSelectedId != -1)
                 {
 
                     customerModels = _deliveryCustomerService.GetCutomersByZoneId(Model.ZoneSelectedId).Result;
-                    Model.Zones = _zoneService.GetListOfZonesByTerritoryId(territoryModel.Id);
+
+                    Model.Zones = _zoneService.GetListOfZonesByTerritoryIds(territoryIds).Result;
                     Model.Zones.Insert(0, new ZoneModel { Id = -1, Name = "select Zone" });
                 }
                 else
                 {
-                    List<ZoneModel> zoneModels = _zoneService.GetListOfZonesByTerritoryId(territoryModel.Id);
+                    List<ZoneModel> zoneModels = _zoneService.GetListOfZonesByTerritoryIds(territoryIds).Result;
                     List<int> zoneIds = zoneModels.Select(z => z.Id).ToList();
 
                     customerModels = _deliveryCustomerService.GetCutomersByListOfZoneIds(zoneIds).Result;
@@ -195,7 +198,7 @@ namespace PriorityApp.Controllers.Sales
                 Model.Customers.Insert(0, new CustomerModel { Id = -1, CustomerName = "select Customer" });
 
 
-                Model.HoldModel = _holdService.GetHold(Model.SelectedPriorityDate.Date, territoryModel.userId);
+                Model.HoldModel = _holdService.GetHold(Model.SelectedPriorityDate.Date, territoryModels.First().userId);
                 Model.OrderModel.holdModel = Model.HoldModel;
                 Model.Items = _itemService.GetAllItems().Result;
                 return View("index", Model);

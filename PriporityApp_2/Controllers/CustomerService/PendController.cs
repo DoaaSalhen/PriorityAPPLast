@@ -88,7 +88,7 @@ namespace MVCCore.ImportExcel.Controllers
                     {
                         addedRows = row.RowState != DataRowState.Deleted ? addedRows = addedRows+1 : addedRows;
                     }
-                      ViewBag.Message = " File Uploaded Successfully && you have added "+addedRows + "new Orders";
+                      ViewBag.Message = " File Uploaded Successfully && "+addedRows + " new Orders are added";
                 }
                 else
                 {

@@ -130,18 +130,24 @@ namespace PriorityApp.Controllers.CustomerService
             {
                 AspNetUser applicationUser = _userManager.GetUserAsync(User).Result;
                 List<string> roles = (List<string>)_userManager.GetRolesAsync(applicationUser).Result;
-                TerritoryModel territoryModel = null;
+                HoldModel holdModel = null;
                 if (roles.Contains("Sales"))
                 {
-                    territoryModel = _territoryService.GetTerritoryByUserId(applicationUser.Id);
+                    List<TerritoryModel> territoryModels = null;
+
+                    territoryModels = _territoryService.GetTerritoryByUserId(applicationUser.Id);
+                    holdModel = _holdService.GetHold(model.SelectedPriorityDate, territoryModels.First().userId);
 
                 }
                 else
                 {
+                    TerritoryModel territoryModel = null;
+
                     territoryModel = _territoryService.GetTerritory(model.TerritorySelectedId);
+                    holdModel = _holdService.GetHold(model.SelectedPriorityDate, territoryModel.userId);
+
 
                 }
-                HoldModel holdModel = _holdService.GetHold(model.SelectedPriorityDate, territoryModel.userId);
                 if (holdModel != null)
                 {
                     model.HoldModel = holdModel;
@@ -208,18 +214,25 @@ namespace PriorityApp.Controllers.CustomerService
                 AspNetUser applicationUser = await _userManager.GetUserAsync(User);
                 OrderModel2 orderModel2 = new OrderModel2();
                 List<string> roles = (List<string>)_userManager.GetRolesAsync(applicationUser).Result;
-                TerritoryModel territoryModel = null;
+                HoldModel hold = null;
                 if (roles.Contains("Sales"))
                 {
-                    territoryModel = _territoryService.GetTerritoryByUserId(applicationUser.Id);
+                    List<TerritoryModel> territoryModels = null;
+
+                    territoryModels = _territoryService.GetTerritoryByUserId(applicationUser.Id);
+                     hold = _holdService.GetHold(model.SelectedPriorityDate, territoryModels.First().userId);
+
 
                 }
                 else
                 {
+                    TerritoryModel territoryModel = null;
+
                     territoryModel = _territoryService.GetTerritory(model.TerritorySelectedId);
+                    hold = _holdService.GetHold(model.SelectedPriorityDate, territoryModel.userId);
+
 
                 }
-                HoldModel hold = _holdService.GetHold(model.SelectedPriorityDate, territoryModel.userId);
                 if (hold != null)
                 {
                      Message = "there is an error";
@@ -257,7 +270,8 @@ namespace PriorityApp.Controllers.CustomerService
                                     warehouseOrderHoldModel.OrderId = newOrderModel.Id;
                                     warehouseOrderHoldModel.HoldPriorityDate = hold.PriorityDate;
                                     warehouseOrderHoldModel.HolduserId = hold.userId;
-                                    warehouseOrderHoldModel.TerritoryId = territoryModel.Id;
+                                    OrderModel2 addedOrder = _orderService.GetOrder(newOrderModel.Id);
+                                    warehouseOrderHoldModel.TerritoryId = addedOrder.Customer.zone.TerritoryId;
                                     await _warehouseOrderHoldService.CreateWarehouseOrderHold(warehouseOrderHoldModel);
 
                                 }
@@ -278,7 +292,8 @@ namespace PriorityApp.Controllers.CustomerService
                                     warehouseOrderHoldModel.OrderId1 = newOrderModel.Id;
                                     warehouseOrderHoldModel.HoldPriorityDate = hold.PriorityDate;
                                     warehouseOrderHoldModel.HolduserId = hold.userId;
-                                    warehouseOrderHoldModel.TerritoryId = territoryModel.Id;
+                                    OrderModel2 addedOrder = _orderService.GetOrder(newOrderModel.Id);
+                                warehouseOrderHoldModel.TerritoryId = addedOrder.Customer.zone.TerritoryId;
                                 await _warehouseOrderHoldService.CreateWarehouseOrderHold(warehouseOrderHoldModel);
                             }
 

@@ -148,6 +148,7 @@ else if (ViewBag.Error != null)
             }
         });
 
+
     });
     var AssignedValuesArray = [];
     var SavedValuesArray = [];
@@ -162,8 +163,9 @@ else if (ViewBag.Error != null)
         var tempholdAssignedQuantity3 = holdAssignedQuantity3;
         var tempholdExtraQuantity3 = holdExtraQuantity3;
         var compareResult = true;
-        //var compareResult = compareInsertedQuantityVSOrderQuantity(insertedQuantity, orderQuantity);
-        if (compareResult == true) {
+        var compareResult = compareInsertedQuantityVSOrderQuantity(insertedQuantity, orderQuantity);
+        if (compareResult == true)
+        {
             if (savedBefore == true && SavedValuesArray[index] == undefined) {
                 if (savedPriorityId == 3) {
                     holdReminingQuantity3 = holdReminingQuantity3 + savedPriorityQuantity;
@@ -204,15 +206,15 @@ else if (ViewBag.Error != null)
             if (totalCheckResult == false)
             {
                 alert("you do not have enough quantity");
-                resetIfFalse(index, priorityQuantityId, radioButtonListId, tempholdReminingQuantity3, tempholdAssignedQuantity3);
+                resetIfFalse(index, priorityQuantityId, radioButtonListId, tempholdReminingQuantity3, tempholdAssignedQuantity3, tempholdExtraQuantity3);
             }
-        }
-        else {
-            alert("please you must insert quantity less than or equal order quantity");
-            resetIfFalse(index, priorityQuantityId, radioButtonListId, holdReminingQuantity2, tempholdAssignedQuantity3);
-        }
-        document.getElementById("sum").value = (parseFloat(document.getElementById("extra").value) + parseFloat(document.getElementById("total").value)).toFixed(2);
 
+        document.getElementById("sum").value = (parseFloat(document.getElementById("extra").value) + parseFloat(document.getElementById("total").value)).toFixed(2);
+    }
+    else {
+            alert("please you must insert quantity less than or equal order quantity");
+            resetIfFalse(index, priorityQuantityId, radioButtonListId, holdReminingQuantity2, tempholdAssignedQuantity3, tempholdExtraQuantity3);
+        }
         var Details =
         {
             Id: document.getElementById("OrderModel_orders_" + index + "__Id").value,
@@ -230,12 +232,15 @@ else if (ViewBag.Error != null)
         });
     }
 
-    function resetIfFalse(index, priorityQuantityId, radioButtonListId, holdReminingQuantity3, holdTotalAssignedQuantity) {
+    function resetIfFalse(index, priorityQuantityId, radioButtonListId, holdReminingQuantity3, holdTotalAssignedQuantity, tempholdExtraQuantity3) {
         priorityQuantityId.value = 0;
         radioButtonListId.value = 2;
         AssignedValuesArray[index] = 0;
+        ExtraValuesArray[index] = 0;
+        extraQuantity = ExtraValuesArray.reduce(function (a, b) { return parseFloat(a) + parseFloat(b); });;
         totalQuantity = AssignedValuesArray.reduce(function (a, b) { return parseFloat(a) + parseFloat(b); });
-        document.getElementById("total").value = holdTotalAssignedQuantity + Math.abs(totalQuantity);
+        document.getElementById("total").value = holdTotalAssignedQuantity + Math.abs(totalQuantity).toFixed(2);
+        document.getElementById("extra").value = (tempholdExtraQuantity3 + Math.abs(extraQuantity)).toFixed(2);
         checkTotalQuantityVsHoldRemainingQuantity(holdReminingQuantity3, totalQuantity, holdTotalAssignedQuantity);
     }
 
@@ -264,6 +269,37 @@ else if (ViewBag.Error != null)
             return false;
         }
     }
+
+    function updateComment(index)
+    {
+
+        var Details =
+        {
+            Id: document.getElementById("OrderModel_orders_" + index + "__Id").value,
+            Comment: document.getElementById("OrderModel_orders_" + index + "__Comment").value,
+        }
+
+        var url = '@Url.Content("~/")' + "PriorityTool/CSDeliveryOrder/SaveComment";
+        $.getJSON(url, Details, function (data) {
+        });
+    }
+
+    function updateTruck(index)
+    {
+
+        var Details =
+        {
+            Id: document.getElementById("OrderModel_orders_" + index + "__Id").value,
+            Truck: document.getElementById("OrderModel_orders_" + index + "__Truck").value,
+        }
+
+        var url = '@Url.Content("~/")' + "PriorityTool/CSDeliveryOrder/SaveTruck";
+        $.getJSON(url, Details, function (data) {
+        });
+    }
+
+
+
 </script>
 
 <style>
@@ -568,12 +604,11 @@ else if (ViewBag.Error != null)
 
     </td>*@
         <td>
-            <input class="form-check-input" asp-for="OrderModel.orders[index].Comment" type="text" style="width:100px" value="@Model.OrderModel.orders[index].Comment" />
+            <input class="form-check-input" asp-for="OrderModel.orders[index].Comment" type="text" style="width:100px" value="@Model.OrderModel.orders[index].Comment" onchange="updateComment(@index)"/>
         </td>
     }
             <td style="width:150px">
-                @Html.DisplayFor(model => model.OrderModel.orders[index].Truck)
-                <input class="form-check-input" asp-for="OrderModel.orders[index].Truck" type="text" style="width:100px" value="@Model.OrderModel.orders[index].Truck" />
+                <input class="form-check-input" asp-for="OrderModel.orders[index].Truck" type="text" style="width:100px" value="@Model.OrderModel.orders[index].Truck" onchange="updateTruck(@index)"/>
             </td>
 
             <input class="form-check-input" asp-for="OrderModel.orders[index].Submitted" type="hidden" />

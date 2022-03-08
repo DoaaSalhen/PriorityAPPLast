@@ -210,7 +210,7 @@
                 <th>Quantity</th>
                 <th>Comment</th>
                 <th>Status</th>
-                <th></th>
+                <th>Actions</th>
 
 
             </tr>
@@ -228,57 +228,62 @@
                     @for (int index = 0; index < Model.warehouseOrderHoldModels.Count; index++)
                     {
                         string UnlockId = "UnlockId" + index;
-                        <tr>
-                            <td>
-                                @Html.DisplayFor(model => model.warehouseOrderHoldModels[index].Order.Customer.CustomerName)
-                                <input class="form-check-input" asp-for="warehouseOrderHoldModels[index].Order.CustomerId" type="hidden" />
-                                <input class="form-check-input" asp-for="warehouseOrderHoldModels[index].Order.Id" type="hidden" />
-                            </td>
+        <tr>
+            <td>
+                @Html.DisplayFor(model => model.warehouseOrderHoldModels[index].Order.Customer.CustomerName)
+                <input class="form-check-input" asp-for="warehouseOrderHoldModels[index].Order.CustomerId" type="hidden" />
+                <input class="form-check-input" asp-for="warehouseOrderHoldModels[index].Order.Id" type="hidden" />
+            </td>
 
-                            <td>
-                                @Html.DisplayFor(model => model.warehouseOrderHoldModels[index].Order.Item.Name)
-                            </td>
-                            <td>
-                                @Html.DisplayFor(model => model.warehouseOrderHoldModels[index].Order.Priority.Name)
-                            </td>
-                            <td>
-                                @Html.DisplayFor(model => model.warehouseOrderHoldModels[index].Order.PriorityQuantity)
-                            </td>
-                            <td>
-                                @Html.DisplayFor(model => model.warehouseOrderHoldModels[index].Order.Comment)
-                            </td>
-                            <td>
-                                @Html.DisplayFor(model => model.warehouseOrderHoldModels[index].Order.Status)
-                            </td>
+            <td>
+                @Html.DisplayFor(model => model.warehouseOrderHoldModels[index].Order.Item.Name)
+            </td>
+            <td>
+                @Html.DisplayFor(model => model.warehouseOrderHoldModels[index].Order.Priority.Name)
+            </td>
+            <td>
+                @Html.DisplayFor(model => model.warehouseOrderHoldModels[index].Order.PriorityQuantity)
+            </td>
+            <td>
+                @Html.DisplayFor(model => model.warehouseOrderHoldModels[index].Order.Comment)
+            </td>
+            <td>
+                @Html.DisplayFor(model => model.warehouseOrderHoldModels[index].Order.Status)
+            </td>
 
 
-                            @if ((Model.warehouseOrderHoldModels[index].Order.Submitted == false) && (Model.warehouseOrderHoldModels[index].Order.SubmitTime != null))
-                            {
+            @if ((Model.warehouseOrderHoldModels[index].Order.Submitted == true) && (Model.warehouseOrderHoldModels[index].Order.Dispatched == false))
+            {
 
-                                <td>
-                                    <a class="btn btn-danger" asp-action="OrderCancel" asp-route-id="@Model.warehouseOrderHoldModels[index].Order.Id">Cancel</a>
-                                </td>
- }
-                            else
-                            {
-                                <td>
-                                    <a class="btn btn-danger disabled" asp-action="" asp-route-id="@Model.warehouseOrderHoldModels[index].Order.Id">Cancel</a>
-                                </td>
-}
-                            @if ((Model.warehouseOrderHoldModels[index].Order.Submitted == true) && (Model.warehouseOrderHoldModels[index].Order.Dispatched == false))
-                            {
+                <td>
+                    <a class="btn btn-danger" asp-action="OrderCancel" asp-route-id="@Model.warehouseOrderHoldModels[index].Order.Id">Cancel</a>
 
-                                <td>
-                                    <a class="far fa-edit btn btn-info" value="@Model.warehouseOrderHoldModels[index].Order.Id" id=@UnlockId asp-action="UnLockOrder" asp-route-id="@Model.warehouseOrderHoldModels[index].Order.Id">Unlock</a>
-                                </td>
- }
-                            else
-                            {
-                                <td>
-                                    <a class="far fa-edit btn btn-info disabled" value="@Model.warehouseOrderHoldModels[index].Order.Id" id=@UnlockId asp-action=" " asp-route-id="@Model.warehouseOrderHoldModels[index].Order.Id">Unlock</a>
-                                </td>
-}
-                        </tr>
+                    <a class="far fa-edit btn btn-info" value="@Model.warehouseOrderHoldModels[index].Order.Id" id=@UnlockId asp-action="UnLockOrder" asp-route-id="@Model.warehouseOrderHoldModels[index].Order.Id">Unlock</a>
+                </td>
+            }
+            else
+            {
+                <td>
+                    <a class="btn btn-danger disabled" asp-action="" asp-route-id="@Model.warehouseOrderHoldModels[index].Order.Id">Cancel</a>
+
+               
+                    <a class="far fa-edit btn btn-info disabled" value="@Model.warehouseOrderHoldModels[index].Order.Id" id=@UnlockId asp-action=" " asp-route-id="@Model.warehouseOrderHoldModels[index].Order.Id">Unlock</a>
+                </td>
+            }
+            @*@if ((Model.warehouseOrderHoldModels[index].Order.Submitted == true) && (Model.warehouseOrderHoldModels[index].Order.Dispatched == false))
+            {
+
+                <td>
+                    <a class="far fa-edit btn btn-info" value="@Model.warehouseOrderHoldModels[index].Order.Id" id=@UnlockId asp-action="UnLockOrder" asp-route-id="@Model.warehouseOrderHoldModels[index].Order.Id">Unlock</a>
+                </td>
+            }
+            else
+            {
+                <td>
+                    <a class="far fa-edit btn btn-info disabled" value="@Model.warehouseOrderHoldModels[index].Order.Id" id=@UnlockId asp-action=" " asp-route-id="@Model.warehouseOrderHoldModels[index].Order.Id">Unlock</a>
+                </td>
+            }*@
+        </tr>
                     }
                 }
                 else

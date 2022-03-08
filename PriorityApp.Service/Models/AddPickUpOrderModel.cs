@@ -37,7 +37,9 @@ namespace PriorityApp.Service.Models
 
         public HoldModel HoldModel { get; set; }
 
-            
+        public List<int> SalesTerritoriesSelectedIds { get; set; }
+
+
         public long ItemSelectedId { get; set; }
         public DateTime SelectedPriorityDate { get; set; }
         public int MainRegionSelectedId { get; set; }

@@ -15,7 +15,7 @@ namespace PriorityApp.Service.Contracts
         bool DeleteTerritory(int id);
         TerritoryModel GetTerritory(int id);
 
-        TerritoryModel GetTerritoryByUserId(string UserId);
+        List<TerritoryModel> GetTerritoryByUserId(string UserId);
         Task<List<int>> GetTerritoryIdsByStateId(int StateId);
 
         Task<List<TerritoryModel>> GetAllTerritoriesByStateId(int StateId);

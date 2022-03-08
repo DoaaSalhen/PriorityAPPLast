@@ -80,7 +80,7 @@ namespace PriorityApp.Service.Implementation
         {
             try
             {
-                Territory territory = _repository.Find(i => i.Id == id && i.IsVisible == true, false).First();
+                Territory territory = _repository.Find(i => i.Id == id && i.IsVisible == true, false, i=>i.State).First();
                 TerritoryModel model = _mapper.Map<TerritoryModel>(territory);
                 return model;
             }
@@ -91,13 +91,13 @@ namespace PriorityApp.Service.Implementation
             return null;
         }
 
-        public TerritoryModel GetTerritoryByUserId(string UserId)
+        public List<TerritoryModel> GetTerritoryByUserId(string UserId)
         {
             try
             {
-                Territory territory = _repository.Find(x => x.userId == UserId, false, x=>x.State).FirstOrDefault();
-                TerritoryModel model = _mapper.Map<TerritoryModel>(territory);
-                return model;
+                List<Territory> territory = _repository.Find(x => x.userId == UserId, false, x=>x.State).ToList();
+                List<TerritoryModel> models = _mapper.Map<List<TerritoryModel>>(territory);
+                return models;
             }
             catch(Exception e)
             {

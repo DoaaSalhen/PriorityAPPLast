@@ -86,16 +86,16 @@ namespace PriorityApp.Controllers.CustomerService
             addPickUpOrderModel.SelectedPriorityDate = DateTime.Today;
 
             AspNetUser applicationUser = await _userManager.GetUserAsync(User);
-            TerritoryModel territoryModelSales = null;
+            List<TerritoryModel> territoryModelSales = null;
             var roles = _userManager.GetRolesAsync(applicationUser).Result.ToList();
             if (roles.Contains("Sales"))
             {
                 List<CustomerModel> customerModels = new List<CustomerModel>();
 
                 territoryModelSales = _territoryService.GetTerritoryByUserId(applicationUser.Id);
-                addPickUpOrderModel.TerritorySelectedId = territoryModelSales.Id;
+                addPickUpOrderModel.SalesTerritoriesSelectedIds = territoryModelSales.Select(t => t.Id).ToList();
 
-                List<ZoneModel> zoneModels = _zoneService.GetListOfZonesByTerritoryId(addPickUpOrderModel.TerritorySelectedId);
+                List<ZoneModel> zoneModels = _zoneService.GetListOfZonesByTerritoryIds(addPickUpOrderModel.SalesTerritoriesSelectedIds).Result.ToList();
                 List<int> zoneIds = zoneModels.Select(z => z.Id).ToList();
                 customerModels = _deliveryCustomerService.GetCutomersByListOfZoneIds(zoneIds).Result;
                 addPickUpOrderModel.TerritoryAllCustomers = customerModels;
@@ -278,13 +278,13 @@ namespace PriorityApp.Controllers.CustomerService
                 List<PickUpOrder> pickUpOrders = new List<PickUpOrder>();
                 DateTime selectedPriorityDate = Model.SelectedPriorityDate.Date;
                 AspNetUser applicationUser = await _userManager.GetUserAsync(User);
-                TerritoryModel territoryModelSales = null;
+                List<TerritoryModel> territoryModelSales = null;
                 var roles = _userManager.GetRolesAsync(applicationUser).Result.ToList();
                 if (roles.Contains("Sales"))
                 {
                     territoryModelSales = _territoryService.GetTerritoryByUserId(applicationUser.Id);
-                    Model.TerritorySelectedId = territoryModelSales.Id;
-                    Model.HoldModel = _holdService.GetHold(Model.SelectedPriorityDate.Date, territoryModelSales.userId);
+                    Model.SalesTerritoriesSelectedIds = territoryModelSales.Select(t=>t.Id).ToList();
+                    Model.HoldModel = _holdService.GetHold(Model.SelectedPriorityDate.Date, territoryModelSales.First().userId);
                     Model.Priorities = _priorityService.GetAllPrioritiesExceptExtra().Result.ToList();
                    
                 }
@@ -721,8 +721,9 @@ namespace PriorityApp.Controllers.CustomerService
                 geoFilterModel.SelectedPriorityDate = DateTime.Today;
                 if (roles.Contains("Sales"))
                 {
-                    TerritoryModel territoryModel = _territoryService.GetTerritoryByUserId(applicationUser.Id);
-                    geoFilterModel.Zones = _zoneService.GetListOfZonesByTerritoryId(territoryModel.Id);
+                    List<TerritoryModel> territoryModels = _territoryService.GetTerritoryByUserId(applicationUser.Id);
+                    geoFilterModel.SalesTerritoriesSelectedIds = territoryModels.Select(t => t.Id).ToList();
+                    geoFilterModel.Zones = _zoneService.GetListOfZonesByTerritoryIds(geoFilterModel.SalesTerritoriesSelectedIds).Result.ToList();
                     geoFilterModel.Zones.Insert(0, new ZoneModel { Id = -1, Name = "select Zone" });
 
                 }
@@ -749,10 +750,11 @@ namespace PriorityApp.Controllers.CustomerService
                 MemoryStream memoryStream = _excelService.WritePickUpTemplateToExcel(items, null);
                 if (roles.Contains("Sales"))
                 {
-                    TerritoryModel territoryModel = _territoryService.GetTerritoryByUserId(applicationUser.Id);
+                    List<TerritoryModel> territoryModels = _territoryService.GetTerritoryByUserId(applicationUser.Id);
 
                     List<CustomerModel> customers = _deliveryCustomerService.GetAllDeliveryCustomer().Result.ToList();
-                    List<CustomerModel> territoryCustomers = customers.Where(c => c.zone.TerritoryId == territoryModel.Id).ToList();
+                    List<int> territoriesIds = territoryModels.Select(t => t.Id).ToList();
+                    List<CustomerModel> territoryCustomers = customers.ToList().Where(c => territoriesIds.Contains(c.zone.TerritoryId)).ToList();
 
                     memoryStream = _excelService.WritePickUpTemplateToExcel(items, territoryCustomers);
                 }

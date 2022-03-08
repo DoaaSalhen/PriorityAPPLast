@@ -27,6 +27,7 @@ namespace PriorityApp.Service.Models
         public int SubRegionSelectedId { get; set; }
         public int StateSelectedId { get; set; }
         public int TerritorySelectedId { get; set; }
+        public List<int> SalesTerritoriesSelectedIds { get; set; }
         public int ZoneSelectedId { get; set; }
         public long CustomerSelectedId { get; set; }
         //public string holdUserId { get; set; }
