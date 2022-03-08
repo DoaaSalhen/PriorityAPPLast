@@ -50,8 +50,12 @@
 
 <script>
     $(document).ready(function () {
-        $('#example').DataTable();
+        var table = $('#example').DataTable({
+            "ordering": false,
+            "paging": false,
+        });
     });
+
 </script>
 <script type="text/javascript">
     $(document).ready(function () {

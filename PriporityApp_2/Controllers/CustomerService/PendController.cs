@@ -71,8 +71,8 @@ namespace MVCCore.ImportExcel.Controllers
 
                     dt = _pendService.ReadExcelData(filePath, ExcelConnectionString);
                     dt = _pendService.Preprocess(dt,QuantityToDelete);
-
-                    if (dt.Rows.Count != 0)
+               
+                    if (dt.Rows.Count > 0)
                     {
                         result = _pendService.WriteDataToSql(dt, SqlConnectionString);
                     }

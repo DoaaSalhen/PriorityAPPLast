@@ -125,9 +125,10 @@
     $(document).ready(function () {
         var table = $('#example').DataTable({
             "ordering": false,
-            "paging": false
+            "paging": false,
         });
     });
+
 </script>
 
 <form asp-controller="Warehouse" asp-action="SearchForOrders" method="post" class="form-horizontal" role="form">
@@ -210,7 +211,9 @@
                 <th>Quantity</th>
                 <th>Comment</th>
                 <th>Status</th>
-                <th>Actions</th>
+                <th>Cancel</th>
+                <th>Unlock</th>
+
 
 
             </tr>
@@ -252,12 +255,13 @@
             </td>
 
 
-            @if ((Model.warehouseOrderHoldModels[index].Order.Submitted == true) && (Model.warehouseOrderHoldModels[index].Order.Dispatched == false))
+            @if ((Model.warehouseOrderHoldModels[index].Order.Submitted == true) && (Model.warehouseOrderHoldModels[index].Order.Dispatched == false) && (Model.warehouseOrderHoldModels[index].Order.Status != "Cancelled"))
             {
 
                 <td>
                     <a class="btn btn-danger" asp-action="OrderCancel" asp-route-id="@Model.warehouseOrderHoldModels[index].Order.Id">Cancel</a>
-
+                </td>
+                <td>
                     <a class="far fa-edit btn btn-info" value="@Model.warehouseOrderHoldModels[index].Order.Id" id=@UnlockId asp-action="UnLockOrder" asp-route-id="@Model.warehouseOrderHoldModels[index].Order.Id">Unlock</a>
                 </td>
             }
@@ -265,8 +269,8 @@
             {
                 <td>
                     <a class="btn btn-danger disabled" asp-action="" asp-route-id="@Model.warehouseOrderHoldModels[index].Order.Id">Cancel</a>
-
-               
+                    </td>
+                    <td>               
                     <a class="far fa-edit btn btn-info disabled" value="@Model.warehouseOrderHoldModels[index].Order.Id" id=@UnlockId asp-action=" " asp-route-id="@Model.warehouseOrderHoldModels[index].Order.Id">Unlock</a>
                 </td>
             }

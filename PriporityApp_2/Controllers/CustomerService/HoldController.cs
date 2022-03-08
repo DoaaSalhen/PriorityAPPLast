@@ -184,21 +184,37 @@ namespace PriorityApp.Controllers.CustomerService
                     dt = _holdService.prepareDataForHold(dt);
                     if (dt != null)
                     {
-                        result = _holdService.AddQuotaFile(dt, SqlConnectionString);
+                        foreach (DataRow row in dt.Rows)
+                        {
+                            if (row.RowState != DataRowState.Deleted)
+                            {
+                                rowsCount = rowsCount + 1;
+                            }
+                        }
+                        if (rowsCount > 0)
+                        {
+                            result = _holdService.AddQuotaFile(dt, SqlConnectionString);
+                        }
                     }
-                }
-                if (result == true)
-                {
-                    ViewBag.Message = " File Uploaded Successfully";  //you have added "+ dt.Rows.Count +" new Quota rows";
-                    return View();
+
+                    if (result == true)
+                    {
+                        ViewBag.Message = " File Uploaded Successfully, " + rowsCount + " New Quota record are added";  //you have added "+ dt.Rows.Count +" new Quota rows";
+                        return View();
+                    }
+                    else
+                    {
+                        ViewBag.Error = " File Not Uploaded";
+                        return View();
+
+                    }
                 }
                 else
                 {
-                    ViewBag.Error = " File Not Uploaded";
+                    ViewBag.Error = " File Not valid";
                     return View();
 
                 }
-                // return View();
             }
             catch (Exception e)
             {

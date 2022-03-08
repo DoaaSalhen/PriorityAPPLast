@@ -247,15 +247,39 @@ namespace PriorityApp.Controllers.CustomerService
                         orderModel2.PriorityId = warehouseOrder.PrioritySelectedId;
                         orderModel2.Comment = warehouseOrder.Comment;
                         orderModel2.CustomerId = warehouseOrder.WarehouseSelectedId;
-                        if (warehouseOrder.PrioritySelectedId == (int)CommanData.Priorities.Norm)
+                        if (roles.Contains("Sales"))
                         {
-                            totalQuantity = warehouseOrder.itemModels.Sum(w => w.Quantity);
-                            if (totalQuantity >= hold.ReminingQuantity)
+                            if (warehouseOrder.PrioritySelectedId == (int)CommanData.Priorities.Norm)
                             {
-                                enoughQuantity = false;
-                            }
+                                totalQuantity = warehouseOrder.itemModels.Sum(w => w.Quantity);
+                                if (totalQuantity >= hold.ReminingQuantity)
+                                {
+                                    enoughQuantity = false;
+                                }
 
-                            if (enoughQuantity)
+                                if (enoughQuantity)
+                                {
+                                    foreach (var item in warehouseOrder.itemModels.Where(i => i.Quantity != 0))
+                                    {
+                                        //if(item.Quantity != 0)
+                                        //{
+                                        orderModel2.ItemId = item.Id;
+                                        orderModel2.PriorityQuantity = item.Quantity;
+                                        hold.ReminingQuantity = hold.ReminingQuantity - item.Quantity;
+                                        hold.TempReminingQuantity = hold.TempReminingQuantity - item.Quantity;
+                                        OrderModel2 newOrderModel = await _orderService.CreateOrder(orderModel2, hold);
+                                        submitOderCount = newOrderModel != null ? submitOderCount++ : submitOderCount;
+                                        warehouseOrderHoldModel.OrderId = newOrderModel.Id;
+                                        warehouseOrderHoldModel.HoldPriorityDate = hold.PriorityDate;
+                                        warehouseOrderHoldModel.HolduserId = hold.userId;
+                                        OrderModel2 addedOrder = _orderService.GetOrder(newOrderModel.Id);
+                                        warehouseOrderHoldModel.TerritoryId = addedOrder.Customer.zone.TerritoryId;
+                                        await _warehouseOrderHoldService.CreateWarehouseOrderHold(warehouseOrderHoldModel);
+
+                                    }
+                                }
+                            }
+                            else if (warehouseOrder.PrioritySelectedId == (int)CommanData.Priorities.Extra)
                             {
                                 foreach (var item in warehouseOrder.itemModels.Where(i => i.Quantity != 0))
                                 {
@@ -263,23 +287,56 @@ namespace PriorityApp.Controllers.CustomerService
                                     //{
                                     orderModel2.ItemId = item.Id;
                                     orderModel2.PriorityQuantity = item.Quantity;
-                                    hold.ReminingQuantity = hold.ReminingQuantity - item.Quantity;
-                                    hold.TempReminingQuantity = hold.TempReminingQuantity - item.Quantity;
+                                    hold.ExtraQuantity = hold.ExtraQuantity + item.Quantity;
                                     OrderModel2 newOrderModel = await _orderService.CreateOrder(orderModel2, hold);
-                                    submitOderCount = newOrderModel !=null ? submitOderCount++ : submitOderCount;
+                                    submitOderCount = newOrderModel != null ? submitOderCount++ : submitOderCount;
                                     warehouseOrderHoldModel.OrderId = newOrderModel.Id;
+                                    warehouseOrderHoldModel.OrderId1 = newOrderModel.Id;
                                     warehouseOrderHoldModel.HoldPriorityDate = hold.PriorityDate;
                                     warehouseOrderHoldModel.HolduserId = hold.userId;
                                     OrderModel2 addedOrder = _orderService.GetOrder(newOrderModel.Id);
                                     warehouseOrderHoldModel.TerritoryId = addedOrder.Customer.zone.TerritoryId;
                                     await _warehouseOrderHoldService.CreateWarehouseOrderHold(warehouseOrderHoldModel);
-
                                 }
+
                             }
                         }
-                        else if(warehouseOrder.PrioritySelectedId == (int) CommanData.Priorities.Extra)
+
+                        else
                         {
-                            foreach (var item in warehouseOrder.itemModels.Where(i => i.Quantity != 0))
+                            if (warehouseOrder.PrioritySelectedId == (int)CommanData.Priorities.Norm)
+                            {
+                                totalQuantity = warehouseOrder.itemModels.Sum(w => w.Quantity);
+                                if (totalQuantity >= hold.ReminingQuantity)
+                                {
+                                    enoughQuantity = false;
+                                }
+
+                                if (enoughQuantity)
+                                {
+                                    foreach (var item in warehouseOrder.itemModels.Where(i => i.Quantity != 0))
+                                    {
+                                        //if(item.Quantity != 0)
+                                        //{
+                                        orderModel2.ItemId = item.Id;
+                                        orderModel2.PriorityQuantity = item.Quantity;
+                                        hold.ReminingQuantity = hold.ReminingQuantity - item.Quantity;
+                                        hold.TempReminingQuantity = hold.TempReminingQuantity - item.Quantity;
+                                        OrderModel2 newOrderModel = await _orderService.CreateOrder(orderModel2, hold);
+                                        submitOderCount = newOrderModel != null ? submitOderCount++ : submitOderCount;
+                                        warehouseOrderHoldModel.OrderId = newOrderModel.Id;
+                                        warehouseOrderHoldModel.HoldPriorityDate = hold.PriorityDate;
+                                        warehouseOrderHoldModel.HolduserId = hold.userId;
+                                        OrderModel2 addedOrder = _orderService.GetOrder(newOrderModel.Id);
+                                        warehouseOrderHoldModel.TerritoryId = model.TerritorySelectedId;
+                                        await _warehouseOrderHoldService.CreateWarehouseOrderHold(warehouseOrderHoldModel);
+
+                                    }
+                                }
+                            }
+                            else if (warehouseOrder.PrioritySelectedId == (int)CommanData.Priorities.Extra)
+                            {
+                                foreach (var item in warehouseOrder.itemModels.Where(i => i.Quantity != 0))
                                 {
                                     //if(item.Quantity != 0)
                                     //{
@@ -287,16 +344,17 @@ namespace PriorityApp.Controllers.CustomerService
                                     orderModel2.PriorityQuantity = item.Quantity;
                                     hold.ExtraQuantity = hold.ExtraQuantity + item.Quantity;
                                     OrderModel2 newOrderModel = await _orderService.CreateOrder(orderModel2, hold);
-                                    submitOderCount = newOrderModel !=null ? submitOderCount++ : submitOderCount;
+                                    submitOderCount = newOrderModel != null ? submitOderCount++ : submitOderCount;
                                     warehouseOrderHoldModel.OrderId = newOrderModel.Id;
                                     warehouseOrderHoldModel.OrderId1 = newOrderModel.Id;
                                     warehouseOrderHoldModel.HoldPriorityDate = hold.PriorityDate;
                                     warehouseOrderHoldModel.HolduserId = hold.userId;
                                     OrderModel2 addedOrder = _orderService.GetOrder(newOrderModel.Id);
-                                warehouseOrderHoldModel.TerritoryId = addedOrder.Customer.zone.TerritoryId;
-                                await _warehouseOrderHoldService.CreateWarehouseOrderHold(warehouseOrderHoldModel);
-                            }
+                                    warehouseOrderHoldModel.TerritoryId = model.TerritorySelectedId;
+                                    await _warehouseOrderHoldService.CreateWarehouseOrderHold(warehouseOrderHoldModel);
+                                }
 
+                            }
                         }
                         
                     }

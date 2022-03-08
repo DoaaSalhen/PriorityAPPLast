@@ -393,7 +393,6 @@ else if (ViewBag.Error != null)
                 <th>Comment</th>
                 <th>Truck</th>
                 <th>Status</th>
-                <th>Actions</th>
 
 
             </tr>
@@ -505,7 +504,7 @@ else if (ViewBag.Error != null)
                                 <input class="form-check-input" asp-for="OrderModel.orders[index].Status" type="hidden" />
                             </td>
 
-                            @if ((Model.OrderModel.orders[index].Submitted == false) && (Model.OrderModel.orders[index].SubmitTime != null))
+                            @*@if ((Model.OrderModel.orders[index].Submitted == false) && (Model.OrderModel.orders[index].SubmitTime != null))
                             {
 
                                 <td>
@@ -518,7 +517,7 @@ else if (ViewBag.Error != null)
                                 <td>
                                     <a class="btn btn-danger disabled" asp-action="" asp-route-id="@Model.OrderModel.orders[index].Id">Cancel</a>
                                 </td>
-                            }
+                            }*@
 
 
 

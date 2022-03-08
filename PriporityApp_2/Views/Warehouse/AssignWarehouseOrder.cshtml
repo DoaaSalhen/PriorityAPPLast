@@ -64,8 +64,12 @@
 
 <script>
     $(document).ready(function () {
-        $('#example').DataTable();
+        var table = $('#example').DataTable({
+            "ordering": false,
+            "paging": false,
+        });
     });
+
 </script>
 <script type="text/javascript">
     $(document).ready(function () {
@@ -268,10 +272,10 @@
         }
         totalQuantity = normTotalValues.reduce(function (a, b) { return parseFloat(a) + parseFloat(b); });
         extraTotalQuantity = extraTotalValues.reduce(function (a, b) { return parseFloat(a) + parseFloat(b); });
-        document.getElementById("total").value = holdTotalAssignedQuantity + parseFloat(totalQuantity);
-        document.getElementById("remaining").value = remainingQuantity - parseFloat(totalQuantity);
-        document.getElementById("extra").value = ExtraQuantity + extraTotalQuantity;
-        document.getElementById("sum") = parseFloat(document.getElementById("total").value) + parseFloat(document.getElementById("extra").value);
+        document.getElementById("total").value = (holdTotalAssignedQuantity + parseFloat(totalQuantity)).toFixed(2);
+        document.getElementById("remaining").value = (remainingQuantity - parseFloat(totalQuantity)).toFixed(2);
+        document.getElementById("extra").value = (ExtraQuantity + extraTotalQuantity).toFixed(2);
+        document.getElementById("sum") = (parseFloat(document.getElementById("total").value) + parseFloat(document.getElementById("extra").value)).toFixed(2);
 
     }
 

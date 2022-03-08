@@ -257,7 +257,9 @@ else
                 <th>Truck</th>
                 <th>Status</th>
                 <th>Comment</th>
-                <th>Actions</th>
+                <th>Cancel</th>
+                <th>Unlock</th>
+
 
             </tr>
         </thead>
@@ -307,12 +309,13 @@ else
                     <input class="form-check-input" asp-for="OrderModel.orders[index].Comment" type="hidden" />
                 </td>
 
-                @if ((Model.OrderModel.orders[index].Submitted == true) && (Model.OrderModel.orders[index].Dispatched == false))
+                @if ((Model.OrderModel.orders[index].Submitted == true) && (Model.OrderModel.orders[index].Dispatched == false) && (Model.OrderModel.orders[index].Status != "Cancelled"))
                 {
 
                     <td>
                         <a class="btn btn-danger" asp-action="OrderCancel" asp-route-id="@Model.OrderModel.orders[index].Id" style="margin-left:20px">Cancel</a>
-
+                    </td>
+                    <td>
                         <a class="far fa-edit btn btn-info" value="@Model.OrderModel.orders[index].Id" id=@UnlockId asp-action="UnLockOrder" asp-route-id="@Model.OrderModel.orders[index].Id">Unlock</a>
                     </td>
                 }
@@ -323,7 +326,8 @@ else
 
                     <td>
                         <a class="btn btn-danger disabled" asp-action="" asp-route-id="@Model.OrderModel.orders[index].Id" style="margin-left:20px">Cancel</a>
-
+                    </td>
+                    <td>
                         <a class="far fa-edit btn btn-info disabled" value="@Model.OrderModel.orders[index].Id" id=@UnlockId asp-action="UnLockOrder" asp-route-id="@Model.OrderModel.orders[index].Id">Unlock</a>
                     </td>
                 }
