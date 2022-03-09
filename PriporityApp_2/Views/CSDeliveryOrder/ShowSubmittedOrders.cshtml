@@ -69,8 +69,8 @@ else if (ViewBag.Error != null)
         $('#SubRegionSelectedId').change(function () {
             var ddlsource = "#SubRegionSelectedId";
             var items = '';
-            if ($(ddlsource).val() != -1) {
-                var url = '@Url.Content("~/")' + "PriorityTool/CSDeliveryOrder/StateFilter";
+            alert($(ddlsource).val());
+            var url = '@Url.Content("~/")' + "PriorityTool/CSDeliveryOrder/StateFilter2";
                 $.getJSON(url, { id: $(ddlsource).val() }, function (data) {
                     $('#StateSelectedId').empty();
                     $.each(data, function (i, state) {
@@ -78,10 +78,10 @@ else if (ViewBag.Error != null)
                     });
                     $('#StateSelectedId').html(items);
                 });
-            }
-            else {
-                $('#StateSelectedId').html(items);
-            }
+            //}
+            //else {
+            //    $('#StateSelectedId').html(items);
+            //}
         });
 
 
@@ -129,6 +129,20 @@ else if (ViewBag.Error != null)
 
         });
     });
+
+
+   
+    
+</script>
+
+<script>
+    function toFromDateCompare() {
+        var from = document.getElementById("SelectedPriorityDate").value;
+        var to = document.getElementById("ToSelectedPriorityDate").value;
+        if (to < from) {
+            alert("To date must be greater than or equal From date");
+            document.getElementById("ToSelectedPriorityDate").value = document.getElementById("SelectedPriorityDate").value;
+        }
 </script>
 
 <script>
@@ -163,7 +177,8 @@ else if (ViewBag.Error != null)
         <div class="form-row">
             <div class="col-xs-12 col-sm-6 col-md-6 col-lg-4 selectFilter" style="display:inline-block">
                 <label class="control-label" style="display:block">Priority Date</label>
-                <input class="form-select form-select-lg mb-3" type="date" id="SelectedPriorityDate" asp-for="SelectedPriorityDate" />
+                <label class="control-label" style="margin-right:10px">From</label><input type="date" id="SelectedPriorityDate" asp-for="SelectedPriorityDate" />
+                <label class="control-label" style="margin-left:40px; margin-right:10px">To</label><input type="date" id="ToSelectedPriorityDate" asp-for="ToSelectedPriorityDate" onchange="toFromDateCompare()" />
                 <input type="hidden" asp-for="orderType" value=1 />
             </div>
 
@@ -235,7 +250,7 @@ else if (ViewBag.Error != null)
                     </div>
                 }
             }
-            @if (Model.Zones == null)
+            @*@if (Model.Zones == null)
             {
                 <div class="col-xs-12 col-sm-6 col-md-6 col-lg-2 selectFilter" style="display:inline-block">
                     <label class="control-label">Zone</label>
@@ -252,7 +267,7 @@ else if (ViewBag.Error != null)
                             class="form-select form-select-lg mb-3"
                             asp-items="@(new SelectList(Model.Zones, "Id", "Name"))"></select>
                 </div>
-            }
+            }*@
             <input type="submit" value="Search" class="btn btn-primary btn-lg searchbtn" />
 
         </div>
@@ -280,7 +295,7 @@ else if (ViewBag.Error != null)
                 <th>Truck</th>
                 <th>Status</th>
                 <th>Comment</th>
-                <th>Cancel </th>
+                @*<th>Cancel </th>*@
                 <th>Unlock </th>
 
 
@@ -314,7 +329,7 @@ else if (ViewBag.Error != null)
                         </td>
 
                         <td>
-                            @Html.DisplayFor(model => model.OrderModel.orders[index].ItemId)
+                            @Html.DisplayFor(model => model.OrderModel.orders[index].Item.Name)
                             <input class="form-check-input" asp-for="OrderModel.orders[index].Item.Name" type="hidden" />
                         </td>
 
@@ -352,8 +367,8 @@ else if (ViewBag.Error != null)
                         </td>
 
                         <td>
-                            @Html.DisplayFor(model => model.OrderModel.orders[index].Comment)
-                            <input class="form-check-input" asp-for="OrderModel.orders[index].Comment" type="hidden" />
+                            @Html.DisplayFor(model => model.OrderModel.orders[index].Truck)
+                            <input class="form-check-input" asp-for="OrderModel.orders[index].Truck" type="hidden" />
                         </td>
 
                         <td>
@@ -368,9 +383,9 @@ else if (ViewBag.Error != null)
                         @if ((Model.OrderModel.orders[index].Submitted == true) && (Model.OrderModel.orders[index].Dispatched == false) && (Model.OrderModel.orders[index].Status != "Cancelled"))
                         {
 
-                            <td>
+                            @*<td>
                                 <a class="btn btn-danger" asp-action="OrderCancel" asp-route-id="@Model.OrderModel.orders[index].Id" style="margin-left:20px">Cancel</a>
-                            </td>
+                            </td>*@
                             <td>
                                 <a class="far fa-edit btn btn-info" value="@Model.OrderModel.orders[index].Id" id=@UnlockId asp-action="UnLockOrder" asp-route-id="@Model.OrderModel.orders[index].Id">Unlock</a>
                             </td>
@@ -380,9 +395,9 @@ else if (ViewBag.Error != null)
                         else
                         {
 
-                            <td>
+                            @*<td>
                                 <a class="btn btn-danger disabled" asp-action="" asp-route-id="@Model.OrderModel.orders[index].Id" style="margin-left:20px">Cancel</a>
-                            </td>
+                            </td>*@
                             <td>
                                 <a class="far fa-edit btn btn-info disabled" value="@Model.OrderModel.orders[index].Id" id=@UnlockId asp-action="UnLockOrder" asp-route-id="@Model.OrderModel.orders[index].Id">Unlock</a>
                             </td>

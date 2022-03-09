@@ -27,6 +27,20 @@
         width: 400px;
     }
 </style>
+
+<script>
+
+    function toFromDateCompare() {
+        var from = document.getElementById("SelectedPriorityDate").value;
+        var to = document.getElementById("ToSelectedPriorityDate").value;
+        if (to < from) {
+            alert("To date must be greater than or equal From date");
+            document.getElementById("ToSelectedPriorityDate").value = document.getElementById("SelectedPriorityDate").value;
+        }
+    }
+</script>
+
+
 <h4>Export Orders</h4>
 @if (Model != null)
 {
@@ -37,9 +51,10 @@
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="row">
                 <div class="col-xs-12 col-sm-6 col-md-6 col-lg-4 selectFilter" style="display:inline-block; margin-bottom:20px;">
-                    <label class="control-label">Priority Date</label>
-                    <input type="date" class="form-select form-select-lg mb-3" id="priorityDateId" name="SelectedpriorityDate" asp-for="SelectedPriorityDate" />
-                    </div>
+                    <label class="control-label" style="display:block">Priority Date</label>
+                    <label class="control-label" style="margin-right:10px">From</label><input type="date" id="SelectedPriorityDate" asp-for="SelectedPriorityDate" />
+                    <label class="control-label" style="margin-left:40px; margin-right:10px">To</label><input type="date" id="ToSelectedPriorityDate" asp-for="ToSelectedPriorityDate" onchange="toFromDateCompare()" />
+                </div>
                 
                 </div>
             <div class="row">

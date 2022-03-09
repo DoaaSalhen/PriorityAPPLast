@@ -48,23 +48,27 @@ namespace PriorityApp.Service.Implementation.CustomerService
             List<Order> PendOrders = _repository.Find(o => o.Dispatched == false).ToList();
             return PendOrders;
         }
-        public Task<bool> ClearPend()
+        public async Task<int> ClearPend()
         {
             try
             {
-                List<Order> PendOrders = _repository.Find(x => x.SavedBefore == false).ToList(); //priority No
+                int clearedOrdersCount = 0;
+                List<Order> PendOrders = _repository.Find(x => x.SavedBefore == false && x.OrderCategoryId == (int) CommanData.OrderCategory.Delivery).ToList(); //priority No
                 foreach (Order o in PendOrders)
                 {
-                    _repository.Delete(o);
+                    if(_repository.Delete(o))
+                    {
+                        clearedOrdersCount = clearedOrdersCount + 1;
+                    }
                 }
-                return Task<bool>.FromResult<bool>(true);
+                return clearedOrdersCount;
             }
             catch (Exception e)
             {
                 //return Task<bool>.FromResult<bool>(false);
                 _logger.LogError(e.ToString());
             }
-            return Task<bool>.FromResult<bool>(false);
+            return -1;
 
         }
         public DataTable ReadExcelData(string filePath, string excelConnectionString)

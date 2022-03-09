@@ -306,7 +306,7 @@ namespace PriorityApp.Controllers.CustomerService
                 List<ZoneModel> zoneModels = _zoneService.GetListOfZonesByTerritoryId(Model.TerritorySelectedId);
                 List<int> zoneIds = zoneModels.Select(z => z.Id).ToList();
                 customerModels = _deliveryCustomerService.GetCutomersByListOfZoneIds(zoneIds).Result;
-                Model.TerritoryAllCustomers = customerModels;
+                Model.TerritoryAllCustomers = customerModels.OrderBy(c=>c.CustomerName).ToList();
                 if (Model.HoldModel != null)
                 {
                     List<CustomerModel> selectedCustomerModels = new List<CustomerModel>();
@@ -406,6 +406,8 @@ namespace PriorityApp.Controllers.CustomerService
                                     updateModel.WHSavedID = applicationUser.Id;
                                     updateModel.Submitted = false;
                                     updateModel.Dispatched = false;
+                                    updateModel.Comment = customer.Comment;
+                                    updateModel.Truck = customer.Truck;
                                     updateModel.OrderCategoryId = (int) CommanData.OrderCategory.Pickup;
                                     if(customer.PrioritySelectedId == (int) CommanData.Priorities.Norm)
                                     {

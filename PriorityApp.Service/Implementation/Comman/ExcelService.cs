@@ -32,8 +32,10 @@ namespace PriorityApp.Service.Implementation.Comman
             try
             {
                 DataTable dt = new DataTable("Grid");
-                dt.Columns.AddRange(new DataColumn[19] { new DataColumn("Order Type"),
+                dt.Columns.AddRange(new DataColumn[21] { new DataColumn("Order Type"),
+                                            new DataColumn("Priority Date"),
                                             new DataColumn("Area"),
+                                            new DataColumn("Territory"),
                                             new DataColumn("Customer Number"),
                                             new DataColumn("Customer Name"),
                                             new DataColumn("Order Number"),
@@ -57,7 +59,7 @@ namespace PriorityApp.Service.Implementation.Comman
                 {
                     DateTime date = (DateTime) order.SubmitTime;
                     
-                    dt.Rows.Add(order.OrderCategory.Name,order.Customer.zone.Territory.state.Name, order.Customer.Id, 
+                    dt.Rows.Add(order.OrderCategory.Name,order.PriorityDate,order.Customer.zone.Territory.state.Name, order.Customer.zone.Territory.Name, order.Customer.Id, 
                         order.Customer.CustomerName, order.OrderNumber,order.OrderDocument, order.LineID,
                         order.ItemId, order.PODName, order.PODZoneAddress,
                         order.PODZoneName, order.PODZoneState, order.PriorityQuantity,
@@ -91,18 +93,20 @@ namespace PriorityApp.Service.Implementation.Comman
             try
             {
                 DataTable dt = new DataTable("DailyQuota");
-                dt.Columns.AddRange(new DataColumn[5] { new DataColumn("PriorityDate"),
+                dt.Columns.AddRange(new DataColumn[7] { new DataColumn("PriorityDate"),
                                             new DataColumn("User"),
                                             new DataColumn("QuotaQuantity"),
-                                            new DataColumn("RemainingQuantity"),
+                                            new DataColumn("TodayHoldQuantity"),
                                             new DataColumn("ExtraQuantity"),
+                                            new DataColumn("YeasterdayHoldQuantity"),
+                                            new DataColumn("Transferred"),
                                             });
 
 
                 foreach (var hold in models)
                 {
 
-                    dt.Rows.Add(hold.PriorityDate, hold.UserName, hold.QuotaQuantity, hold.ReminingQuantity, hold.ExtraQuantity);
+                    dt.Rows.Add(hold.PriorityDate, hold.UserName, hold.QuotaQuantity, hold.ReminingQuantity, hold.ExtraQuantity, hold.YeasterdayReminingQuantity ,hold.YesterdayRemainingTranferred);
                 }
 
                 using (XLWorkbook wb = new XLWorkbook())

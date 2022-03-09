@@ -14,7 +14,7 @@ namespace PriorityApp.Service.Contracts.CustomerService
         public DataTable ReadExcelData(string filePath, string excelConnectionString);
         public bool WriteDataToSql(DataTable dt, string SqlConnectionString);
         public List<Order> GetPend();
-        public Task<bool> ClearPend();
+        public Task<int> ClearPend();
 
         public bool FixDuplication();
 

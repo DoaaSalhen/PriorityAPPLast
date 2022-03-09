@@ -13,6 +13,8 @@ namespace PriorityApp.Service.Models
         public List<OrderCategoryModel> OrderCategoryModels  { get; set; }
 
         public int OrderCategorySelectedId { get; set; }
+        public DateTime ToSelectedPriorityDate { get; set; }
+
 
     }
 }

@@ -82,9 +82,8 @@ namespace PriorityApp.Controllers
         {
             AspNetUser applicationUser =  _userManager.GetUserAsync(User).Result;
             var subRegionModels = _regionService.GetAllISubRegions().Result;
-            subRegionModels.Insert(0, new SubRegionModel { Id = -1, Name = "All" });
+            subRegionModels.Insert(0, new SubRegionModel { Id = -2, Name = "All" });
             geoFilterModel.SubRegions = subRegionModels;
-            itemModels = _itemService.GetAllItems().Result;
             itemModels = _itemService.GetAllItems().Result;
             itemModels.Insert(0, new ItemModel { Id = -1, Name = "All" });
             geoFilterModel.Items = itemModels;
@@ -111,15 +110,15 @@ namespace PriorityApp.Controllers
         public JsonResult StateFilter(int id)
         {
             var stateModels = new List<StateModel>();
-            if (id == -1)
+            if (id == -2)
             {
                 //stateModels = _stateService.GetAllStates().Result;
-                stateModels.Insert(0, new StateModel { Id = -1, Name = "All" });
+                stateModels.Insert(0, new StateModel { Id = -2, Name = "All" });
             }
             else
             {
                 stateModels = _stateService.GetStatesBySubRegionId(id).Result;
-                stateModels.Insert(0, new StateModel { Id = -1, Name = "All" });
+                stateModels.Insert(0, new StateModel { Id = -2, Name = "All" });
 
             }
             return Json(new SelectList(stateModels, "Id", "Name"));
@@ -137,9 +136,9 @@ namespace PriorityApp.Controllers
                 geoFilterModel.ToSelectedPriorityDate = Model.ToSelectedPriorityDate.Date;
 
                 List<int> territoryIds = new List<int>();
-                if(Model.SubRegionSelectedId != -1)
+                if(Model.SubRegionSelectedId != -2)
                 {
-                    if (Model.StateSelectedId != -1)
+                    if (Model.StateSelectedId != -2)
                     {
                         territoryIds = _territoryService.GetTerritoryIdsByStateId(Model.StateSelectedId).Result;
                     }
@@ -182,9 +181,9 @@ namespace PriorityApp.Controllers
                 Model.OrderModel.orders = orderModels;
                 Model.Customers = customerModels;
                 Model.SubRegions = _regionService.GetAllISubRegions().Result;
-                Model.SubRegions.Insert(0, new SubRegionModel { Id = -1, Name = "All" });
+                Model.SubRegions.Insert(0, new SubRegionModel { Id = -2, Name = "All" });
                 Model.States = _stateService.GetStatesBySubRegionId(Model.SubRegionSelectedId).Result;
-                Model.States.Insert(0, new StateModel { Id = -1, Name = "All" });
+                Model.States.Insert(0, new StateModel { Id = -2, Name = "All" });
                 Model.SubRegionSelectedId = -1;
                 itemModels = _itemService.GetAllItems().Result;
                 itemModels.Insert(0, new ItemModel { Id = -1, Name = "All" });

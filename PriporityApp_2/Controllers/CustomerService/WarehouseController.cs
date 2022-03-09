@@ -599,7 +599,7 @@ namespace PriorityApp.Controllers.CustomerService
                     {
 
                         updateModel.PriorityId = warehouseModel.Order.PriorityId;
-                        updateModel.SavedBefore = true;
+                        updateModel.SavedBefore = false;
                         updateModel.Truck = "";
                         updateModel.WHSavedID = applicationUser.Id;
                         updateModel.PriorityQuantity = 0;

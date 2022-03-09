@@ -113,6 +113,54 @@ namespace PriorityApp.Controllers.CustomerService
         [Authorize(Roles = "SuperAdmin, Admin, CustomerService")]
         [HttpPost]
         [ValidateAntiForgeryToken]
+        public ActionResult TransferYesterdayRemaining()
+        {
+            try
+            {
+                bool transferredResult = false;
+                int TransferredCount = 0;
+                List<HoldModel> TodayHolds = new List<HoldModel>();
+                TodayHolds = _holdService.GetHoldBypriorityDate(DateTime.Today);
+                foreach(var todayHold in TodayHolds)
+                {
+                    if(!todayHold.YesterdayRemainingTranferred)
+                    {
+                        var yesterdayHold = _holdService.GetLastHoldByUserIdAndPriorityDate(todayHold.userId, DateTime.Today.AddDays(-1));
+                        if (yesterdayHold != null)
+                        {
+                            todayHold.QuotaQuantity = todayHold.QuotaQuantity + yesterdayHold.ReminingQuantity;
+                            todayHold.YesterdayRemainingTranferred = true;
+                            transferredResult = _holdService.UpdateHold(todayHold).Result;
+
+                            if (Convert.ToBoolean(transferredResult))
+                            {
+                                TransferredCount = TransferredCount + 1;
+                            }
+                        }
+                    }
+
+                }
+                if(TransferredCount > 0)
+                {
+                    ViewBag.Message = "Sucessful Process, you have transferred " + TransferredCount + " Yesterday Remaining Quota to Today Quota";
+                }
+                else
+                {
+                    ViewBag.Message = "No transferring";
+                }
+                return View("Create");
+            }
+            catch(Exception e)
+            {
+                _logger.LogError(e.ToString());
+            }
+            ViewBag.Error = "Failed Process";
+            return View("Create");
+        }
+
+        [Authorize(Roles = "SuperAdmin, Admin, CustomerService")]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
         public ActionResult DownloadQuotaTemplate()
         {
             MemoryStream memoryStream;
@@ -139,9 +187,18 @@ namespace PriorityApp.Controllers.CustomerService
 
             try
             {
-                List<HoldModel> models = _holdService.GetHoldBypriorityDate(model.PriorityDate);
-                models.ForEach(h => h.UserName = _userManager.FindByIdAsync(h.userId).Result.UserName);
-                memoryStream = _excelService.ExportQuotaToExcel(models);
+                List<HoldModel> Todaymodels = _holdService.GetHoldBypriorityDate(model.PriorityDate);
+                List<HoldModel> Yeasterdaymodels = _holdService.GetHoldBypriorityDate(model.PriorityDate.AddDays(-1));
+                List<string> userIds = Yeasterdaymodels.Select(y => y.userId).ToList();
+                Todaymodels.ForEach(h => h.UserName = _userManager.FindByIdAsync(h.userId).Result.UserName);
+                foreach(var Todaymodel in Todaymodels)
+                {
+                    if(userIds.Contains(Todaymodel.userId))
+                    {
+                        Todaymodel.YeasterdayReminingQuantity = Yeasterdaymodels.Where(y => y.userId == Todaymodel.userId).First().ReminingQuantity;
+                    }
+                }
+                memoryStream = _excelService.ExportQuotaToExcel(Todaymodels);
                 return File(memoryStream.ToArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "TodayQuota.xlsx");
             }
             catch (Exception e)

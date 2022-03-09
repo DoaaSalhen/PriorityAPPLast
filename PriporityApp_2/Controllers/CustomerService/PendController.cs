@@ -45,8 +45,8 @@ namespace MVCCore.ImportExcel.Controllers
         public async Task<IActionResult> Index(IFormFile postedFile, float QuantityToDelete)
         {
 
-            if (_pendService.ClearPend().Result)
-            {
+            //if (_pendService.ClearPend().Result)
+            //{
                 bool result = false;
                 bool fixResult = false;
                 string ExcelConnectionString = this._configuration.GetConnectionString("ExcelCon");
@@ -81,7 +81,12 @@ namespace MVCCore.ImportExcel.Controllers
                         fixResult = _pendService.FixDuplication();
                     }
                 }
-                int addedRows = 0;
+            else
+            {
+                ViewBag.Error = "File Not Uploaded, Please Select Valid File";
+                return View();
+            }
+            int addedRows = 0;
                 if (fixResult == true)
                 {
                     foreach(DataRow row in dt.Rows)
@@ -95,12 +100,26 @@ namespace MVCCore.ImportExcel.Controllers
                     ViewBag.Error = " File Not Uploaded";
                 }
                 return View();
-            }
-            ViewBag.Error = "File Not Uploaded, Please Select Valid File";
-            return View();
+            //}
         }
 
 
+        [HttpPost]
+        public async Task<IActionResult> Clear()
+        {
+            int clearedOrdersCount = _pendService.ClearPend().Result;
+            if(clearedOrdersCount >= 0)
+            {
+                ViewBag.Message = " successful process, you have cleared " + clearedOrdersCount + "unsaved Delivery orders";
+            }
+            else
+            {
+                ViewBag.Error = "Failed to clear Orders";
+            }
+
+            return View("Index");
+
+        }
 
 
 

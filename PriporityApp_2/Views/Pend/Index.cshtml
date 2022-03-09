@@ -101,6 +101,16 @@ else if (ViewBag.Error != null)
 </script>
 <h2>Upload Orders</h2>
 <div class="text-center uploadOrdersDiv">
+
+    <form asp-controller="Pend" asp-action="Clear" method="post" enctype="multipart/form-data">
+
+        
+        <div class="row" style="margin-top:20px">
+            
+         <input type="submit" value="Clear Pend" class="btn btn-primary" />
+
+        </div>
+    </form>
     <form asp-controller="Pend" asp-action="Index" method="post" enctype="multipart/form-data">
 
         <div class="row">

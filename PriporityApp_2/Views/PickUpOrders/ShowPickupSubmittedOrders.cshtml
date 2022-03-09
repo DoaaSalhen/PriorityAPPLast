@@ -46,8 +46,8 @@
         $('#SubRegionSelectedId').change(function () {
             var ddlsource = "#SubRegionSelectedId";
             var items = '';
-            if ($(ddlsource).val() != -1) {
-                var url = '@Url.Content("~/")' + "PriorityTool/CSDeliveryOrder/StateFilter";
+            alert($(ddlsource).val());
+            var url = '@Url.Content("~/")' + "PriorityTool/CSDeliveryOrder/StateFilter2";
                 $.getJSON(url, { id: $(ddlsource).val() }, function (data) {
                     $('#StateSelectedId').empty();
                     $.each(data, function (i, state) {
@@ -55,10 +55,10 @@
                     });
                     $('#StateSelectedId').html(items);
                 });
-            }
-            else {
-                $('#StateSelectedId').html(items);
-            }
+            //}
+            //else {
+            //    $('#StateSelectedId').html(items);
+            //}
         });
 
 
@@ -129,6 +129,15 @@
 
 </script>
 
+<script>
+    function toFromDateCompare() {
+        var from = document.getElementById("SelectedPriorityDate").value;
+        var to = document.getElementById("ToSelectedPriorityDate").value;
+        if (to < from) {
+            alert("To date must be greater than or equal From date");
+            document.getElementById("ToSelectedPriorityDate").value = document.getElementById("SelectedPriorityDate").value;
+        }
+</script>
 <style>
 
     table {
@@ -152,7 +161,8 @@
         <div class="form-row">
             <div class="col-xs-12 col-sm-6 col-md-6 col-lg-4 selectFilter" style="display:inline-block">
                 <label class="control-label" style="display:block">Priority Date</label>
-                <input class="form-select form-select-lg mb-3" type="date" id="SelectedPriorityDate" asp-for="SelectedPriorityDate" />
+                <label class="control-label" style="margin-right:10px">From</label><input type="date" id="SelectedPriorityDate" asp-for="SelectedPriorityDate" />
+                <label class="control-label" style="margin-left:40px; margin-right:10px">To</label><input type="date" id="ToSelectedPriorityDate" asp-for="ToSelectedPriorityDate" onchange="toFromDateCompare()" />
                 <input type="hidden" asp-for="orderType" value=2 />
                 <input type="hidden" asp-for="viewCase" value="show" />
 
@@ -257,7 +267,7 @@ else
                 <th>Truck</th>
                 <th>Status</th>
                 <th>Comment</th>
-                <th>Cancel</th>
+                @*<th>Cancel</th>*@
                 <th>Unlock</th>
 
 
@@ -312,9 +322,9 @@ else
                 @if ((Model.OrderModel.orders[index].Submitted == true) && (Model.OrderModel.orders[index].Dispatched == false) && (Model.OrderModel.orders[index].Status != "Cancelled"))
                 {
 
-                    <td>
+                    @*<td>
                         <a class="btn btn-danger" asp-action="OrderCancel" asp-route-id="@Model.OrderModel.orders[index].Id" style="margin-left:20px">Cancel</a>
-                    </td>
+                    </td>*@
                     <td>
                         <a class="far fa-edit btn btn-info" value="@Model.OrderModel.orders[index].Id" id=@UnlockId asp-action="UnLockOrder" asp-route-id="@Model.OrderModel.orders[index].Id">Unlock</a>
                     </td>
@@ -324,9 +334,9 @@ else
                 else
                 {
 
-                    <td>
+                    @*<td>
                         <a class="btn btn-danger disabled" asp-action="" asp-route-id="@Model.OrderModel.orders[index].Id" style="margin-left:20px">Cancel</a>
-                    </td>
+                    </td>*@
                     <td>
                         <a class="far fa-edit btn btn-info disabled" value="@Model.OrderModel.orders[index].Id" id=@UnlockId asp-action="UnLockOrder" asp-route-id="@Model.OrderModel.orders[index].Id">Unlock</a>
                     </td>

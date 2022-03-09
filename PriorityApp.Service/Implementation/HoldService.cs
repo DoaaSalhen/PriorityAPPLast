@@ -123,6 +123,55 @@ namespace PriorityApp.Service.Implementation
             return null;
         }
 
+        //public DataTable prepareDataForHold(DataTable dt)
+        //{
+        //    try
+        //    {
+        //        DateTime priorityDate = (DateTime)dt.Rows[0]["Quota Date"];
+        //        int tolerance = Convert.ToInt32(dt.Rows[0]["Tolerance"]);
+
+        //        //List<HoldModel> models = GetHoldBypriorityDate(priorityDate);
+        //        string userName;
+        //        //if(models.Count() == 0)
+        //        //{
+        //        dt.Columns.Add("RemainingQuantity");
+        //        dt.Columns.Add("TempReminingQuantity");
+        //        dt.Columns.Add("PriorityDate");
+        //        dt.Columns.Add("PreviousRemainingQuantity");
+        //        DateTime previousDay = priorityDate.AddDays(-1);
+        //        List<HoldModel> holdModels = GetHoldBypriorityDate(previousDay);
+        //        for (int index = 0; index < dt.Rows.Count; index++)
+        //        {
+        //            userName = dt.Rows[index]["Salesman"].ToString();
+        //            dt.Rows[index]["Salesman"] = _userManager.FindByNameAsync(userName).Result.Id;
+        //            dt.Rows[index]["PriorityDate"] = priorityDate;
+        //            dt.Rows[index]["Tolerance"] = tolerance;
+
+        //            float previousRemainingQuota = holdModels.Where(h => h.userId == dt.Rows[index]["Salesman"].ToString()).First().ReminingQuantity;
+        //            dt.Rows[index]["Assigned"] = dt.Rows[index]["Assigned"].ToString() + previousRemainingQuota;
+        //            dt.Rows[index]["RemainingQuantity"] = dt.Rows[index]["Assigned"];
+        //            dt.Rows[index]["TempReminingQuantity"] = dt.Rows[index]["Assigned"];
+
+        //        }
+        //        foreach (DataRow row in dt.Rows)
+        //        {
+        //            HoldModel hold = GetLastHoldByUserIdAndPriorityDate(row["Salesman"].ToString(), priorityDate);
+        //            if (hold != null)
+        //            {
+        //                row.Delete();
+        //            }
+        //        }
+        //        return dt;
+        //        //}
+
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        _logger.LogError(e.ToString());
+        //    }
+        //    return null;
+        //}
+
         public DataTable prepareDataForHold(DataTable dt)
         {
             try
@@ -165,8 +214,6 @@ namespace PriorityApp.Service.Implementation
             }
             return null;
         }
-
-
         public async Task<bool> UpdateHold(HoldModel model)
         {
             try

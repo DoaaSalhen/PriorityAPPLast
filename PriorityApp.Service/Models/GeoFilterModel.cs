@@ -46,7 +46,7 @@ namespace PriorityApp.Service.Models
         public float holdTotalAssignedQuantity { get; set; }
         public DateTime ToSelectedPriorityDate { get; set; }
 
-
+        public bool SavedOnly { get; set; }
 
 
 

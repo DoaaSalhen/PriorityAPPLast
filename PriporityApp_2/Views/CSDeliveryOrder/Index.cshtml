@@ -292,13 +292,24 @@ else if (ViewBag.Error != null)
             Id: document.getElementById("OrderModel_orders_" + index + "__Id").value,
             Truck: document.getElementById("OrderModel_orders_" + index + "__Truck").value,
         }
-
         var url = '@Url.Content("~/")' + "PriorityTool/CSDeliveryOrder/SaveTruck";
         $.getJSON(url, Details, function (data) {
         });
     }
 
+    function checkAllSelectedOrders()
+    {
+        var checkboxes = document.getElementsByClassName('CheckDeliveryOrders');
+        for (var checkbox of checkboxes) {
+            checkbox.checked = !checkbox.checked;
+        }
+        var shownElements = document.getElementsByTagName("tr");
+        for (var i = 0; i < shownElements.length; i++)
+        {
 
+        }
+        alert(shownElements.length);
+    }
 
 </script>
 
@@ -429,6 +440,9 @@ else if (ViewBag.Error != null)
                             asp-items="@(new SelectList(Model.Zones, "Id", "Name"))"></select>
                 </div>
             }
+
+            <input type="checkbox" id="SavedOnly" asp-for="SavedOnly" name="SavedOnly" style="margin-left:20px;" />
+            <label class="control-label" style="margin-right:20px;">SavedOnly</label>
             <input type="submit" value="Search" class="btn btn-primary btn-lg searchbtn" />
 
         </div>
@@ -443,6 +457,7 @@ else if (ViewBag.Error != null)
     <table id="example" class="display table table-striped" style="text-align: center; width:100%">
         <thead class="table-dark">
             <tr>
+                <th><input type="checkbox" id="DispatchedChexboxHeadId" onchange="checkAllSelectedOrders()"/></th>
                 <th scope="col"> Customer Name</th>
                 <th>Order Number</th>
                 @*<th>line</th>*@
@@ -450,7 +465,7 @@ else if (ViewBag.Error != null)
                 <th> POD Number</th>
                 <th> POD Name</th>
                 <th> POD Address</th>
-                <th> POD Zone</th>
+                @*<th> POD Zone</th>*@
                 <th> POD  State</th>
                 <th> O.Qty</th>
                 <th> Priority</th>
@@ -479,6 +494,9 @@ else if (ViewBag.Error != null)
 
 
         <tr>
+            <td>
+                <input type="checkbox" id="dispatchedCheckListId" class="CheckDeliveryOrders" asp-for="OrderModel.orders[index].Dispatched" />
+            </td>
             <td>
                 @Html.DisplayFor(model => model.OrderModel.orders[index].Customer.CustomerName)
                 <input class="form-check-input" asp-for="OrderModel.orders[index].CustomerId" type="hidden" />
@@ -519,10 +537,10 @@ else if (ViewBag.Error != null)
                 <input class="form-check-input" asp-for="OrderModel.orders[index].PODZoneAddress" type="hidden" />
 
             </td>
-            <td>
+            @*<td>
                 @Html.DisplayFor(model => model.OrderModel.orders[index].PODZoneName)
                 <input class="form-check-input" asp-for="OrderModel.orders[index].PODZoneName" type="hidden" />
-            </td>
+            </td>*@
             <td>
                 @Html.DisplayFor(model => model.OrderModel.orders[index].PODZoneState)
                 <input class="form-check-input" asp-for="OrderModel.orders[index].PODZoneState" type="hidden" />

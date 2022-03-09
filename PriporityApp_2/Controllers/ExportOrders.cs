@@ -62,7 +62,7 @@ namespace PriorityApp.Controllers
         {
             try
             {
-                var orders = _orderService.GetSubmittedOdersByPriorityDate(Model.SelectedPriorityDate, Model.SelectedPriorityDate).Result;
+                var orders = _orderService.GetSubmittedOdersByPriorityDate(Model.SelectedPriorityDate, Model.ToSelectedPriorityDate).Result;
                 if(Model.OrderCategorySelectedId != 0)
                 {
                     orders = orders.Where(o => o.OrderCategoryId == Model.OrderCategorySelectedId).ToList();

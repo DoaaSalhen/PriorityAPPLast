@@ -211,7 +211,7 @@
                 <th>Quantity</th>
                 <th>Comment</th>
                 <th>Status</th>
-                <th>Cancel</th>
+                @*<th>Cancel</th>*@
                 <th>Unlock</th>
 
 
@@ -258,18 +258,18 @@
             @if ((Model.warehouseOrderHoldModels[index].Order.Submitted == true) && (Model.warehouseOrderHoldModels[index].Order.Dispatched == false) && (Model.warehouseOrderHoldModels[index].Order.Status != "Cancelled"))
             {
 
-                <td>
+                @*<td>
                     <a class="btn btn-danger" asp-action="OrderCancel" asp-route-id="@Model.warehouseOrderHoldModels[index].Order.Id">Cancel</a>
-                </td>
+                </td>*@
                 <td>
                     <a class="far fa-edit btn btn-info" value="@Model.warehouseOrderHoldModels[index].Order.Id" id=@UnlockId asp-action="UnLockOrder" asp-route-id="@Model.warehouseOrderHoldModels[index].Order.Id">Unlock</a>
                 </td>
             }
             else
             {
-                <td>
+                @*<td>
                     <a class="btn btn-danger disabled" asp-action="" asp-route-id="@Model.warehouseOrderHoldModels[index].Order.Id">Cancel</a>
-                    </td>
+                    </td>*@
                     <td>               
                     <a class="far fa-edit btn btn-info disabled" value="@Model.warehouseOrderHoldModels[index].Order.Id" id=@UnlockId asp-action=" " asp-route-id="@Model.warehouseOrderHoldModels[index].Order.Id">Unlock</a>
                 </td>

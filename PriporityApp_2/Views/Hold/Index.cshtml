@@ -43,8 +43,21 @@
     });
 
 </script>
+@if (ViewBag.Message != null)
+{
+<div style="background-color: #00e600; height: 60px; box-shadow: 5px; margin: 0px 20px 20px 50px; text-align:center; font-size:x-large">@ViewBag.Message</div> }
+else if (ViewBag.Error != null)
+{
+
+<div style="background-color: #ff3333; height: 60px; box-shadow: 5px; margin: 0px 20px 20px 50px; text-align: center; font-size: x-large">@ViewBag.Error</div>///////////////////////////////*@ <!--<div class="modal">--> <!-- Modal content -->
+
+}
 
 <h3>Show Qouta</h3>
+
+<form asp-action="TransferYesterdayRemaining" asp-controller="Hold" method="post" enctype="multipart/form-data">
+    <input type="submit" value="Transfer" class="btn btn-success btn-lg searchbtn" style="margin-bottom:40px" />
+</form>
 
 <form method="post" asp-controller="Hold">
 
@@ -59,7 +72,7 @@
 
     <input type="submit" value="Download Quota" asp-action="ExportQuotaDaily" class="btn btn-link" style="margin-bottom:40px" />
 </form>
-<table  id="example" class="display table table-striped">
+<table id="example" class="display table table-striped">
     <thead class="table-dark">
         <tr>
             <th>
@@ -77,6 +90,9 @@
             <th>
                 @Html.DisplayNameFor(model => model.Tolerance)
             </th>
+            <th>
+                @Html.DisplayNameFor(model => model.YesterdayRemainingTranferred)
+            </th>
 
             <th></th>
         </tr>
@@ -86,38 +102,40 @@
         {
 @for (int index = 0; index < Model.holdModels.Count; index++)
 {
-<tr>
-    <td>
-        @Html.DisplayFor(model => model.holdModels[index].UserName)
-        <input class="form-check-input" asp-for="holdModels[index].userId" type="hidden" />
-    </td>
-    <td>
-        @Html.DisplayFor(model => model.holdModels[index].PriorityDate)
-    </td>
-    <td>
-        @Html.DisplayFor(model => model.holdModels[index].QuotaQuantity)
-    </td>
-    <td>
-        @Html.DisplayFor(model => model.holdModels[index].ReminingQuantity)
-    </td>
-    <td>
-        @Html.DisplayFor(model => model.holdModels[index].Tolerance)
-    </td>
-    @if (!roles.Contains("Sales"))
-    {
-<td>
-    <a class="far fa-edit btn btn-success" asp-action="Edit" asp-route-userId="@Model.holdModels[index].userId" asp-route-PriorityDate="@Model.holdModels[index].PriorityDate">Edit</a>
-</td>
+        <tr>
+            <td>
+                @Html.DisplayFor(model => model.holdModels[index].UserName)
+                <input class="form-check-input" asp-for="holdModels[index].userId" type="hidden" />
+            </td>
+            <td>
+                @Html.DisplayFor(model => model.holdModels[index].PriorityDate)
+            </td>
+            <td>
+                @Html.DisplayFor(model => model.holdModels[index].QuotaQuantity)
+            </td>
+            <td>
+                @Html.DisplayFor(model => model.holdModels[index].ReminingQuantity)
+            </td>
+            <td>
+                @Html.DisplayFor(model => model.holdModels[index].Tolerance)
+            </td>
+            <td>
+                @Html.DisplayFor(model => model.holdModels[index].YesterdayRemainingTranferred)
+            </td>
+            @if (!roles.Contains("Sales") && Model.PriorityDate >= DateTime.Today)
+            {
+        <td>
+            <a class="far fa-edit btn btn-success" asp-action="Edit" asp-route-userId="@Model.holdModels[index].userId" asp-route-PriorityDate="@Model.holdModels[index].PriorityDate">Edit</a>
+        </td>
  }
-else
-{
-<td>
-    <a class="far fa-edit btn btn-success disabled" asp-action="" asp-route-territoryId="@Model.holdModels[index].userId" asp-route-PriorityDate="@Model.holdModels[index].PriorityDate">Edit</a>
-</td>
+    else
+    {
+        <td>
+            <a class="far fa-edit btn btn-success disabled" asp-action="" asp-route-territoryId="@Model.holdModels[index].userId" asp-route-PriorityDate="@Model.holdModels[index].PriorityDate">Edit</a>
+        </td>
 }
 
-</tr>
-}}
+        </tr>}}
     </tbody>
 </table>
 
