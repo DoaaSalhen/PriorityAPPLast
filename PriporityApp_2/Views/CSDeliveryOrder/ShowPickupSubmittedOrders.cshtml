@@ -238,7 +238,7 @@ else
             asp-items="@(new SelectList(Model.Territories, "Id", "Name"))"></select>
 </div>}            }
 
-            @if (Model.Zones == null)
+            @*@if (Model.Zones == null)
             {
 <div class="col-xs-12 col-sm-6 col-md-6 col-lg-2 selectFilter" style="display:inline-block">
     <label class="control-label">Zone</label>
@@ -253,7 +253,7 @@ else
     <select id="ZoneSelectedId" name="ZoneSelectedId" asp-for="ZoneSelectedId"
             class="form-select form-select-lg mb-3"
             asp-items="@(new SelectList(Model.Zones, "Id", "Name"))"></select>
-</div>}
+</div>}*@
             <input type="submit" value="Search" class="btn btn-primary btn-lg searchbtn" />
 
         </div>

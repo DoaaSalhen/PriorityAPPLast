@@ -69,7 +69,6 @@ else if (ViewBag.Error != null)
         $('#SubRegionSelectedId').change(function () {
             var ddlsource = "#SubRegionSelectedId";
             var items = '';
-            alert($(ddlsource).val());
             var url = '@Url.Content("~/")' + "PriorityTool/CSDeliveryOrder/StateFilter2";
                 $.getJSON(url, { id: $(ddlsource).val() }, function (data) {
                     $('#StateSelectedId').empty();

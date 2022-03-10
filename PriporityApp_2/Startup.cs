@@ -165,7 +165,7 @@ namespace PriporityApp_2
                     name: "default",
                     pattern: "{PriorityTool}/{controller=Item}/{action=Index}/{id?}");
                 endpoints.MapRazorPages();
-                endpoints.MapHub<NotificationHub>("/NotificationHub");
+                endpoints.MapHub<NotificationHub>("PriorityTool/NotificationHub");
 
             });
 
