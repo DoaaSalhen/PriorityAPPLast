@@ -76,6 +76,18 @@ namespace PriorityApp.Controllers
                 new DispatchCaseModel {Id = 3, Name = "Not Dispatched"},
 
             };
+
+        List<SortingModel> filterColoumns = new List<SortingModel>()
+        { new SortingModel {ID =1, Name ="Cutomer Name", Type = "text" },
+          new SortingModel {ID =2, Name = "Order Number", Type ="numeric" },
+          new SortingModel {ID =3, Name = "Item" , Type ="text"},
+          new SortingModel {ID =4, Name = "POD Number", Type ="numeric" },
+          new SortingModel {ID =5, Name = "POD Name",  Type ="text" },
+          new SortingModel {ID =6, Name = "POD Address",  Type ="text" },
+          new SortingModel {ID =7, Name = "POD State",  Type ="text" },
+          new SortingModel {ID =8, Name = "o.Qty" ,  Type ="numeric"},
+          new SortingModel {ID =9, Name = "Qty" , Type ="numeric"},
+         };
         List<UserNotificationModel> userNotificationModels = new List<UserNotificationModel>();
         // GET: DispatchController
         public async Task<ActionResult> Index()
@@ -189,7 +201,7 @@ namespace PriorityApp.Controllers
                 itemModels.Insert(0, new ItemModel { Id = -1, Name = "All" });
                 Model.Items = itemModels;
                 Model.ItemSelectedId = -1; Model.DispatchCases = dispatchCaseModels;
-
+                Model.FilterColoumns = filterColoumns;
                 return View("Index", Model);
             }
             catch

@@ -48,6 +48,8 @@ namespace PriorityApp.Service.Models
 
         public bool SavedOnly { get; set; }
 
+        public List<SortingModel> FilterColoumns;
+
 
 
     }

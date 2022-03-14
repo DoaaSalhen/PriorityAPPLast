@@ -15,7 +15,7 @@ $.fn.ddTableFilter = function(options) {
       if($(this).hasClass('skip-filter')) return;
       var selectbox = $('<select>');
       var values = [];
-      var opts = [];
+        var opts = [];
       selectbox.append('<option value="--all--">' + $(this).text() + '</option>');
 
       var col = $('tr:not(.skip-filter) td:nth-child(' + (index + 1) + ')', table).each(function() {
@@ -119,7 +119,7 @@ $.fn.ddTableFilter.defaultOptions = {
   emptyText:'--Empty--',
   sortOpt:true,
   debug:false,
-  minOptions:2
+  minOptions:1
 }
 
 })(jQuery);

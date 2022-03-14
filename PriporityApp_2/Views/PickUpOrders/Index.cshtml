@@ -463,14 +463,14 @@ else if (ViewBag.Error != null)
             <tr>
                 <th> Customer Number</th>
                 <th> Customer Name</th>
-                <th> Priority</th>
-                <th>Comment</th>
-                <th>Truck</th>
+                <th class="skip-filter"> Priority</th>
+                <th class="skip-filter">Comment</th>
+                <th class="skip-filter">Truck</th>
 
                 @foreach (var item in Model.Items)
                 {
-                    <th> @item.Name</th>
-                    <th></th>
+                    <th class="skip-filter"> @item.Name</th>
+                    @*<th></th>*@
                 }
             </tr>
         </thead>
@@ -488,56 +488,59 @@ else if (ViewBag.Error != null)
                     string priorityQuantityId = "";
                     priorityQuantityId = "PQ" + index;
                     string customerId = "customerId" + index;
-                    <tr>
-                        @*<td>
-                                <select id="WarehouseModel2[@index].WarehouseSelectedId" name="WarehouseModel2[@index].WarehouseSelectedId" asp-for="WarehouseModel2[index].WarehouseSelectedId"
-                                        asp-items="@(new SelectList(Model.WarehouseModel2[index].WarehouseModels, "Id", "Name"))"></select>
+        <tr>
+            @*<td>
+            <select id="WarehouseModel2[@index].WarehouseSelectedId" name="WarehouseModel2[@index].WarehouseSelectedId" asp-for="WarehouseModel2[index].WarehouseSelectedId"
+                    asp-items="@(new SelectList(Model.WarehouseModel2[index].WarehouseModels, "Id", "Name"))"></select>
 
-                            </td>
-                            <td>
-                                <select class="@dropDownPriorityId form-control" id="WarehouseModel2[@index].PrioritySelectedId" name="WarehouseModel2[@index].PrioritySelectedId" asp-for="WarehouseModel2[index].PrioritySelectedId"
-                                        asp-items="@(new SelectList(Model.WarehouseModel2[index].priorityModels, "Id", "Name"))" onchange="calculateTotal(@index, @Model.HoldModel.ReminingQuantity)"></select>*@
-
-
-                        @*</td>*@
-                        <td>
-                            @Html.DisplayFor(model => model.Customers[index].Id)
-                            <input class="form-check-input" asp-for="Customers[index].Id" type="hidden" />
-
-                            <input type="hidden" asp-for="SelectedPriorityDate" />
-                            <input type="hidden" asp-for="TerritorySelectedId" />
-                        </td>
-                        <td>
-                            @Html.DisplayFor(model => model.Customers[index].CustomerName)
-                            <input class="form-check-input" asp-for="Customers[index].CustomerName" type="hidden" />
-
-                        </td>
-                        <td>
-                            <select id=@dropDownPriorityId name="Customers[@index].PrioritySelectedId" asp-for="Customers[index].PrioritySelectedId"
-                                    asp-items="@(new SelectList(Model.Priorities, "Id", "Name"))" onchange="calculateTotal(@index, @Model.HoldModel.ReminingQuantity, @Model.holdTotalAssignedQuantity, @Model.HoldModel.ExtraQuantity)"></select>
+        </td>
+        <td>
+            <select class="@dropDownPriorityId form-control" id="WarehouseModel2[@index].PrioritySelectedId" name="WarehouseModel2[@index].PrioritySelectedId" asp-for="WarehouseModel2[index].PrioritySelectedId"
+                    asp-items="@(new SelectList(Model.WarehouseModel2[index].priorityModels, "Id", "Name"))" onchange="calculateTotal(@index, @Model.HoldModel.ReminingQuantity)"></select>*@
 
 
-                        </td>
-                        <td>
-                            <input asp-for="Customers[index].Comment" type="text" />
+            @*</td>*@
+            <td>
+                @Html.DisplayFor(model => model.Customers[index].Id)
+                <input class="form-check-input" asp-for="Customers[index].Id" type="hidden" />
 
-                        </td>
-                        <td>
-                            <input asp-for="Customers[index].Truck" type="text" />
+                <input type="hidden" asp-for="SelectedPriorityDate" />
+                <input type="hidden" asp-for="TerritorySelectedId" />
+            </td>
+            <td>
+                @Html.DisplayFor(model => model.Customers[index].CustomerName)
+                <input class="form-check-input" asp-for="Customers[index].CustomerName" type="hidden" />
 
-                        </td>
-                        @for (var itemIndex = 0; itemIndex < Model.Customers[index].itemModels.Count; itemIndex++)
-                        {
-                            <td><input type="number" class="@priorityQuantityId" asp-for="Customers[index].itemModels[itemIndex].Quantity" onchange="calculateTotal(@index, @Model.HoldModel.ReminingQuantity, @Model.holdTotalAssignedQuantity, @Model.HoldModel.ExtraQuantity)" /></td>
-                            <td><input type="hidden" asp-for="Customers[index].itemModels[itemIndex].Id" id="Customers[index].itemModels[itemIndex].Id" /></td>
-                        }
-                        <input class="form-check-input" asp-for="HoldModel.QuotaQuantity" type="hidden" style="width:100px" />
-                        <input id="calculatedRemainingQuantity" class="form-check-input" asp-for="HoldModel.ReminingQuantity" type="hidden" style="width:100px" />
-                        @Html.Hidden("test", Model.HoldModel.ReminingQuantity)
-                        <input class="form-check-input" asp-for="HoldModel.userId" type="hidden" style="width:100px" />
-                        <input class="form-check-input" asp-for="HoldModel.PriorityDate" type="hidden" style="width:100px" />
+            </td>
+            <td>
+                <select id=@dropDownPriorityId name="Customers[@index].PrioritySelectedId" asp-for="Customers[index].PrioritySelectedId"
+                        asp-items="@(new SelectList(Model.Priorities, "Id", "Name"))" onchange="calculateTotal(@index, @Model.HoldModel.ReminingQuantity, @Model.holdTotalAssignedQuantity, @Model.HoldModel.ExtraQuantity)"></select>
 
-                    </tr>
+
+            </td>
+            <td>
+                <input asp-for="Customers[index].Comment" type="text" />
+
+            </td>
+            <td>
+                <input asp-for="Customers[index].Truck" type="text" />
+
+            </td>
+            @for (var itemIndex = 0; itemIndex < Model.Customers[index].itemModels.Count; itemIndex++)
+            {
+                <td class="skip-filter">
+                    <input type="number" class="@priorityQuantityId skip-filter" asp-for="Customers[index].itemModels[itemIndex].Quantity" onchange="calculateTotal(@index, @Model.HoldModel.ReminingQuantity, @Model.holdTotalAssignedQuantity, @Model.HoldModel.ExtraQuantity)" />
+                    <input type="hidden" asp-for="Customers[index].itemModels[itemIndex].Id" id="Customers[index].itemModels[itemIndex].Id" />
+                </td>
+                @*<td><input type="hidden" asp-for="Customers[index].itemModels[itemIndex].Id" id="Customers[index].itemModels[itemIndex].Id" /></td>*@
+            }
+            <input class="form-check-input" asp-for="HoldModel.QuotaQuantity" type="hidden" style="width:100px" />
+            <input id="calculatedRemainingQuantity" class="form-check-input" asp-for="HoldModel.ReminingQuantity" type="hidden" style="width:100px" />
+            @Html.Hidden("test", Model.HoldModel.ReminingQuantity)
+            <input class="form-check-input" asp-for="HoldModel.userId" type="hidden" style="width:100px" />
+            <input class="form-check-input" asp-for="HoldModel.PriorityDate" type="hidden" style="width:100px" />
+
+        </tr>
                 }
 
             }

@@ -142,6 +142,24 @@ else if (ViewBag.Error != null)
             alert("To date must be greater than or equal From date");
             document.getElementById("ToSelectedPriorityDate").value = document.getElementById("SelectedPriorityDate").value;
         }
+    }
+
+    function sorting(thIndex) {
+        var ths = document.getElementsByTagName("th");
+        var test = ths[thIndex];
+        var table = $(test).parents('table').eq(0)
+        var rows = table.find('tr:gt(0)').toArray().sort(comparer($(test).index()))
+        test.asc = !test.asc
+        if (!test.asc) { rows = rows.reverse() }
+        for (var i = 0; i < rows.length; i++) { table.append(rows[i]) }
+    }
+    function comparer(index) {
+        return function (a, b) {
+            var valA = getCellValue(a, index), valB = getCellValue(b, index)
+            return $.isNumeric(valA) && $.isNumeric(valB) ? valA - valB : valA.toString().localeCompare(valB)
+        }
+    }
+    function getCellValue(row, index) { return $(row).children('td').eq(index).text() }
 </script>
 
 <script>
@@ -174,9 +192,9 @@ else if (ViewBag.Error != null)
     <div class="alert-danger" asp-validation-summary="ModelOnly"></div>
     <div class="form-group">
         <div class="form-row">
-            <div class="col-xs-12 col-sm-6 col-md-6 col-lg-4 selectFilter" style="display:inline-block">
+            <div class="col-xs-15 col-sm-6 col-md-6 col-lg-6 selectFilter" style="display:inline-block">
                 <label class="control-label" style="display:block">Priority Date</label>
-                <label class="control-label" style="margin-right:10px">From</label><input type="date" id="SelectedPriorityDate" asp-for="SelectedPriorityDate" />
+                <label class="control-label" style="margin-right:10px">From</label><input type="date" id="SelectedPriorityDate" asp-for="SelectedPriorityDate" onchange="toFromDateCompare()" />
                 <label class="control-label" style="margin-left:40px; margin-right:10px">To</label><input type="date" id="ToSelectedPriorityDate" asp-for="ToSelectedPriorityDate" onchange="toFromDateCompare()" />
                 <input type="hidden" asp-for="orderType" value=1 />
             </div>
@@ -250,30 +268,47 @@ else if (ViewBag.Error != null)
                 }
             }
             @*@if (Model.Zones == null)
-            {
-                <div class="col-xs-12 col-sm-6 col-md-6 col-lg-2 selectFilter" style="display:inline-block">
-                    <label class="control-label">Zone</label>
-                    <select id="ZoneSelectedId" name="ZoneSelectedId" asp-for="ZoneSelectedId"
-                            class="form-select form-select-lg mb-3"
-                            asp-items="@(new SelectList(string.Empty, "Id", "Name"))"></select>
-                </div>
-            }
-            else
-            {
-                <div class="col-xs-12 col-sm-6 col-md-6 col-lg-2 selectFilter" style="display:inline-block">
-                    <label class="control-label">Zone</label>
-                    <select id="ZoneSelectedId" name="ZoneSelectedId" asp-for="ZoneSelectedId"
-                            class="form-select form-select-lg mb-3"
-                            asp-items="@(new SelectList(Model.Zones, "Id", "Name"))"></select>
-                </div>
-            }*@
+                {
+                    <div class="col-xs-12 col-sm-6 col-md-6 col-lg-2 selectFilter" style="display:inline-block">
+                        <label class="control-label">Zone</label>
+                        <select id="ZoneSelectedId" name="ZoneSelectedId" asp-for="ZoneSelectedId"
+                                class="form-select form-select-lg mb-3"
+                                asp-items="@(new SelectList(string.Empty, "Id", "Name"))"></select>
+                    </div>
+                }
+                else
+                {
+                    <div class="col-xs-12 col-sm-6 col-md-6 col-lg-2 selectFilter" style="display:inline-block">
+                        <label class="control-label">Zone</label>
+                        <select id="ZoneSelectedId" name="ZoneSelectedId" asp-for="ZoneSelectedId"
+                                class="form-select form-select-lg mb-3"
+                                asp-items="@(new SelectList(Model.Zones, "Id", "Name"))"></select>
+                    </div>
+                }*@
             <input type="submit" value="Search" class="btn btn-primary btn-lg searchbtn" />
 
         </div>
 
 
     </div>
-
+    @if (Model.FilterColoumns == null)
+    {
+        <div class="col-xs-12 col-sm-6 col-md-6 col-lg-2 selectFilter" style="display:inline-block">
+            <label class="control-label">Sort by</label>
+            <select multiple id="sortingDD" name="sortingDD"
+                    class="form-select form-select-lg mb-3"
+                    asp-items="@(new SelectList(string.Empty, "ID", "Name","Type"))"></select>
+        </div>
+    }
+    else
+    {
+        <div class="col-xs-12 col-sm-6 col-md-6 col-lg-2 selectFilter" style="display:inline-block">
+            <label class="control-label">Sort by</label>
+            <select multiple id="sortingDD" name="sortingDD"
+                    class="form-select form-select-lg mb-3"
+                    asp-items="@(new SelectList(Model.FilterColoumns, "ID", "Name", "Type"))" onclick="sorting(this.value)"></select>
+        </div>
+    }
 </form>
 
 <form asp-action="SaveOrders" class="CreateForm" asp-controller="CSDeliveryOrder" method="post">

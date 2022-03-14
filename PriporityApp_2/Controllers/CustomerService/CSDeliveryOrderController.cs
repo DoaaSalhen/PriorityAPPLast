@@ -91,12 +91,18 @@ namespace PriorityApp.Controllers.CustomerService
             Norm = 3,
             Extra = 4,
         };
-        //class submittedInfo
-        //{
-        //    public string territoryName { get; set; }
-        //    public int NumberOfOrders { get; set; }
-        //}
 
+        List<SortingModel> filterColoumns = new List<SortingModel>()
+        { new SortingModel {ID =1, Name ="Cutomer Name", Type = "text" },
+          new SortingModel {ID =2, Name = "Order Number", Type ="numeric" },
+          new SortingModel {ID =3, Name = "Item" , Type ="text"},
+          new SortingModel {ID =4, Name = "POD Number", Type ="numeric" },
+          new SortingModel {ID =5, Name = "POD Name",  Type ="text" },
+          new SortingModel {ID =6, Name = "POD Address",  Type ="text" },
+          new SortingModel {ID =7, Name = "POD State",  Type ="text" },
+          new SortingModel {ID =8, Name = "o.Qty" ,  Type ="numeric"},
+          new SortingModel {ID =9, Name = "Qty" , Type ="numeric"},
+         };
         // GET: CSDeliveryOrderController
         public async Task<ActionResult> Index()
         {
@@ -110,7 +116,6 @@ namespace PriorityApp.Controllers.CustomerService
                 itemModels.Insert(0, new ItemModel { Id = -1, Name = "All" });
                 geoFilterModel.Items = itemModels;
                 geoFilterModel.ItemSelectedId = -1;
-
                 //geoFilterModel.SubRegions = subRegionModels;
 
                 geoFilterModel.SelectedPriorityDate = DateTime.Today;
@@ -173,7 +178,6 @@ namespace PriorityApp.Controllers.CustomerService
             var zoneModels = new List<ZoneModel>();
             if (id == -1)
             {
-                //stateModels = _stateService.GetAllStates().Result;
                 zoneModels = null;
 
 
@@ -225,7 +229,9 @@ namespace PriorityApp.Controllers.CustomerService
                     Model.SalesTerritoriesSelectedIds = territoryModelSales.Select(t=>t.Id).ToList();
                     Model.HoldModel = _holdService.GetHold(Model.SelectedPriorityDate.Date, territoryModelSales.First().userId);
                     Model.Priorities = _priorityService.GetAllPrioritiesExceptExtra().Result.ToList();
-                                
+                    Model.FilterColoumns = filterColoumns;
+
+
                 }
                 else
                 {
@@ -238,6 +244,7 @@ namespace PriorityApp.Controllers.CustomerService
                     Model.States.Insert(0, new StateModel { Id = -1, Name = "Select State" });
                     Model.Territories = _territoryService.GetAllTerritoriesByStateId(Model.StateSelectedId).Result;
                     Model.Territories.Insert(0, new TerritoryModel { Id = -1, Name = "Select Territory" });
+                    Model.FilterColoumns = filterColoumns;
                 }
                 itemModels = _itemService.GetAllItems().Result;
                 itemModels.Insert(0, new ItemModel { Id = -1, Name = "All" });
@@ -375,7 +382,6 @@ namespace PriorityApp.Controllers.CustomerService
                 if (updateOrderResult)
                 {
                     return Json(true);
-
                 }
 
             }
@@ -449,41 +455,50 @@ namespace PriorityApp.Controllers.CustomerService
                     DBholdModel.ExtraQuantity = (float)DBholdModel.ExtraQuantity + (float)orderModel.PriorityQuantity;
 
                 }
-                if (orderModel.PriorityId != (int)CommanData.Priorities.No)
+                if (DBholdModel.ReminingQuantity > 0)
                 {
-                    DBholdModel.TempReminingQuantity = DBholdModel.ReminingQuantity;
-                    updateModel.ItemId = orderModel.ItemId;
-                    updateModel.PriorityId = orderModel.PriorityId;
-                    updateModel.PriorityQuantity = orderModel.PriorityQuantity;
-                    updateModel.SavedBefore = true;
-                    updateModel.WHSavedID = applicationUser.Id;
-                    updateModel.Comment = orderModel.Comment;
-                    updateModel.Truck = orderModel.Truck;
-                    updateModel.OrderCategoryId = (int)CommanData.OrderCategory.Delivery;
-                }
-                else if (updateModel.SavedBefore == true && orderModel.PriorityId == (int)CommanData.Priorities.No)
-                {
-                    DBholdModel.TempReminingQuantity = DBholdModel.ReminingQuantity;
-                    updateModel.PriorityId = orderModel.PriorityId;
-                    updateModel.SavedBefore = false;
-                    updateModel.Truck = "";
-                    updateModel.WHSavedID = applicationUser.Id;
-                    updateModel.PriorityQuantity = 0;
-                    updateModel.ItemId = orderModel.ItemId;
-                    updateModel.OrderCategoryId = (int)CommanData.OrderCategory.Delivery;
-                    updateModel.Comment = "";
+                    if (orderModel.PriorityId != (int)CommanData.Priorities.No)
+                    {
+                        DBholdModel.TempReminingQuantity = DBholdModel.ReminingQuantity;
+                        updateModel.ItemId = orderModel.ItemId;
+                        updateModel.PriorityId = orderModel.PriorityId;
+                        updateModel.PriorityQuantity = orderModel.PriorityQuantity;
+                        updateModel.SavedBefore = true;
+                        updateModel.WHSavedID = applicationUser.Id;
+                        updateModel.Comment = orderModel.Comment;
+                        updateModel.Truck = orderModel.Truck;
+                        updateModel.OrderCategoryId = (int)CommanData.OrderCategory.Delivery;
+                    }
+                    else if (updateModel.SavedBefore == true && orderModel.PriorityId == (int)CommanData.Priorities.No)
+                    {
+                        DBholdModel.TempReminingQuantity = DBholdModel.ReminingQuantity;
+                        updateModel.PriorityId = orderModel.PriorityId;
+                        updateModel.SavedBefore = false;
+                        updateModel.Truck = "";
+                        updateModel.WHSavedID = applicationUser.Id;
+                        updateModel.PriorityQuantity = 0;
+                        updateModel.ItemId = orderModel.ItemId;
+                        updateModel.OrderCategoryId = (int)CommanData.OrderCategory.Delivery;
+                        updateModel.Comment = "";
 
-                }
-                updateOrderResult = _orderService.UpdateOrder2(updateModel, DBholdModel).Result;
-                if (updateOrderResult == true)
-                {
-                    SavedOrderCount = SavedOrderCount + 1;
+                    }
+                    updateOrderResult = _orderService.UpdateOrder2(updateModel, DBholdModel).Result;
+                    if (updateOrderResult == true)
+                    {
+                        SavedOrderCount = SavedOrderCount + 1;
+                    }
+                    else
+                    {
+                        AllOrdersSaved = false;
+                    }
+                    updateOrderResult = false;
                 }
                 else
                 {
-                    AllOrdersSaved = false;
+                    ViewBag.Error = " you do not have enough quantity";
+                    return Json(false);
                 }
-                updateOrderResult = false;
+
             }
             catch(Exception e)
             {
@@ -568,41 +583,50 @@ namespace PriorityApp.Controllers.CustomerService
                         DBholdModel.ExtraQuantity = (float)DBholdModel.ExtraQuantity + (float)orderModel.PriorityQuantity;
 
                     }
-                    if (orderModel.PriorityId != (int)CommanData.Priorities.No)
+                    if (DBholdModel.ReminingQuantity > 0)
                     {
-                        DBholdModel.TempReminingQuantity = DBholdModel.ReminingQuantity;
-                        updateModel.ItemId = orderModel.ItemId;
-                        updateModel.PriorityId = orderModel.PriorityId;
-                        updateModel.PriorityQuantity = orderModel.PriorityQuantity;
-                        updateModel.SavedBefore = true;
-                        updateModel.WHSavedID = applicationUser.Id;
-                        updateModel.Comment = orderModel.Comment;
-                        updateModel.Truck = orderModel.Truck;
-                        updateModel.OrderCategoryId = Model.orderType;
-                    }
-                    else if(orderModel.SavedBefore == true && orderModel.PriorityId == (int)CommanData.Priorities.No)
-                    {
-                        DBholdModel.TempReminingQuantity = DBholdModel.ReminingQuantity;
-                        updateModel.PriorityId = orderModel.PriorityId;
-                        updateModel.SavedBefore = true;
-                        updateModel.Truck = "";
-                        updateModel.WHSavedID = applicationUser.Id;
-                        updateModel.PriorityQuantity = 0;
-                        updateModel.ItemId = orderModel.ItemId;
-                        updateModel.OrderCategoryId = Model.orderType;
-                        updateModel.Comment = "";
+                        if (orderModel.PriorityId != (int)CommanData.Priorities.No)
+                        {
+                            DBholdModel.TempReminingQuantity = DBholdModel.ReminingQuantity;
+                            updateModel.ItemId = orderModel.ItemId;
+                            updateModel.PriorityId = orderModel.PriorityId;
+                            updateModel.PriorityQuantity = orderModel.PriorityQuantity;
+                            updateModel.SavedBefore = true;
+                            updateModel.WHSavedID = applicationUser.Id;
+                            updateModel.Comment = orderModel.Comment;
+                            updateModel.Truck = orderModel.Truck;
+                            updateModel.OrderCategoryId = (int)CommanData.OrderCategory.Delivery;
+                        }
+                        else if (updateModel.SavedBefore == true && orderModel.PriorityId == (int)CommanData.Priorities.No)
+                        {
+                            DBholdModel.TempReminingQuantity = DBholdModel.ReminingQuantity;
+                            updateModel.PriorityId = orderModel.PriorityId;
+                            updateModel.SavedBefore = false;
+                            updateModel.Truck = "";
+                            updateModel.WHSavedID = applicationUser.Id;
+                            updateModel.PriorityQuantity = 0;
+                            updateModel.ItemId = orderModel.ItemId;
+                            updateModel.OrderCategoryId = (int)CommanData.OrderCategory.Delivery;
+                            updateModel.Comment = "";
 
-                    }
-                    updateOrderResult = _orderService.UpdateOrder2(updateModel, DBholdModel).Result;
-                    if (updateOrderResult == true)
-                    {
-                        SavedOrderCount = SavedOrderCount + 1;
+                        }
+                        updateOrderResult = _orderService.UpdateOrder2(updateModel, DBholdModel).Result;
+                        if (updateOrderResult == true)
+                        {
+                            SavedOrderCount = SavedOrderCount + 1;
+                        }
+                        else
+                        {
+                            AllOrdersSaved = false;
+                        }
+                        updateOrderResult = false;
                     }
                     else
                     {
-                        AllOrdersSaved = false;
+                        ViewBag.Error = " you do not have enough quantity";
+                        break;
                     }
-                    updateOrderResult = false;
+
                 }
                 TempData["SubmittedOrdersCount"] = SavedOrderCount;
                 if (Model.orderType == (int)CommanData.OrderCategory.Delivery)
@@ -1030,6 +1054,7 @@ namespace PriorityApp.Controllers.CustomerService
                     Model.Territories = _territoryService.GetAllTerritoriesByStateId(Model.StateSelectedId).Result;
                     Model.Territories.Insert(0, new TerritoryModel { Id = -2, Name = "All" });
                     }
+                    Model.FilterColoumns = filterColoumns;
 
                 //}
                 //else

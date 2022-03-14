@@ -49,7 +49,7 @@ namespace PriorityApp.Service.Models
 
         public int?    TerritoryId { get; set; }
 
-        public bool? SavedBefore { get; set; }
+        public bool SavedBefore { get; set; }
 
         public bool Dispatched { get; set; }
 

@@ -393,13 +393,12 @@
     <table class="display table table-striped" style="text-align: center;  width:100%" id="example">
         <thead class="table-dark">
             <tr>
-                <th> Warehouse Name</th>
-                <th> Priority</th>
-                <th>Comment</th>
+                <th class="skip-filter"> Warehouse Name</th>
+                <th class="skip-filter"> Priority</th>
+                <th class="skip-filter">Comment</th>
                 @foreach (var item in Model.Items)
                 {
-                    <th> @item.Name</th>
-                    <th></th>
+                    <th class="skip-filter"> @item.Name</th>
                 }
             </tr>
         </thead>
@@ -437,8 +436,8 @@
                         </td>
                         @for (var itemIndex = 0; itemIndex < Model.WarehouseModel2[index].itemModels.Count; itemIndex++)
                         {
-                            <td><input type="number" class="@priorityQuantityId" asp-for="WarehouseModel2[index].itemModels[itemIndex].Quantity" onchange="calculateTotal(@index, @Model.HoldModel.ReminingQuantity,  @Model.holdTotalAssignedQuantity, @Model.HoldModel.ExtraQuantity)" /></td>
-                            <td><input type="hidden" asp-for="WarehouseModel2[index].itemModels[itemIndex].Id" id="WarehouseModel2[index].itemModels[itemIndex].Id" /></td>
+                            <td><input type="number" class="@priorityQuantityId" asp-for="WarehouseModel2[index].itemModels[itemIndex].Quantity" onchange="calculateTotal(@index, @Model.HoldModel.ReminingQuantity,  @Model.holdTotalAssignedQuantity, @Model.HoldModel.ExtraQuantity)" />
+                            <input type="hidden" asp-for="WarehouseModel2[index].itemModels[itemIndex].Id" id="WarehouseModel2[index].itemModels[itemIndex].Id" /></td>
                         }
                         <input class="form-check-input" asp-for="HoldModel.QuotaQuantity" type="hidden" style="width:100px" />
                         <input id="calculatedRemainingQuantity" class="form-check-input" asp-for="HoldModel.ReminingQuantity" type="hidden" style="width:100px" />

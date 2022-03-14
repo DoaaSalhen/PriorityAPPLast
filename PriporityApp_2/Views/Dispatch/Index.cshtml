@@ -96,6 +96,24 @@
             document.getElementById("ToSelectedPriorityDate").value = document.getElementById("SelectedPriorityDate").value;
         }
     }
+
+
+    function sorting(thIndex) {
+        var ths = document.getElementsByTagName("th");
+        var test = ths[thIndex];
+        var table = $(test).parents('table').eq(0)
+        var rows = table.find('tr:gt(0)').toArray().sort(comparer($(test).index()))
+        test.asc = !test.asc
+        if (!test.asc) { rows = rows.reverse() }
+        for (var i = 0; i < rows.length; i++) { table.append(rows[i]) }
+    }
+    function comparer(index) {
+        return function (a, b) {
+            var valA = getCellValue(a, index), valB = getCellValue(b, index)
+            return $.isNumeric(valA) && $.isNumeric(valB) ? valA - valB : valA.toString().localeCompare(valB)
+        }
+    }
+    function getCellValue(row, index) { return $(row).children('td').eq(index).text() }
 </script>
 <style>
 
@@ -137,7 +155,7 @@
             <div class="col-xs-12 col-sm-6 col-md-6 col-lg-4 selectFilter" style="display:inline-block">
                 <label class="control-label" style="display:block">Priority Date</label>
                 <label class="control-label" style="margin-right:10px">From</label><input type="date" id="SelectedPriorityDate" asp-for="SelectedPriorityDate" />
-                <label class="control-label" style="margin-left:40px; margin-right:10px">To</label><input type="date" id="ToSelectedPriorityDate" asp-for="ToSelectedPriorityDate" onchange="toFromDateCompare()"/>
+                <label class="control-label" style="margin-left:40px; margin-right:10px">To</label><input type="date" id="ToSelectedPriorityDate" asp-for="ToSelectedPriorityDate" onchange="toFromDateCompare()" />
             </div>
 
             <div class="col-xs-12 col-sm-6 col-md-6 col-lg-4 selectFilter" style="display:inline-block">
@@ -152,39 +170,40 @@
             @if (Model.SubRegions == null)
             {
 
-        <div class="col-xs-12 col-sm-6 col-md-6 col-lg-2 selectFilter" style="display:inline-block">
-            <label class="control-label">SubRegion</label>
-            <select id="SubRegionSelectedId" name="SubRegionSelectedId" asp-for="SubRegionSelectedId"
-                    class="form-control"
-                    asp-items="@(new SelectList(string.Empty, "Id", "Name"))"></select>
-        </div> }
-                    else
-                    {
-        <div class="col-xs-12 col-sm-6 col-md-6 col-lg-2 selectFilter" style="display:inline-block">
-            <label class="control-label">SubRegion</label>
-            <select id="SubRegionSelectedId" name="SubRegionSelectedId" asp-for="SubRegionSelectedId"
-                    class="form-control"
-                    asp-items="@(new SelectList(Model.SubRegions, "Id", "Name"))"></select>
-        </div>}
+                <div class="col-xs-12 col-sm-6 col-md-6 col-lg-2 selectFilter" style="display:inline-block">
+                    <label class="control-label">SubRegion</label>
+                    <select id="SubRegionSelectedId" name="SubRegionSelectedId" asp-for="SubRegionSelectedId"
+                            class="form-control"
+                            asp-items="@(new SelectList(string.Empty, "Id", "Name"))"></select>
+                </div> }
+            else
+            {
+                <div class="col-xs-12 col-sm-6 col-md-6 col-lg-2 selectFilter" style="display:inline-block">
+                    <label class="control-label">SubRegion</label>
+                    <select id="SubRegionSelectedId" name="SubRegionSelectedId" asp-for="SubRegionSelectedId"
+                            class="form-control"
+                            asp-items="@(new SelectList(Model.SubRegions, "Id", "Name"))"></select>
+                </div>}
 
             @if (Model.States == null)
             {
 
-        <div class="col-xs-12 col-sm-6 col-md-6 col-lg-2 selectFilter" style="display:inline-block">
-            <label class="control-label">State</label>
-            <select id="StateSelectedId" name="StateSelectedId" asp-for="StateSelectedId"
-                    class="form-control"
-                    asp-items="@(new SelectList(string.Empty, "Id", "Name"))"></select>
-        </div> }
-    else
-    {
+                <div class="col-xs-12 col-sm-6 col-md-6 col-lg-2 selectFilter" style="display:inline-block">
+                    <label class="control-label">State</label>
+                    <select id="StateSelectedId" name="StateSelectedId" asp-for="StateSelectedId"
+                            class="form-control"
+                            asp-items="@(new SelectList(string.Empty, "Id", "Name"))"></select>
+                </div> }
+            else
+            {
 
-        <div class="col-xs-12 col-sm-6 col-md-6 col-lg-2 selectFilter" style="display:inline-block">
-            <label class="control-label">State</label>
-            <select id="StateSelectedId" name="StateSelectedId" asp-for="StateSelectedId"
-                    class="form-control"
-                    asp-items="@(new SelectList(Model.States, "Id", "Name"))"></select>
-        </div>}
+                <div class="col-xs-12 col-sm-6 col-md-6 col-lg-2 selectFilter" style="display:inline-block">
+                    <label class="control-label">State</label>
+                    <select id="StateSelectedId" name="StateSelectedId" asp-for="StateSelectedId"
+                            class="form-control"
+                            asp-items="@(new SelectList(Model.States, "Id", "Name"))"></select>
+                </div>
+            }
 
             <div class="col-xs-12 col-sm-6 col-md-6 col-lg-2 selectFilter" style="display:inline-block">
                 <label class="control-label">Dispatch</label>
@@ -196,6 +215,25 @@
         </div>
     </div>
 
+
+    @if (Model.FilterColoumns == null)
+    {
+        <div class="col-xs-12 col-sm-6 col-md-6 col-lg-2 selectFilter" style="display:inline-block">
+            <label class="control-label">Sort by</label>
+            <select multiple id="sortingDD" name="sortingDD"
+                    class="form-select form-select-lg mb-3"
+                    asp-items="@(new SelectList(string.Empty, "ID", "Name","Type"))"></select>
+        </div>
+    }
+    else
+    {
+        <div class="col-xs-12 col-sm-6 col-md-6 col-lg-2 selectFilter" style="display:inline-block">
+            <label class="control-label">Sort by</label>
+            <select multiple id="sortingDD" name="sortingDD"
+                    class="form-select form-select-lg mb-3"
+                    asp-items="@(new SelectList(Model.FilterColoumns, "ID", "Name", "Type"))" onclick="sorting(this.value)"></select>
+        </div>
+    }
 </form>
 
 <form class="CreateForm" asp-controller="Dispatch" asp-action="SaveDispatchedOrders" method="post">
@@ -218,7 +256,7 @@
                 <th>Truck</th>
                 <th>Status</th>
                 <th>Comment</th>
-                <th><input type="checkbox" id="DispatchedChexboxHeadId" onchange="allDispatchedChange()" /></th>
+                <th class="skip-filter" ><input type="checkbox" id="DispatchedChexboxHeadId" onchange="allDispatchedChange()"/></th>
                 <th> </th>
             </tr>
         </thead>
@@ -305,8 +343,8 @@
 
                 @if (Model.OrderModel.orders[index].Dispatched == false && Model.SelectedPriorityDate >= DateTime.Today && Model.OrderModel.orders[index].Status != "Cancelled")
                 {
-                    <td>
-                        <input type="checkbox" id="dispatchedCheckListId" class="DispatchedClass" asp-for="OrderModel.orders[index].Dispatched" />
+                    <td class="skip-filter">
+                        <input type="checkbox" id="dispatchedCheckListId" class="DispatchedClass" asp-for="OrderModel.orders[index].Dispatched"  />
                     </td>
                     <td>
                         <a class="far fa-edit btn btn-info disabled" value="@Model.OrderModel.orders[index].Id" id=@UnlockId asp-action="" asp-route-id="@Model.OrderModel.orders[index].Id">Unlock</a>
@@ -349,6 +387,9 @@
                 {
                     <td>
                         <input class="form-check-input" asp-for="OrderModel.orders[index].Dispatched" type="hidden" />
+                    </td>
+                     <td>
+                        <a class="far fa-edit btn btn-info disabled" value="@Model.OrderModel.orders[index].Id" id=@UnlockId asp-action="" asp-route-id="@Model.OrderModel.orders[index].Id">Unlock</a>
                     </td>
 }
 

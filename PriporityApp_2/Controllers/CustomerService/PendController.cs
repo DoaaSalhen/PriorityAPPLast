@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using PriorityApp.Service.Contracts.CustomerService;
+using PriporityApp_2.Controllers;
 using PriporityApp_2.Models;
 using System;
 using System.Collections.Generic;
@@ -19,7 +20,7 @@ using System.Threading.Tasks;
 namespace MVCCore.ImportExcel.Controllers
 {
     [Authorize(Roles = "SuperAdmin , Admin , CustomerService, Sales")]
-    public class PendController : Controller
+    public class PendController : BaseController
     {
         private readonly ILogger<PendController> _logger;
         private readonly IWebHostEnvironment _environment;
@@ -45,8 +46,8 @@ namespace MVCCore.ImportExcel.Controllers
         public async Task<IActionResult> Index(IFormFile postedFile, float QuantityToDelete)
         {
 
-            //if (_pendService.ClearPend().Result)
-            //{
+            try
+            {
                 bool result = false;
                 bool fixResult = false;
                 string ExcelConnectionString = this._configuration.GetConnectionString("ExcelCon");
@@ -70,8 +71,8 @@ namespace MVCCore.ImportExcel.Controllers
                     }
 
                     dt = _pendService.ReadExcelData(filePath, ExcelConnectionString);
-                    dt = _pendService.Preprocess(dt,QuantityToDelete);
-               
+                    dt = _pendService.Preprocess(dt, QuantityToDelete);
+
                     if (dt.Rows.Count > 0)
                     {
                         result = _pendService.WriteDataToSql(dt, SqlConnectionString);
@@ -81,26 +82,30 @@ namespace MVCCore.ImportExcel.Controllers
                         fixResult = _pendService.FixDuplication();
                     }
                 }
-            else
-            {
-                ViewBag.Error = "File Not Uploaded, Please Select Valid File";
-                return View();
-            }
-            int addedRows = 0;
+                else
+                {
+                    ViewBag.Error = "File Not Uploaded, Please Select Valid File";
+                    return View();
+                }
+                int addedRows = 0;
                 if (fixResult == true)
                 {
-                    foreach(DataRow row in dt.Rows)
+                    foreach (DataRow row in dt.Rows)
                     {
-                        addedRows = row.RowState != DataRowState.Deleted ? addedRows = addedRows+1 : addedRows;
+                        addedRows = row.RowState != DataRowState.Deleted ? addedRows = addedRows + 1 : addedRows;
                     }
-                      ViewBag.Message = " File Uploaded Successfully && "+addedRows + " new Orders are added";
+                    ViewBag.Message = " File Uploaded Successfully && " + addedRows + " new Orders are added";
                 }
                 else
                 {
                     ViewBag.Error = " File Not Uploaded";
                 }
                 return View();
-            //}
+            }
+            catch(Exception e)
+            {
+                return RedirectToAction("ERROR404");
+            }
         }
 
 

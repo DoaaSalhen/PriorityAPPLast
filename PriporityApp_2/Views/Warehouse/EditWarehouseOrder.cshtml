@@ -321,15 +321,12 @@
         <thead class="table-dark">
             <tr>
                 <th> Warehouse Name</th>
-                <th> Item </th>
-                <th> Priority</th>
-                <th>Quantity</th>
-                <th>Comment</th>
-                <th>Truck</th>
+                <th class="skip-filter"> Item </th>
+                <th class="skip-filter"> Priority</th>
+                <th class="skip-filter">Quantity</th>
+                <th class="skip-filter">Comment</th>
+                <th class="skip-filter">Truck</th>
                 <th>Status</th>
-                <th></th>
-
-
             </tr>
         </thead>
         <tbody>
@@ -435,7 +432,6 @@
                                 <input class="form-check-input" asp-for="warehouseOrderHoldModels[index].Order.Status" type="hidden" />
                             </td>
 
-                            <td></td>
                             <input class="form-check-input" asp-for="@Model.orderType" value="3" type="hidden" />
 
                             <input class="form-check-input" asp-for="warehouseOrderHoldModels[index].Order.Submitted" type="hidden" />
