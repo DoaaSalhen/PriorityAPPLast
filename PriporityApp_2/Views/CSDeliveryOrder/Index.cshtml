@@ -170,6 +170,7 @@ else if (ViewBag.Error != null)
         var tempholdAssignedQuantity3 = holdAssignedQuantity3;
         var tempholdExtraQuantity3 = holdExtraQuantity3;
         var compareResult = true;
+        var totalCheckResult = false;
         var compareResult = compareInsertedQuantityVSOrderQuantity(insertedQuantity, orderQuantity);
         var checkboxes = document.getElementsByClassName('CheckDeliveryOrders');
         if (compareResult == true)
@@ -210,7 +211,7 @@ else if (ViewBag.Error != null)
             extraQuantity = ExtraValuesArray.reduce(function (a, b) { return parseFloat(a) + parseFloat(b); });
             document.getElementById("extra").value = (parseFloat(tempholdExtraQuantity3) + parseFloat(extraQuantity)).toFixed(2);
             totalQuantity = AssignedValuesArray.reduce(function (a, b) { return parseFloat(a) + parseFloat(b); });
-            var totalCheckResult = checkTotalQuantityVsHoldRemainingQuantity(tempholdReminingQuantity3, totalQuantity, tempholdAssignedQuantity3);
+            totalCheckResult = checkTotalQuantityVsHoldRemainingQuantity(tempholdReminingQuantity3, totalQuantity, tempholdAssignedQuantity3);
             if (totalCheckResult == false) {
                 alert("you do not have enough quantity");
                 resetIfFalse(index, priorityQuantityId, radioButtonListId, tempholdReminingQuantity3, tempholdAssignedQuantity3, tempholdExtraQuantity3);
