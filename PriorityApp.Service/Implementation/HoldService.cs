@@ -23,6 +23,7 @@ namespace PriorityApp.Service.Implementation
     public class HoldService : IHoldService
     {
         private readonly IRepository<Hold, int> _HoldRepository;
+        private readonly IRepository<Hold, Hold> _repository2;
         private readonly IUserService _userService;
         private readonly ITerritoryService _territoryService;
         private readonly ILogger<HoldService> _logger;
@@ -34,7 +35,8 @@ namespace PriorityApp.Service.Implementation
             ILogger<HoldService> logger, IMapper mapper,
             IUserService userService,
             ITerritoryService territoryService,
-            UserManager<AspNetUser> userManager)
+            UserManager<AspNetUser> userManager,
+            IRepository<Hold, Hold> repository2)
         {
             _HoldRepository = HoldRepository;
             _logger = logger;
@@ -42,6 +44,7 @@ namespace PriorityApp.Service.Implementation
             _userService = userService;
             _territoryService = territoryService;
             _userManager = userManager;
+            _repository2 = repository2;
 
         }
         public Task<bool> CreateHold(HoldModel model)
@@ -229,6 +232,28 @@ namespace PriorityApp.Service.Implementation
             return false;
         }
 
+        public async Task<bool> Update2Holds(HoldModel model1, HoldModel model2)
+        {
+            try
+            {
+                bool response = false;
+                Hold hold1 = _mapper.Map<Hold>(model1);
+                Hold hold2 = _mapper.Map<Hold>(model2);
+
+                var updatedHold = _repository2.UpdateTwoEntities(hold1, hold2,false);
+                if (updatedHold != null)
+                {
+                    //OrderModel2 newOrderModel = _mapper.Map<OrderModel2>(updatedOrder);
+                    return true;
+
+                }
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e.ToString());
+            }
+            return false;
+        }
 
 
         bool IHoldService.AddQuotaFile(DataTable dt, string SqlConnectionString)

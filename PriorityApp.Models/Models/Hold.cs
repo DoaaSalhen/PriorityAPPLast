@@ -22,6 +22,6 @@ namespace PriorityApp.Models.Models
 
         public int     Tolerance { get; set; }
         public float   ExtraQuantity { get; set; }
-        public bool YesterdayRemainingTranferred { get; set; }
+        public bool RemainingTranferred { get; set; }
     }
 }

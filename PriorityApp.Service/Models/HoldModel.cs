@@ -38,7 +38,7 @@ namespace PriorityApp.Service.Models
         public DateTime CreatedDate { get; set; }
         public DateTime UpdatedDate { get; set; }
         public List<UserModel> userModels { get; set; }
-        public bool YesterdayRemainingTranferred { get; set; }
+        public bool RemainingTranferred { get; set; }
 
         public float YeasterdayReminingQuantity { get; set; }
 

@@ -330,7 +330,7 @@ else if (ViewBag.Error != null)
                 <th>Status</th>
                 <th>Comment</th>
                 @*<th>Cancel </th>*@
-                <th>Unlock </th>
+                <th  class="skip-filter">Unlock </th>
 
 
             </tr>
@@ -420,7 +420,7 @@ else if (ViewBag.Error != null)
                             @*<td>
                                 <a class="btn btn-danger" asp-action="OrderCancel" asp-route-id="@Model.OrderModel.orders[index].Id" style="margin-left:20px">Cancel</a>
                             </td>*@
-                            <td>
+                            <td  class="skip-filter">
                                 <a class="far fa-edit btn btn-info" value="@Model.OrderModel.orders[index].Id" id=@UnlockId asp-action="UnLockOrder" asp-route-id="@Model.OrderModel.orders[index].Id">Unlock</a>
                             </td>
                         }
@@ -432,7 +432,7 @@ else if (ViewBag.Error != null)
                             @*<td>
                                 <a class="btn btn-danger disabled" asp-action="" asp-route-id="@Model.OrderModel.orders[index].Id" style="margin-left:20px">Cancel</a>
                             </td>*@
-                            <td>
+                            <td  class="skip-filter">
                                 <a class="far fa-edit btn btn-info disabled" value="@Model.OrderModel.orders[index].Id" id=@UnlockId asp-action="UnLockOrder" asp-route-id="@Model.OrderModel.orders[index].Id">Unlock</a>
                             </td>
                         }

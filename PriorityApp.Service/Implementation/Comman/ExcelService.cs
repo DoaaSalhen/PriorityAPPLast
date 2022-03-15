@@ -106,7 +106,7 @@ namespace PriorityApp.Service.Implementation.Comman
                 foreach (var hold in models)
                 {
 
-                    dt.Rows.Add(hold.PriorityDate, hold.UserName, hold.QuotaQuantity, hold.ReminingQuantity, hold.ExtraQuantity, hold.YeasterdayReminingQuantity ,hold.YesterdayRemainingTranferred);
+                    dt.Rows.Add(hold.PriorityDate, hold.UserName, hold.QuotaQuantity, hold.ReminingQuantity, hold.ExtraQuantity, hold.YeasterdayReminingQuantity ,hold.RemainingTranferred);
                 }
 
                 using (XLWorkbook wb = new XLWorkbook())

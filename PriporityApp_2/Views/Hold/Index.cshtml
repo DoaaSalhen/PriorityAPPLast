@@ -90,11 +90,11 @@ else if (ViewBag.Error != null)
             <th>
                 @Html.DisplayNameFor(model => model.Tolerance)
             </th>
-            <th>
-                @Html.DisplayNameFor(model => model.YesterdayRemainingTranferred)
+            <th class="skip-filter">
+                @Html.DisplayNameFor(model => model.RemainingTranferred)
             </th>
 
-            <th></th>
+            <th  class="skip-filter"></th>
         </tr>
     </thead>
     <tbody>
@@ -119,18 +119,18 @@ else if (ViewBag.Error != null)
             <td>
                 @Html.DisplayFor(model => model.holdModels[index].Tolerance)
             </td>
-            <td>
-                @Html.DisplayFor(model => model.holdModels[index].YesterdayRemainingTranferred)
+            <td  class="skip-filter">
+                @Html.DisplayFor(model => model.holdModels[index].RemainingTranferred)
             </td>
             @if (!roles.Contains("Sales") && Model.PriorityDate >= DateTime.Today)
             {
-        <td>
+        <td  class="skip-filter">
             <a class="far fa-edit btn btn-success" asp-action="Edit" asp-route-userId="@Model.holdModels[index].userId" asp-route-PriorityDate="@Model.holdModels[index].PriorityDate">Edit</a>
         </td>
  }
     else
     {
-        <td>
+        <td  class="skip-filter">
             <a class="far fa-edit btn btn-success disabled" asp-action="" asp-route-territoryId="@Model.holdModels[index].userId" asp-route-PriorityDate="@Model.holdModels[index].PriorityDate">Edit</a>
         </td>
 }

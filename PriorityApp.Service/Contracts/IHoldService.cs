@@ -22,6 +22,7 @@ namespace PriorityApp.Service.Contracts
         bool AddQuotaFile(DataTable dt, string SqlConnectionString);
 
         DataTable  prepareDataForHold (DataTable dt);
+        Task<bool> Update2Holds(HoldModel model1, HoldModel model2);
 
     }
 }

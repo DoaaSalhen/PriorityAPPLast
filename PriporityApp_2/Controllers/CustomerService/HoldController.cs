@@ -31,6 +31,9 @@ namespace PriorityApp.Controllers.CustomerService
         private readonly IHoldService _holdService;
         private readonly IExcelService _excelService;
         private readonly ITerritoryService _territoryService;
+        private readonly IZoneService _zoneService;
+        private readonly IDeliveryCustomerService _customerService;
+        private readonly IOrderService _orderService;
         private readonly UserManager<AspNetUser> _userManager;
 
         public HoldController(ILogger<HoldController> logger,
@@ -39,7 +42,10 @@ namespace PriorityApp.Controllers.CustomerService
             IHoldService holdService,
             IExcelService excelService,
             ITerritoryService territoryService,
-             UserManager<AspNetUser> userManager)
+            IZoneService zoneService,
+            IDeliveryCustomerService customerService,
+            IOrderService orderService,
+            UserManager<AspNetUser> userManager)
         {
             _logger = logger;
             _environment = environment;
@@ -47,6 +53,9 @@ namespace PriorityApp.Controllers.CustomerService
             _holdService = holdService;
             _excelService = excelService;
             _territoryService = territoryService;
+            _zoneService = zoneService;
+            _customerService = customerService;
+            _orderService = orderService;
             _userManager = userManager;
         }
         [Authorize(Roles = "SuperAdmin, Admin, CustomerService, Sales")]
@@ -123,15 +132,16 @@ namespace PriorityApp.Controllers.CustomerService
                 TodayHolds = _holdService.GetHoldBypriorityDate(DateTime.Today);
                 foreach(var todayHold in TodayHolds)
                 {
-                    if(!todayHold.YesterdayRemainingTranferred)
+                    if(!todayHold.RemainingTranferred)
                     {
-                        var yesterdayHold = _holdService.GetLastHoldByUserIdAndPriorityDate(todayHold.userId, DateTime.Today.AddDays(-1));
-                        if (yesterdayHold != null)
+                        var tomorrowHold = _holdService.GetLastHoldByUserIdAndPriorityDate(todayHold.userId, DateTime.Today.AddDays(1));
+                        if (tomorrowHold != null)
                         {
-                            todayHold.QuotaQuantity = todayHold.QuotaQuantity + yesterdayHold.ReminingQuantity;
-                            todayHold.YesterdayRemainingTranferred = true;
-                            transferredResult = _holdService.UpdateHold(todayHold).Result;
-
+                            tomorrowHold.QuotaQuantity = tomorrowHold.QuotaQuantity + todayHold.ReminingQuantity;
+                            todayHold.RemainingTranferred = true;
+                            todayHold.ReminingQuantity = 0;
+                            transferredResult = _holdService.Update2Holds(todayHold, tomorrowHold).Result;
+                            
                             if (Convert.ToBoolean(transferredResult))
                             {
                                 TransferredCount = TransferredCount + 1;
@@ -195,7 +205,7 @@ namespace PriorityApp.Controllers.CustomerService
                 {
                     if(userIds.Contains(Todaymodel.userId))
                     {
-                        Todaymodel.YeasterdayReminingQuantity = Yeasterdaymodels.Where(y => y.userId == Todaymodel.userId).First().ReminingQuantity;
+                        Todaymodel.YeasterdayReminingQuantity = Yeasterdaymodels.Where(y => y.userId == Todaymodel.userId).First().TempReminingQuantity;
                     }
                 }
                 memoryStream = _excelService.ExportQuotaToExcel(Todaymodels);
@@ -302,6 +312,7 @@ namespace PriorityApp.Controllers.CustomerService
                 bool result = _holdService.UpdateHold(model).Result;
                 if (result == true)
                 {
+
                     ViewData["SearchPriorityDate"] = model.PriorityDate;
                     ActionResult action = Search();
 
@@ -319,6 +330,88 @@ namespace PriorityApp.Controllers.CustomerService
                 //return View();
             }
         }
+
+        // POST: HoldController/Edit/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult EditAndConvert(HoldModel model)
+        {
+            try
+            {
+                int convertedOrdersCount = 0;
+                if (model.QuotaQuantity < model.ReminingQuantity)
+                {
+                    //model.ReminingQuantity = 
+                }
+                model.TempReminingQuantity = model.ReminingQuantity;
+                bool result = _holdService.UpdateHold(model).Result;
+                if (result == true && model.ReminingQuantity > 0)
+                {
+                    convertedOrdersCount = ConvertExtraToNorm(model);
+                    if(convertedOrdersCount >= 0)
+                    {
+                        ViewBag.Message = "you have converted " + convertedOrdersCount + " from Extra to Norm priority";
+                    }
+                    else
+                    {
+                        ViewBag.Error = "No convert";
+                    }
+                    ViewData["SearchPriorityDate"] = model.PriorityDate;
+                    return RedirectToAction("edit");
+
+                }
+                else
+                {
+                    return RedirectToAction("edit");
+                }
+            }
+            catch (Exception e)
+            {
+                return RedirectToAction("ERROR404"); ;
+                //return View();
+            }
+        }
+        public int ConvertExtraToNorm(HoldModel holdModel)
+        {
+            try
+            {
+                bool result = false;
+                int convertedOrdersCount = 0;
+                List<TerritoryModel> territoryModels = _territoryService.GetTerritoryByUserId(holdModel.userId).ToList();
+                List<int> territoryIds = territoryModels.Select(t => t.Id).ToList();
+                List<ZoneModel> zoneModels = _zoneService.GetListOfZonesByTerritoryIds(territoryIds).Result.ToList();
+                List<int> zoneIds = zoneModels.Select(z => z.Id).ToList();
+                List<CustomerModel> customerModels = _customerService.GetCutomersByListOfZoneIds(zoneIds).Result.ToList();
+                List<long> customerIds = customerModels.Select(c => c.Id).ToList();
+                List<OrderModel2> orderModels = _orderService.GetSubmittedOdersByListOfCustomerNumbers(customerIds, holdModel.PriorityDate, holdModel.PriorityDate).Result.Where(o=>o.PriorityId == 4).ToList();
+                foreach(var order in orderModels)
+                {
+                    if(holdModel.ReminingQuantity > 0 && holdModel.ReminingQuantity >= order.PriorityQuantity)
+                    {
+                        order.PriorityId = 3;
+                        holdModel.ReminingQuantity = (float)(holdModel.ReminingQuantity - order.PriorityQuantity);
+                        holdModel.TempReminingQuantity = holdModel.ReminingQuantity;
+                        holdModel.ExtraQuantity = (float)(holdModel.ExtraQuantity - order.PriorityQuantity);
+                       result = _orderService.UpdateOrder2(order, holdModel).Result;
+                        if(result)
+                        {
+                            convertedOrdersCount = convertedOrdersCount + 1;
+                        }
+                        else
+                        {
+                            return convertedOrdersCount;
+                        }
+                    }
+                }
+                return convertedOrdersCount;
+            }
+            catch (Exception e)
+            {
+                return -1 ;
+                //return View();
+            }
+        }
+
 
         // GET: HoldController/Delete/5
         public ActionResult Delete(int id)

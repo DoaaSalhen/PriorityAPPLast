@@ -167,7 +167,7 @@ namespace PriorityApp.Controllers.CustomerService
             {
                 territoryModels = _territoryService.GetAllTerritoriesByStateId(id).Result;
 
-                territoryModels.Insert(0, new TerritoryModel { Id = -1, Name = "select Territory" });
+                territoryModels.Insert(0, new TerritoryModel { Id = -2, Name = "All" });
             }
             return Json(new SelectList(territoryModels, "Id", "Name"));
 
@@ -595,7 +595,14 @@ namespace PriorityApp.Controllers.CustomerService
                             updateModel.WHSavedID = applicationUser.Id;
                             updateModel.Comment = orderModel.Comment;
                             updateModel.Truck = orderModel.Truck;
-                            updateModel.OrderCategoryId = (int)CommanData.OrderCategory.Delivery;
+                            if (Model.orderType == (int)CommanData.OrderCategory.Delivery)
+                            {
+                                updateModel.OrderCategoryId = (int)CommanData.OrderCategory.Delivery;
+                            }
+                            else if (updateModel.OrderCategoryId == (int)CommanData.OrderCategory.Pickup)
+                            {
+                                updateModel.OrderCategoryId = (int)CommanData.OrderCategory.Pickup;
+                            }
                         }
                         else if (updateModel.SavedBefore == true && orderModel.PriorityId == (int)CommanData.Priorities.No)
                         {
@@ -606,7 +613,14 @@ namespace PriorityApp.Controllers.CustomerService
                             updateModel.WHSavedID = applicationUser.Id;
                             updateModel.PriorityQuantity = 0;
                             updateModel.ItemId = orderModel.ItemId;
-                            updateModel.OrderCategoryId = (int)CommanData.OrderCategory.Delivery;
+                            if (Model.orderType == (int)CommanData.OrderCategory.Delivery)
+                            {
+                                updateModel.OrderCategoryId = (int)CommanData.OrderCategory.Delivery;
+                            }
+                            else if (updateModel.OrderCategoryId == (int)CommanData.OrderCategory.Pickup)
+                            {
+                                updateModel.OrderCategoryId = (int)CommanData.OrderCategory.Pickup;
+                            }
                             updateModel.Comment = "";
 
                         }
@@ -997,7 +1011,7 @@ namespace PriorityApp.Controllers.CustomerService
                                     zoneIds = zoneModels.Select(z => z.Id).ToList();
                                     customerModels = _deliveryCustomerService.GetCutomersByListOfZoneIds(zoneIds).Result;
                                     customerNumbers = customerModels.Select(c => c.Id).ToList();
-                                    orderModels = _orderService.GetSubmittedOdersByListOfCustomerNumbers(customerNumbers, Model.SelectedPriorityDate, Model.ToSelectedPriorityDate).Result.ToList();
+                                    orderModels = _orderService.GetSubmittedOdersByListOfCustomerNumbers(customerNumbers, Model.SelectedPriorityDate, Model.ToSelectedPriorityDate).Result.Where(o => o.OrderCategoryId == Model.orderType).ToList();
 
                             }
                             else
@@ -1010,7 +1024,7 @@ namespace PriorityApp.Controllers.CustomerService
                                     zoneIds = zoneModels.Select(z => z.Id).ToList();
                                     customerModels = _deliveryCustomerService.GetCutomersByListOfZoneIds(zoneIds).Result;
                                     customerNumbers = customerModels.Select(c => c.Id).ToList();
-                                    orderModels = _orderService.GetSubmittedOdersByListOfCustomerNumbers(customerNumbers, Model.SelectedPriorityDate, Model.ToSelectedPriorityDate).Result.ToList();
+                                    orderModels = _orderService.GetSubmittedOdersByListOfCustomerNumbers(customerNumbers, Model.SelectedPriorityDate, Model.ToSelectedPriorityDate).Result.Where(o => o.OrderCategoryId == Model.orderType).ToList();
 
                             }
                         }
@@ -1024,7 +1038,7 @@ namespace PriorityApp.Controllers.CustomerService
                                 zoneIds = zoneModels.Select(z => z.Id).ToList();
                                 customerModels = _deliveryCustomerService.GetCutomersByListOfZoneIds(zoneIds).Result;
                                 customerNumbers = customerModels.Select(c => c.Id).ToList();
-                                orderModels = _orderService.GetSubmittedOdersByListOfCustomerNumbers(customerNumbers, Model.SelectedPriorityDate, Model.ToSelectedPriorityDate).Result.ToList();
+                                orderModels = _orderService.GetSubmittedOdersByListOfCustomerNumbers(customerNumbers, Model.SelectedPriorityDate, Model.ToSelectedPriorityDate).Result.Where(o => o.OrderCategoryId == Model.orderType).ToList();
 
                         }
 

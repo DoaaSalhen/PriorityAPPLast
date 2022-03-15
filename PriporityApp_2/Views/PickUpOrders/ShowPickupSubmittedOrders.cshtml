@@ -159,9 +159,9 @@
     <div class="alert-danger" asp-validation-summary="ModelOnly"></div>
     <div class="form-group">
         <div class="form-row">
-            <div class="col-xs-12 col-sm-6 col-md-6 col-lg-4 selectFilter" style="display:inline-block">
+            <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6 selectFilter" style="display:inline-block">
                 <label class="control-label" style="display:block">Priority Date</label>
-                <label class="control-label" style="margin-right:10px">From</label><input type="date" id="SelectedPriorityDate" asp-for="SelectedPriorityDate" />
+                <label class="control-label" style="margin-right:10px">From</label><input type="date" id="SelectedPriorityDate" asp-for="SelectedPriorityDate" onchange="toFromDateCompare()"/>
                 <label class="control-label" style="margin-left:40px; margin-right:10px">To</label><input type="date" id="ToSelectedPriorityDate" asp-for="ToSelectedPriorityDate" onchange="toFromDateCompare()" />
                 <input type="hidden" asp-for="orderType" value=2 />
                 <input type="hidden" asp-for="viewCase" value="show" />
@@ -268,7 +268,7 @@ else
                 <th>Status</th>
                 <th>Comment</th>
                 @*<th>Cancel</th>*@
-                <th>Unlock</th>
+                <th class="skip-filter">Unlock</th>
 
 
             </tr>
@@ -325,7 +325,7 @@ else
                     @*<td>
                         <a class="btn btn-danger" asp-action="OrderCancel" asp-route-id="@Model.OrderModel.orders[index].Id" style="margin-left:20px">Cancel</a>
                     </td>*@
-                    <td>
+                    <td class="skip-filter">
                         <a class="far fa-edit btn btn-info" value="@Model.OrderModel.orders[index].Id" id=@UnlockId asp-action="UnLockOrder" asp-route-id="@Model.OrderModel.orders[index].Id">Unlock</a>
                     </td>
                 }
@@ -337,7 +337,7 @@ else
                     @*<td>
                         <a class="btn btn-danger disabled" asp-action="" asp-route-id="@Model.OrderModel.orders[index].Id" style="margin-left:20px">Cancel</a>
                     </td>*@
-                    <td>
+                    <td class="skip-filter">
                         <a class="far fa-edit btn btn-info disabled" value="@Model.OrderModel.orders[index].Id" id=@UnlockId asp-action="UnLockOrder" asp-route-id="@Model.OrderModel.orders[index].Id">Unlock</a>
                     </td>
                 }
