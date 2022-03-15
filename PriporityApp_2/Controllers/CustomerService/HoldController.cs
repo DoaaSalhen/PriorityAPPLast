@@ -154,7 +154,7 @@ namespace PriorityApp.Controllers.CustomerService
                 }
                 if(TransferredCount > 0)
                 {
-                    ViewBag.Message = "Sucessful Process, you have transferred " + TransferredCount + " Yesterday Remaining Quota to Today Quota";
+                    ViewBag.Message = "Sucessful Process, you have transferred " + TransferredCount + " Today Remaining Quota to Tomorrow Quota";
                 }
                 else
                 {
