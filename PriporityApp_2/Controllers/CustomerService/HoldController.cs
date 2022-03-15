@@ -138,6 +138,8 @@ namespace PriorityApp.Controllers.CustomerService
                         if (tomorrowHold != null)
                         {
                             tomorrowHold.QuotaQuantity = tomorrowHold.QuotaQuantity + todayHold.ReminingQuantity;
+                            tomorrowHold.ReminingQuantity = tomorrowHold.ReminingQuantity + todayHold.ReminingQuantity;
+                            tomorrowHold.TempReminingQuantity = tomorrowHold.ReminingQuantity;
                             todayHold.RemainingTranferred = true;
                             todayHold.ReminingQuantity = 0;
                             transferredResult = _holdService.Update2Holds(todayHold, tomorrowHold).Result;
@@ -357,12 +359,14 @@ namespace PriorityApp.Controllers.CustomerService
                         ViewBag.Error = "No convert";
                     }
                     ViewData["SearchPriorityDate"] = model.PriorityDate;
-                    return RedirectToAction("edit");
+                    ActionResult action = Search();
+
+                    return action;
 
                 }
                 else
                 {
-                    return RedirectToAction("edit");
+                    return RedirectToAction("Index");
                 }
             }
             catch (Exception e)
@@ -383,7 +387,7 @@ namespace PriorityApp.Controllers.CustomerService
                 List<int> zoneIds = zoneModels.Select(z => z.Id).ToList();
                 List<CustomerModel> customerModels = _customerService.GetCutomersByListOfZoneIds(zoneIds).Result.ToList();
                 List<long> customerIds = customerModels.Select(c => c.Id).ToList();
-                List<OrderModel2> orderModels = _orderService.GetSubmittedOdersByListOfCustomerNumbers(customerIds, holdModel.PriorityDate, holdModel.PriorityDate).Result.Where(o=>o.PriorityId == 4).ToList();
+                List<OrderModel2> orderModels = _orderService.GetOdersByListOfCustomerNumbers(customerIds, holdModel.PriorityDate).Result.Where(o=>o.PriorityId == 4 && o.Submitted == false).ToList();
                 foreach(var order in orderModels)
                 {
                     if(holdModel.ReminingQuantity > 0 && holdModel.ReminingQuantity >= order.PriorityQuantity)
