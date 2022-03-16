@@ -95,10 +95,10 @@ namespace PriorityApp.Service.Implementation.Comman
                 DataTable dt = new DataTable("DailyQuota");
                 dt.Columns.AddRange(new DataColumn[7] { new DataColumn("PriorityDate"),
                                             new DataColumn("User"),
-                                            new DataColumn("QuotaQuantity"),
                                             new DataColumn("TodayHoldQuantity"),
-                                            new DataColumn("ExtraQuantity"),
                                             new DataColumn("YeasterdayHoldQuantity"),
+                                             new DataColumn("ExtraQuantity"),
+                                            new DataColumn("QuotaQuantity"),
                                             new DataColumn("Transferred"),
                                             });
 
@@ -106,7 +106,7 @@ namespace PriorityApp.Service.Implementation.Comman
                 foreach (var hold in models)
                 {
 
-                    dt.Rows.Add(hold.PriorityDate, hold.UserName, hold.QuotaQuantity, hold.ReminingQuantity, hold.ExtraQuantity, hold.YeasterdayReminingQuantity ,hold.RemainingTranferred);
+                    dt.Rows.Add(hold.PriorityDate, hold.UserName,  hold.ReminingQuantity,  hold.YeasterdayReminingQuantity , hold.ExtraQuantity, hold.QuotaQuantity, hold.RemainingTranferred);
                 }
 
                 using (XLWorkbook wb = new XLWorkbook())

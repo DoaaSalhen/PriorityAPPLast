@@ -114,334 +114,341 @@
 
         <ul class="sidebar-nav" id="sidebar-nav">
             @if (roles.Contains("CustomerService") || roles.Contains("Sales") || roles.Contains("Admin"))
-                {
-            <li class="nav-item">
-                <a class="nav-link collapsed" data-bs-target="#components-nav" data-bs-toggle="collapse" href="#">
-                    <i class="bi bi-menu-button-wide"></i><span>Pend</span><i class="bi bi-chevron-down ms-auto"></i>
-                </a>
-                <ul id="components-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
-                    <li>
-                        <a href="~/PriorityTool/Pend/Index">
-                            <i class="bi bi-circle"></i><span>upload Pend</span>
-                        </a>
-                    </li>
+            {
+        <li class="nav-item">
+            <a class="nav-link collapsed" data-bs-target="#components-nav" data-bs-toggle="collapse" href="#">
+                <i class="bi bi-menu-button-wide"></i><span>Pend</span><i class="bi bi-chevron-down ms-auto"></i>
+            </a>
+            <ul id="components-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+                <li>
+                    <a href="~/PriorityTool/Pend/Index">
+                        <i class="bi bi-circle"></i><span>upload Pend</span>
+                    </a>
+                </li>
 
-                </ul>
-            </li><!-- End Components Nav -->
+            </ul>
+        </li><!-- End Components Nav -->
 
-            <li class="nav-item">
-                <a class="nav-link collapsed" data-bs-target="#forms-nav" data-bs-toggle="collapse" href="#">
-                    <i class="bi bi-journal-text"></i><span>Delivery Orders</span><i class="bi bi-chevron-down ms-auto"></i>
-                </a>
-                <ul id="forms-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
-                    @if (roles.Contains("CustomerService") || roles.Contains("Admin"))
-                            {
-                    <li>
-                        <a href="~/PriorityTool/CSDeliveryOrder/Index">
-                            <i class="bi bi-circle"></i><span>Assign Orders</span>
-                        </a>
-                    </li>
-                            }
-                            else if (roles.Contains("Sales"))
-                            {
-                    <li>
-                        <a href="~/PriorityTool/Order/Index">
-                            <i class="bi bi-circle"></i><span>Assign Orders</span>
-                        </a>
-                    </li>
-                            }
-                    <li>
-                        <a href="~/PriorityTool/CSDeliveryOrder/ShowSubmittedOrders">
-                            <i class="bi bi-circle"></i><span>Show Submitted orders</span>
-                        </a>
-                    </li>
-                </ul>
-            </li><!-- End Forms Nav -->
+                            <li class="nav-item">
+                                <a class="nav-link collapsed" data-bs-target="#forms-nav" data-bs-toggle="collapse" href="#">
+                                    <i class="bi bi-journal-text"></i><span>Delivery Orders</span><i class="bi bi-chevron-down ms-auto"></i>
+                                </a>
+                                <ul id="forms-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+                                    @if (roles.Contains("CustomerService") || roles.Contains("Admin"))
+                                    {
+                <li>
+                    <a href="~/PriorityTool/CSDeliveryOrder/Index">
+                        <i class="bi bi-circle"></i><span>Assign Orders</span>
+                    </a>
+                </li> }
+                                    else if (roles.Contains("Sales"))
+                                    {
+                <li>
+                    <a href="~/PriorityTool/Order/Index">
+                        <i class="bi bi-circle"></i><span>Assign Orders</span>
+                    </a>
+                </li>}
+                                    <li>
+                                        <a href="~/PriorityTool/CSDeliveryOrder/ShowSubmittedOrders">
+                                            <i class="bi bi-circle"></i><span>Show Submitted orders</span>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li><!-- End Forms Nav -->
 
-            <li class="nav-item">
-                <a class="nav-link collapsed" data-bs-target="#tables-nav" data-bs-toggle="collapse" href="#">
-                    <i class="bi bi-layout-text-window-reverse"></i><span>PickUp Orders</span><i class="bi bi-chevron-down ms-auto"></i>
-                </a>
-                <ul id="tables-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
-                    <li>
-                        <a href="~/PriorityTool/PickUpOrders/AddPickupOrders">
-                            <i class="bi bi-circle"></i><span>upload PickUp Orders</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="~/PriorityTool/PickUpOrders/Index">
-                            <i class="bi bi-circle"></i><span>Add PickUp Customers</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="~/PriorityTool/CSDeliveryOrder/ShowPickupSubmittedOrders">
-                            <i class="bi bi-circle"></i><span>Show Pickup Submitted orders</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="~/PriorityTool/PickUpOrders/EditPickUpOrders
+                                                <li class="nav-item">
+                                                    <a class="nav-link collapsed" data-bs-target="#tables-nav" data-bs-toggle="collapse" href="#">
+                                                        <i class="bi bi-layout-text-window-reverse"></i><span>PickUp Orders</span><i class="bi bi-chevron-down ms-auto"></i>
+                                                    </a>
+                                                    <ul id="tables-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+                                                        <li>
+                                                            <a href="~/PriorityTool/PickUpOrders/AddPickupOrders">
+                                                                <i class="bi bi-circle"></i><span>upload PickUp Orders</span>
+                                                            </a>
+                                                        </li>
+                                                        <li>
+                                                            <a href="~/PriorityTool/PickUpOrders/Index">
+                                                                <i class="bi bi-circle"></i><span>Add PickUp Customers</span>
+                                                            </a>
+                                                        </li>
+                                                        <li>
+                                                            <a href="~/PriorityTool/CSDeliveryOrder/ShowPickupSubmittedOrders">
+                                                                <i class="bi bi-circle"></i><span>Show Pickup Submitted orders</span>
+                                                            </a>
+                                                        </li>
+                                                        <li>
+                                                            <a href="~/PriorityTool/PickUpOrders/EditPickUpOrders
 ">
-                            <i class="bi bi-circle"></i><span>Edit</span>
-                        </a>
-                    </li>
-                </ul>
-            </li><!-- End Tables Nav -->
+                                                                <i class="bi bi-circle"></i><span>Edit</span>
+                                                            </a>
+                                                        </li>
+                                                    </ul>
+                                                </li><!-- End Tables Nav -->
 
-            <li class="nav-item">
-                <a class="nav-link collapsed" data-bs-target="#charts-nav" data-bs-toggle="collapse" href="#">
-                    <i class="bi bi-bar-chart"></i><span>Warehouse</span><i class="bi bi-chevron-down ms-auto"></i>
-                </a>
-                <ul id="charts-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
-                    <li>
-                        <a href="~/PriorityTool/Warehouse/AssignWarehouseOrder">
-                            <i class="bi bi-circle"></i><span>AddQuantity</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="~/PriorityTool/Warehouse/EditWarehouseOrder">
-                            <i class="bi bi-circle"></i><span>Edit</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="~/PriorityTool/Warehouse/ShowSubmittedOrder">
-                            <i class="bi bi-circle"></i><span>Show</span>
-                        </a>
-                    </li>
+                                                                    <li class="nav-item">
+                                                                        <a class="nav-link collapsed" data-bs-target="#charts-nav" data-bs-toggle="collapse" href="#">
+                                                                            <i class="bi bi-bar-chart"></i><span>Warehouse</span><i class="bi bi-chevron-down ms-auto"></i>
+                                                                        </a>
+                                                                        <ul id="charts-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+                                                                            <li>
+                                                                                <a href="~/PriorityTool/Warehouse/AssignWarehouseOrder">
+                                                                                    <i class="bi bi-circle"></i><span>AddQuantity</span>
+                                                                                </a>
+                                                                            </li>
+                                                                            <li>
+                                                                                <a href="~/PriorityTool/Warehouse/EditWarehouseOrder">
+                                                                                    <i class="bi bi-circle"></i><span>Edit</span>
+                                                                                </a>
+                                                                            </li>
+                                                                            <li>
+                                                                                <a href="~/PriorityTool/Warehouse/ShowSubmittedOrder">
+                                                                                    <i class="bi bi-circle"></i><span>Show</span>
+                                                                                </a>
+                                                                            </li>
 
-                </ul>
-            </li><!-- End Charts Nav -->
+                                                                        </ul>
+                                                                    </li><!-- End Charts Nav -->
+                                                                                        <li class="nav-item">
+                                                                                            <a class="nav-link collapsed" data-bs-target="#submit-nav" data-bs-toggle="collapse" href="#">
+                                                                                                <i class="bi bi-bar-chart"></i><span>Submit</span><i class="bi bi-chevron-down ms-auto"></i>
+                                                                                            </a>
+                                                                                            <ul id="submit-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+                                                                                                <li>
+                                                                                                    <a href="~/PriorityTool/CSDeliveryOrder/Submit">
+                                                                                                        <i class="bi bi-circle"></i><span>Submit</span>
+                                                                                                    </a>
+                                                                                                </li>
+                                                                                               
+                                                                                            </ul>
+                                                                                        </li><!-- End Charts Nav -->
 
-            <li class="nav-item">
-                <a class="nav-link collapsed" data-bs-target="#Quota-nav" data-bs-toggle="collapse" href="#">
-                    <i class="bi bi-gem"></i><span>Quota</span><i class="bi bi-chevron-down ms-auto"></i>
-                </a>
-                <ul id="Quota-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
-                    @if (roles.Contains("CustomerService") || roles.Contains("Admin"))
-                            {
-                    <li>
-                        <a href="~/PriorityTool/Hold/Create">
-                            <i class="bi bi-circle"></i><span>Upload Quota File </span>
-                        </a>
-                    </li>
-                            }
+                                                                                                            <li class="nav-item">
+                                                                                                                <a class="nav-link collapsed" data-bs-target="#Quota-nav" data-bs-toggle="collapse" href="#">
+                                                                                                                    <i class="bi bi-gem"></i><span>Quota</span><i class="bi bi-chevron-down ms-auto"></i>
+                                                                                                                </a>
+                                                                                                                <ul id="Quota-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+                                                                                                                    @if (roles.Contains("CustomerService") || roles.Contains("Admin"))
+                                                                                                                    {
+                                                                                                <li>
+                                                                                                    <a href="~/PriorityTool/Hold/Create">
+                                                                                                        <i class="bi bi-circle"></i><span>Upload Quota File </span>
+                                                                                                    </a>
+                                                                                                </li>}
 
-                    <li>
-                        <a href="~/PriorityTool/Hold/Index">
-                            <i class="bi bi-circle"></i><span>Show Quota </span>
-                        </a>
-                    </li>
+                                                                                                                    <li>
+                                                                                                                        <a href="~/PriorityTool/Hold/Index">
+                                                                                                                            <i class="bi bi-circle"></i><span>Show Quota </span>
+                                                                                                                        </a>
+                                                                                                                    </li>
 
-                </ul>
-            </li><!-- End Icons Nav -->
+                                                                                                                </ul>
+                                                                                                            </li><!-- End Icons Nav -->
 
-            <li class="nav-item">
-                <a class="nav-link collapsed" data-bs-target="#export-nav" data-bs-toggle="collapse" href="#">
-                    <i class="bi bi-gem"></i><span>Export Orders</span><i class="bi bi-chevron-down ms-auto"></i>
-                </a>
-                <ul id="export-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
-                    <li>
-                        <a href="~/PriorityTool/ExportOrders/Index">
-                            <i class="bi bi-circle"></i><span>Export Orders File</span>
-                        </a>
-                    </li>
+                                                                                                                                <li class="nav-item">
+                                                                                                                                    <a class="nav-link collapsed" data-bs-target="#export-nav" data-bs-toggle="collapse" href="#">
+                                                                                                                                        <i class="bi bi-gem"></i><span>Export Orders</span><i class="bi bi-chevron-down ms-auto"></i>
+                                                                                                                                    </a>
+                                                                                                                                    <ul id="export-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+                                                                                                                                        <li>
+                                                                                                                                            <a href="~/PriorityTool/ExportOrders/Index">
+                                                                                                                                                <i class="bi bi-circle"></i><span>Export Orders File</span>
+                                                                                                                                            </a>
+                                                                                                                                        </li>
 
-                </ul>
-            </li><!-- End Icons Nav -->
-                }
+                                                                                                                                    </ul>
+                                                                                                                                </li><!-- End Icons Nav -->                }
             @if (roles.Contains("Dispatch"))
-                {
+            {
 
-            <li class="nav-item">
-                <a class="nav-link collapsed" data-bs-target="#DispatchOrders-nav" data-bs-toggle="collapse" href="#">
-                    <i class="bi bi-gem"></i><span>Orders </span><i class="bi bi-chevron-down ms-auto"></i>
-                </a>
-                <ul id="DispatchOrders-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
-                    <li>
-                        <a href="~/PriorityTool/Dispatch/Index">
-                            <i class="bi bi-circle"></i><span>Show Orders</span>
-                        </a>
-                    </li>
-                </ul>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link collapsed" data-bs-target="#export-nav" data-bs-toggle="collapse" href="#">
-                    <i class="bi bi-gem"></i><span>Export Orders</span><i class="bi bi-chevron-down ms-auto"></i>
-                </a>
-                <ul id="export-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
-                    <li>
-                        <a href="~/PriorityTool/ExportOrders/Index">
-                            <i class="bi bi-circle"></i><span>Export Orders File</span>
-                        </a>
-                    </li>
-                </ul>
-            </li><!-- End Icons Nav -->
-                }
+        <li class="nav-item">
+            <a class="nav-link collapsed" data-bs-target="#DispatchOrders-nav" data-bs-toggle="collapse" href="#">
+                <i class="bi bi-gem"></i><span>Orders </span><i class="bi bi-chevron-down ms-auto"></i>
+            </a>
+            <ul id="DispatchOrders-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+                <li>
+                    <a href="~/PriorityTool/Dispatch/Index">
+                        <i class="bi bi-circle"></i><span>Show Orders</span>
+                    </a>
+                </li>
+            </ul>
+        </li>
+                            <li class="nav-item">
+                                <a class="nav-link collapsed" data-bs-target="#export-nav" data-bs-toggle="collapse" href="#">
+                                    <i class="bi bi-gem"></i><span>Export Orders</span><i class="bi bi-chevron-down ms-auto"></i>
+                                </a>
+                                <ul id="export-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+                                    <li>
+                                        <a href="~/PriorityTool/ExportOrders/Index">
+                                            <i class="bi bi-circle"></i><span>Export Orders File</span>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li><!-- End Icons Nav -->                }
 
             @if (roles.Contains("Admin"))
-                {
-            <li class="nav-item">
-                <a class="nav-link collapsed" data-bs-target="#products-nav" data-bs-toggle="collapse" href="#">
-                    <i class="bi bi-layout-text-window-reverse"></i><span>Products</span><i class="bi bi-chevron-down ms-auto"></i>
-                </a>
-                <ul id="products-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
-                    <li>
-                        <a href="~/PriorityTool/Item/Index">
-                            <i class="bi bi-circle"></i><span>Show</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="~/PriorityTool/Item/Create">
-                            <i class="bi bi-circle"></i><span>Add</span>
-                        </a>
-                    </li>
-                </ul>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link collapsed" data-bs-target="#mainRegion-nav" data-bs-toggle="collapse" href="#">
-                    <i class="bi bi-layout-text-window-reverse"></i><span>Main Region</span><i class="bi bi-chevron-down ms-auto"></i>
-                </a>
-                <ul id="mainRegion-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
-                    <li>
-                        <a href="~/PriorityTool/MainRegion/Index">
-                            <i class="bi bi-circle"></i><span>Show</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="~/PriorityTool/MainRegion/Create">
-                            <i class="bi bi-circle"></i><span>Add</span>
-                        </a>
-                    </li>
-                </ul>
-            </li><!-- End Tables Nav -->
+            {
+        <li class="nav-item">
+            <a class="nav-link collapsed" data-bs-target="#products-nav" data-bs-toggle="collapse" href="#">
+                <i class="bi bi-layout-text-window-reverse"></i><span>Products</span><i class="bi bi-chevron-down ms-auto"></i>
+            </a>
+            <ul id="products-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+                <li>
+                    <a href="~/PriorityTool/Item/Index">
+                        <i class="bi bi-circle"></i><span>Show</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="~/PriorityTool/Item/Create">
+                        <i class="bi bi-circle"></i><span>Add</span>
+                    </a>
+                </li>
+            </ul>
+        </li>
+                            <li class="nav-item">
+                                <a class="nav-link collapsed" data-bs-target="#mainRegion-nav" data-bs-toggle="collapse" href="#">
+                                    <i class="bi bi-layout-text-window-reverse"></i><span>Main Region</span><i class="bi bi-chevron-down ms-auto"></i>
+                                </a>
+                                <ul id="mainRegion-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+                                    <li>
+                                        <a href="~/PriorityTool/MainRegion/Index">
+                                            <i class="bi bi-circle"></i><span>Show</span>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="~/PriorityTool/MainRegion/Create">
+                                            <i class="bi bi-circle"></i><span>Add</span>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li><!-- End Tables Nav -->
 
 
-            <li class="nav-item">
-                <a class="nav-link collapsed" data-bs-target="#subRegion-nav" data-bs-toggle="collapse" href="#">
-                    <i class="bi bi-layout-text-window-reverse"></i><span>Sub Region</span><i class="bi bi-chevron-down ms-auto"></i>
-                </a>
-                <ul id="subRegion-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
-                    <li>
-                        <a href="~/PriorityTool/SubRegion/Index">
-                            <i class="bi bi-circle"></i><span>Show</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="~/PriorityTool/SubRegion/Create">
-                            <i class="bi bi-circle"></i><span>Add</span>
-                        </a>
-                    </li>
-                </ul>
-            </li><!-- End Tables Nav -->
-            <li class="nav-item">
-                <a class="nav-link collapsed" data-bs-target="#state-nav" data-bs-toggle="collapse" href="#">
-                    <i class="bi bi-layout-text-window-reverse"></i><span>State</span><i class="bi bi-chevron-down ms-auto"></i>
-                </a>
-                <ul id="state-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
-                    <li>
-                        <a href="~/PriorityTool/State/Index">
-                            <i class="bi bi-circle"></i><span>Show</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="~/PriorityTool/State/Create">
-                            <i class="bi bi-circle"></i><span>Add</span>
-                        </a>
-                    </li>
-                </ul>
-            </li><!-- End Tables Nav -->
+                                                <li class="nav-item">
+                                                    <a class="nav-link collapsed" data-bs-target="#subRegion-nav" data-bs-toggle="collapse" href="#">
+                                                        <i class="bi bi-layout-text-window-reverse"></i><span>Sub Region</span><i class="bi bi-chevron-down ms-auto"></i>
+                                                    </a>
+                                                    <ul id="subRegion-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+                                                        <li>
+                                                            <a href="~/PriorityTool/SubRegion/Index">
+                                                                <i class="bi bi-circle"></i><span>Show</span>
+                                                            </a>
+                                                        </li>
+                                                        <li>
+                                                            <a href="~/PriorityTool/SubRegion/Create">
+                                                                <i class="bi bi-circle"></i><span>Add</span>
+                                                            </a>
+                                                        </li>
+                                                    </ul>
+                                                </li><!-- End Tables Nav -->
+                                                                    <li class="nav-item">
+                                                                        <a class="nav-link collapsed" data-bs-target="#state-nav" data-bs-toggle="collapse" href="#">
+                                                                            <i class="bi bi-layout-text-window-reverse"></i><span>State</span><i class="bi bi-chevron-down ms-auto"></i>
+                                                                        </a>
+                                                                        <ul id="state-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+                                                                            <li>
+                                                                                <a href="~/PriorityTool/State/Index">
+                                                                                    <i class="bi bi-circle"></i><span>Show</span>
+                                                                                </a>
+                                                                            </li>
+                                                                            <li>
+                                                                                <a href="~/PriorityTool/State/Create">
+                                                                                    <i class="bi bi-circle"></i><span>Add</span>
+                                                                                </a>
+                                                                            </li>
+                                                                        </ul>
+                                                                    </li><!-- End Tables Nav -->
 
-            <li class="nav-item">
-                <a class="nav-link collapsed" data-bs-target="#territory-nav" data-bs-toggle="collapse" href="#">
-                    <i class="bi bi-layout-text-window-reverse"></i><span>Territory</span><i class="bi bi-chevron-down ms-auto"></i>
-                </a>
-                <ul id="territory-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
-                    <li>
-                        <a href="~/PriorityTool/Territory/Index">
-                            <i class="bi bi-circle"></i><span>Show</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="~/PriorityTool/Territory/Create">
-                            <i class="bi bi-circle"></i><span>Add</span>
-                        </a>
-                    </li>
-                </ul>
-            </li><!-- End Tables Nav -->
+                                                                                        <li class="nav-item">
+                                                                                            <a class="nav-link collapsed" data-bs-target="#territory-nav" data-bs-toggle="collapse" href="#">
+                                                                                                <i class="bi bi-layout-text-window-reverse"></i><span>Territory</span><i class="bi bi-chevron-down ms-auto"></i>
+                                                                                            </a>
+                                                                                            <ul id="territory-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+                                                                                                <li>
+                                                                                                    <a href="~/PriorityTool/Territory/Index">
+                                                                                                        <i class="bi bi-circle"></i><span>Show</span>
+                                                                                                    </a>
+                                                                                                </li>
+                                                                                                <li>
+                                                                                                    <a href="~/PriorityTool/Territory/Create">
+                                                                                                        <i class="bi bi-circle"></i><span>Add</span>
+                                                                                                    </a>
+                                                                                                </li>
+                                                                                            </ul>
+                                                                                        </li><!-- End Tables Nav -->
 
-            <li class="nav-item">
-                <a class="nav-link collapsed" data-bs-target="#zone-nav" data-bs-toggle="collapse" href="#">
-                    <i class="bi bi-layout-text-window-reverse"></i><span>Zone</span><i class="bi bi-chevron-down ms-auto"></i>
-                </a>
-                <ul id="zone-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
-                    <li>
-                        <a href="~/PriorityTool/Zone/Index">
-                            <i class="bi bi-circle"></i><span>Show</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="~/PriorityTool/Zone/Create">
-                            <i class="bi bi-circle"></i><span>Add</span>
-                        </a>
-                    </li>
-                </ul>
-            </li><!-- End Tables Nav -->
-            <li class="nav-item">
-                <a class="nav-link collapsed" data-bs-target="#customer-nav" data-bs-toggle="collapse" href="#">
-                    <i class="bi bi-layout-text-window-reverse"></i><span>Customer</span><i class="bi bi-chevron-down ms-auto"></i>
-                </a>
-                <ul id="customer-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
-                    <li>
-                        <a href="~/PriorityTool/DeliveryCustomer/Index">
-                            <i class="bi bi-circle"></i><span>Show</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="~/PriorityTool/DeliveryCustomer/Create">
-                            <i class="bi bi-circle"></i><span>Add</span>
-                        </a>
-                    </li>
-                </ul>
-            </li><!-- End Tables Nav -->
-            <li class="nav-item">
-                <a class="nav-link collapsed" data-bs-target="#users-nav" data-bs-toggle="collapse" href="#">
-                    <i class="bi bi-layout-text-window-reverse"></i><span>Users</span><i class="bi bi-chevron-down ms-auto"></i>
-                </a>
-                <ul id="users-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
-                    <li>
-                        <a href="~/PriorityTool/Admin/Create">
-                            <i class="bi bi-circle"></i><span>Create</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="~/PriorityTool/Admin/Index">
-                            <i class="bi bi-circle"></i><span>Show</span>
-                        </a>
-                    </li>
-                </ul>
-            </li><!-- End Tables Nav -->
-            <li class="nav-item">
-                <a class="nav-link collapsed" data-bs-target="#roles-nav" data-bs-toggle="collapse" href="#">
-                    <i class="bi bi-layout-text-window-reverse"></i><span>Roles</span><i class="bi bi-chevron-down ms-auto"></i>
-                </a>
-                <ul id="roles-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
-                    <li>
-                        <a href="~/PriorityTool/Role/Create">
-                            <i class="bi bi-circle"></i><span>Create</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="~/PriorityTool/Role/Index">
-                            <i class="bi bi-circle"></i><span>Show</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="~/PriorityTool/Role/edit">
-                            <i class="bi bi-circle"></i><span>Edit</span>
-                        </a>
-                    </li>
-                </ul>
-            </li><!-- End Tables Nav -->
-                }
+                                                                                                            <li class="nav-item">
+                                                                                                                <a class="nav-link collapsed" data-bs-target="#zone-nav" data-bs-toggle="collapse" href="#">
+                                                                                                                    <i class="bi bi-layout-text-window-reverse"></i><span>Zone</span><i class="bi bi-chevron-down ms-auto"></i>
+                                                                                                                </a>
+                                                                                                                <ul id="zone-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+                                                                                                                    <li>
+                                                                                                                        <a href="~/PriorityTool/Zone/Index">
+                                                                                                                            <i class="bi bi-circle"></i><span>Show</span>
+                                                                                                                        </a>
+                                                                                                                    </li>
+                                                                                                                    <li>
+                                                                                                                        <a href="~/PriorityTool/Zone/Create">
+                                                                                                                            <i class="bi bi-circle"></i><span>Add</span>
+                                                                                                                        </a>
+                                                                                                                    </li>
+                                                                                                                </ul>
+                                                                                                            </li><!-- End Tables Nav -->
+                                                                                                                                <li class="nav-item">
+                                                                                                                                    <a class="nav-link collapsed" data-bs-target="#customer-nav" data-bs-toggle="collapse" href="#">
+                                                                                                                                        <i class="bi bi-layout-text-window-reverse"></i><span>Customer</span><i class="bi bi-chevron-down ms-auto"></i>
+                                                                                                                                    </a>
+                                                                                                                                    <ul id="customer-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+                                                                                                                                        <li>
+                                                                                                                                            <a href="~/PriorityTool/DeliveryCustomer/Index">
+                                                                                                                                                <i class="bi bi-circle"></i><span>Show</span>
+                                                                                                                                            </a>
+                                                                                                                                        </li>
+                                                                                                                                        <li>
+                                                                                                                                            <a href="~/PriorityTool/DeliveryCustomer/Create">
+                                                                                                                                                <i class="bi bi-circle"></i><span>Add</span>
+                                                                                                                                            </a>
+                                                                                                                                        </li>
+                                                                                                                                    </ul>
+                                                                                                                                </li><!-- End Tables Nav -->
+                                                                                                                                                    <li class="nav-item">
+                                                                                                                                                        <a class="nav-link collapsed" data-bs-target="#users-nav" data-bs-toggle="collapse" href="#">
+                                                                                                                                                            <i class="bi bi-layout-text-window-reverse"></i><span>Users</span><i class="bi bi-chevron-down ms-auto"></i>
+                                                                                                                                                        </a>
+                                                                                                                                                        <ul id="users-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+                                                                                                                                                            <li>
+                                                                                                                                                                <a href="~/PriorityTool/Admin/Create">
+                                                                                                                                                                    <i class="bi bi-circle"></i><span>Create</span>
+                                                                                                                                                                </a>
+                                                                                                                                                            </li>
+                                                                                                                                                            <li>
+                                                                                                                                                                <a href="~/PriorityTool/Admin/Index">
+                                                                                                                                                                    <i class="bi bi-circle"></i><span>Show</span>
+                                                                                                                                                                </a>
+                                                                                                                                                            </li>
+                                                                                                                                                        </ul>
+                                                                                                                                                    </li><!-- End Tables Nav -->
+                                                                                                                                                                        <li class="nav-item">
+                                                                                                                                                                            <a class="nav-link collapsed" data-bs-target="#roles-nav" data-bs-toggle="collapse" href="#">
+                                                                                                                                                                                <i class="bi bi-layout-text-window-reverse"></i><span>Roles</span><i class="bi bi-chevron-down ms-auto"></i>
+                                                                                                                                                                            </a>
+                                                                                                                                                                            <ul id="roles-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+                                                                                                                                                                                <li>
+                                                                                                                                                                                    <a href="~/PriorityTool/Role/Create">
+                                                                                                                                                                                        <i class="bi bi-circle"></i><span>Create</span>
+                                                                                                                                                                                    </a>
+                                                                                                                                                                                </li>
+                                                                                                                                                                                <li>
+                                                                                                                                                                                    <a href="~/PriorityTool/Role/Index">
+                                                                                                                                                                                        <i class="bi bi-circle"></i><span>Show</span>
+                                                                                                                                                                                    </a>
+                                                                                                                                                                                </li>
+                                                                                                                                                                                <li>
+                                                                                                                                                                                    <a href="~/PriorityTool/Role/edit">
+                                                                                                                                                                                        <i class="bi bi-circle"></i><span>Edit</span>
+                                                                                                                                                                                    </a>
+                                                                                                                                                                                </li>
+                                                                                                                                                                            </ul>
+                                                                                                                                                                        </li><!-- End Tables Nav -->                }
         </ul>
 
     </aside><!-- End Sidebar-->

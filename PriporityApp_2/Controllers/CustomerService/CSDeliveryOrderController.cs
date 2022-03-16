@@ -661,10 +661,24 @@ namespace PriorityApp.Controllers.CustomerService
             //return RedirectToAction("Index");
         }
 
+        public ActionResult Submit()
+        {
+            try
+            {
+                GeoFilterModel model = new GeoFilterModel();
+                model.SelectedPriorityDate = DateTime.Today;
+                return View("Submit", model);
+            }
+            catch(Exception e)
+            {
+                _logger.LogError(e.ToString());
+                return RedirectToAction("ERROR404");
+            }
+        }
 
-        [HttpPost]
+                [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult SubmitOrders()
+        public ActionResult SubmitOrders(GeoFilterModel model)
         {
             AspNetUser applicationUser = _userManager.GetUserAsync(User).Result;
             bool submitted = false;
@@ -679,10 +693,12 @@ namespace PriorityApp.Controllers.CustomerService
                 if (!roles.Contains("Sales"))
                 {
                     unSubmittedOrders = _orderService.GetAllUnSubmittedOrdersByRole(roles, submitted).Result;
+                    unSubmittedOrders = unSubmittedOrders.Where(o => o.PriorityDate == model.SelectedPriorityDate).ToList(); 
                 }
                 else
                 {
                     unSubmittedOrders = _orderService.GetSubmittedOdersByUserId(applicationUser.Id, false).Result;
+                    unSubmittedOrders = unSubmittedOrders.Where(o => o.PriorityDate == model.SelectedPriorityDate).ToList();
 
                 }
                 for (int index=0; index < unSubmittedOrders.Count; index++)

@@ -1,0 +1,25 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@model PriorityApp.Service.Models.GeoFilterModel
+@{
+    Layout = "~/Views/Shared/NiceAdmin/_CSLayout.cshtml";
+}
+
+<h2>Submit Orders</h2>
+<div class="text-center">
+
+    <form asp-controller="CSDeliveryOrder" asp-action="SubmitOrders" method="post">
+
+        <div class="col-xs-12 col-sm-6 col-md-6 col-lg-4">
+            <label>Priority Date</label>
+            <input class="form-select form-select-lg mb-3" type="date" id="SelectedPriorityDate" asp-for="SelectedPriorityDate" />
+        </div>
+        <div class="row col-lg-2" style="margin-top:20px; margin-bottom:30px">
+
+            <input type="submit" value="Submit" class="btn btn-primary btn-lg-2" />
+
+        </div>
+    </form>
+
+</div>
