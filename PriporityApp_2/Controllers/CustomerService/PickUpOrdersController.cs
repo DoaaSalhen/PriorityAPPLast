@@ -83,7 +83,7 @@ namespace PriorityApp.Controllers.CustomerService
             subRegionModels.Insert(0, new SubRegionModel { Id = -1, Name = "select SubRegion" });
             addPickUpOrderModel.SubRegions = subRegionModels;
             addPickUpOrderModel.SubRegionSelectedId = -1;
-            addPickUpOrderModel.SelectedPriorityDate = DateTime.Today;
+            addPickUpOrderModel.SelectedPriorityDate = DateTime.Today.AddDays(1);
 
             AspNetUser applicationUser = await _userManager.GetUserAsync(User);
             List<TerritoryModel> territoryModelSales = null;

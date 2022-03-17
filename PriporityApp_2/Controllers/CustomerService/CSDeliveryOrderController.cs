@@ -118,7 +118,7 @@ namespace PriorityApp.Controllers.CustomerService
                 geoFilterModel.ItemSelectedId = -1;
                 //geoFilterModel.SubRegions = subRegionModels;
 
-                geoFilterModel.SelectedPriorityDate = DateTime.Today;
+                geoFilterModel.SelectedPriorityDate = DateTime.Today.AddDays(1);
 
                 return View(geoFilterModel);
             }
@@ -500,13 +500,13 @@ namespace PriorityApp.Controllers.CustomerService
                 }
 
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 return Json(false);
 
             }
             return Json(true);
-            }
+        }
 
         [HttpPost]
         [ValidateAntiForgeryToken]

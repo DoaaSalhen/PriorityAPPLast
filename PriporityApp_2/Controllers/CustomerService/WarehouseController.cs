@@ -97,11 +97,11 @@ namespace PriorityApp.Controllers.CustomerService
                 AspNetUser applicationUser = _userManager.GetUserAsync(User).Result;
                 List<string> roles = (List<string>)_userManager.GetRolesAsync(applicationUser).Result;
                 itemModels = _itemService.GetItemsByType("Bags").Result;
-                warehouseOrderModel.SelectedPriorityDate = DateTime.Today;
                 warehouseOrderModel.WarehouseModel2 = warehouseModel2s;
                 warehouseOrderModel.Items = itemModels;
                 if (!roles.Contains("Sales"))
                 {
+                    warehouseOrderModel.SelectedPriorityDate = DateTime.Today.AddDays(1);
                     var subRegionModels = _regionService.GetAllISubRegions().Result;
                     subRegionModels.Insert(0, new SubRegionModel { Id = -1, Name = "select SubRegion" });
                     warehouseOrderModel.SubRegions = subRegionModels;
@@ -110,6 +110,7 @@ namespace PriorityApp.Controllers.CustomerService
                 }
                 else
                 {
+                    warehouseOrderModel.SelectedPriorityDate = DateTime.Today;
                     warehouseOrderModel.HoldModel = _holdService.GetLastHoldByUserIdAndPriorityDate(applicationUser.Id, warehouseOrderModel.SelectedPriorityDate);
                 }
                 
