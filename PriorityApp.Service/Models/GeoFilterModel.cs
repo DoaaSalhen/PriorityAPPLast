@@ -45,8 +45,10 @@ namespace PriorityApp.Service.Models
         public string viewCase { get; set; }
         public float holdTotalAssignedQuantity { get; set; }
         public DateTime ToSelectedPriorityDate { get; set; }
-
+        public int PendingSelectedId { get; set; }
         public bool SavedOnly { get; set; }
+        public bool PendingOnly { get; set; }
+
 
         public List<SortingModel> FilterColoumns;
 

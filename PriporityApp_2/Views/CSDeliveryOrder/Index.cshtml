@@ -167,12 +167,17 @@ else if (ViewBag.Error != null)
         var tempholdExtraQuantity3 = holdExtraQuantity3;
         var compareResult = true;
         var totalCheckResult = false;
+        //savedBefore = document.getElementById("OrderModel_orders_" + index + "__SavedBefore").value ;
+        //savedPriorityId = document.getElementById("RBLI" + index).value;
+
         var compareResult = compareInsertedQuantityVSOrderQuantity(insertedQuantity, orderQuantity);
         var checkboxes = document.getElementsByClassName('CheckDeliveryOrders');
         if (compareResult == true)
         {
+
             if (savedBefore == true && SavedValuesArray[index] == undefined) {
                 if (savedPriorityId == 3) {
+                    alert("test");
                     holdReminingQuantity3 = parseFloat(holdReminingQuantity3) + savedPriorityQuantity;
                     tempholdReminingQuantity3 = tempholdReminingQuantity3 + savedPriorityQuantity;
                     holdAssignedQuantity3 = parseFloat(holdAssignedQuantity3) - savedPriorityQuantity;
@@ -235,13 +240,14 @@ else if (ViewBag.Error != null)
                             //contentType: false
                             success: function (data) {
 
-                                if (document.getElementById("RBLI" + index).value == 3) {
+                                if (document.getElementById("RBLI" + index).value == 3)
+                                {
                                     document.getElementById("tr" + index).style.backgroundColor = "lawngreen";
                                     document.getElementById("OrderModel_orders_" + index + "__SavedBefore").value = "True";
                                     checkboxes[index].checked = true;
                                 }
                                 else if (document.getElementById("RBLI" + index).value == 4) {
-                                    document.getElementById("tr" + index).style.backgroundColor = " #ff4d4d";
+                                    document.getElementById("tr" + index).style.backgroundColor = "#ff4d4d";
                                     document.getElementById("OrderModel_orders_" + index + "__SavedBefore").value = "True";
                                     checkboxes[index].checked = true;
 
@@ -396,6 +402,7 @@ else if (ViewBag.Error != null)
                                     document.getElementById("tr" + checkIndex).style.backgroundColor = "lawngreen";
                                     holdReminingQuantity3 = parseFloat(document.getElementById("remaining").value);
                                     holdAssignedQuantity3 = parseFloat(document.getElementById("total").value);
+                                    alert(document.getElementById("OrderModel_orders_" + checkIndex + "__SavedBefore").value);
                                 }
                             });
                             //alert(holdReminingQuantity3);
@@ -503,6 +510,8 @@ else if (ViewBag.Error != null)
                 else
                 {
                     alert("you donot have enough quantity");
+                    holdReminingQuantity3 = parseFloat(document.getElementById("remaining").value);
+                    holdAssignedQuantity3 = parseFloat(document.getElementById("total").value);
                 }
 
 
@@ -679,77 +688,87 @@ else if (ViewBag.Error != null)
         <div class="form-row" style="width:100%">
             @if (!roles.Contains("Sales"))
             {
-@if (Model.SubRegions == null)
-{
-<div class="col-xs-12 col-sm-6 col-md-6 col-lg-2 selectFilter" style="display:inline-block">
-    <label class="control-label">Region</label>
-    <select id="SubRegionSelectedId" name="SubRegionSelectedId" asp-for="SubRegionSelectedId"
-            class="form-select form-select-lg mb-3"
-            asp-items="@(new SelectList(string.Empty, "Id", "Name"))"></select>
-</div> }
-                else
-                {
-<div class="col-xs-12 col-sm-6 col-md-6 col-lg-2 selectFilter" style="display:inline-block">
-    <label class="control-label">Region</label>
-    <select id="SubRegionSelectedId" name="SubRegionSelectedId" asp-for="SubRegionSelectedId"
-            class="form-select form-select-lg mb-3"
-            asp-items="@(new SelectList(Model.SubRegions, "Id", "Name"))"></select>
-</div>                }
-                @if (Model.States == null)
-                {
-<div class="col-xs-12 col-sm-6 col-md-6 col-lg-2 selectFilter" style="display:inline-block">
-    <label class="control-label">State</label>
-    <select id="StateSelectedId" name="StateSelectedId" asp-for="StateSelectedId"
-            class="form-select form-select-lg mb-3"
-            asp-items="@(new SelectList(string.Empty, "Id", "Name"))"></select>
-</div> }
-                else
-                {
-<div class="col-xs-12 col-sm-6 col-md-6 col-lg-2 selectFilter" style="display:inline-block">
-    <label class="control-label">State</label>
-    <select id="StateSelectedId" name="StateSelectedId" asp-for="StateSelectedId"
-            class="form-select form-select-lg mb-3"
-            asp-items="@(new SelectList(Model.States, "Id", "Name"))"></select>
-</div>                }
+        @if (Model.SubRegions == null)
+        {
+        <div class="col-xs-12 col-sm-6 col-md-6 col-lg-2 selectFilter" style="display:inline-block">
+            <label class="control-label">Region</label>
+            <select id="SubRegionSelectedId" name="SubRegionSelectedId" asp-for="SubRegionSelectedId"
+                    class="form-select form-select-lg mb-3"
+                    asp-items="@(new SelectList(string.Empty, "Id", "Name"))"></select>
+        </div> }
+    else
+    {
+        <div class="col-xs-12 col-sm-6 col-md-6 col-lg-2 selectFilter" style="display:inline-block">
+            <label class="control-label">Region</label>
+            <select id="SubRegionSelectedId" name="SubRegionSelectedId" asp-for="SubRegionSelectedId"
+                    class="form-select form-select-lg mb-3"
+                    asp-items="@(new SelectList(Model.SubRegions, "Id", "Name"))"></select>
+        </div>  }
+                        @if (Model.States == null)
+                        {
+        <div class="col-xs-12 col-sm-6 col-md-6 col-lg-2 selectFilter" style="display:inline-block">
+            <label class="control-label">State</label>
+            <select id="StateSelectedId" name="StateSelectedId" asp-for="StateSelectedId"
+                    class="form-select form-select-lg mb-3"
+                    asp-items="@(new SelectList(string.Empty, "Id", "Name"))"></select>
+        </div> }
+    else
+    {
+        <div class="col-xs-12 col-sm-6 col-md-6 col-lg-2 selectFilter" style="display:inline-block">
+            <label class="control-label">State</label>
+            <select id="StateSelectedId" name="StateSelectedId" asp-for="StateSelectedId"
+                    class="form-select form-select-lg mb-3"
+                    asp-items="@(new SelectList(Model.States, "Id", "Name"))"></select>
+        </div>  }
 
-                                @if (Model.Territories == null)
-                                {
-                <div class="col-xs-12 col-sm-6 col-md-6 col-lg-2 selectFilter" style="display:inline-block">
-                    <label class="control-label">Territory</label>
+                                        @if (Model.Territories == null)
+                                        {
+                        <div class="col-xs-12 col-sm-6 col-md-6 col-lg-2 selectFilter" style="display:inline-block">
+                            <label class="control-label">Territory</label>
 
-                    <select id="TerritorySelectedId" name="TerritorySelectedId" asp-for="TerritorySelectedId"
-                            class="form-select form-select-lg mb-3"
-                            asp-items="@(new SelectList(string.Empty, "Id", "Name"))"></select>
-                </div> }
-                                else
-                                {
-                <div class="col-xs-12 col-sm-6 col-md-6 col-lg-2 selectFilter" style="display:inline-block">
-                    <label class="control-label">Territory</label>
+                            <select id="TerritorySelectedId" name="TerritorySelectedId" asp-for="TerritorySelectedId"
+                                    class="form-select form-select-lg mb-3"
+                                    asp-items="@(new SelectList(string.Empty, "Id", "Name"))"></select>
+                        </div> }
+                    else
+                    {
+        <div class="col-xs-12 col-sm-6 col-md-6 col-lg-2 selectFilter" style="display:inline-block">
+            <label class="control-label">Territory</label>
 
-                    <select id="TerritorySelectedId" name="TerritorySelectedId" asp-for="TerritorySelectedId"
-                            class="form-select form-select-lg mb-3"
-                            asp-items="@(new SelectList(Model.Territories, "Id", "Name"))"></select>
-                </div>                }            }
+            <select id="TerritorySelectedId" name="TerritorySelectedId" asp-for="TerritorySelectedId"
+                    class="form-select form-select-lg mb-3"
+                    asp-items="@(new SelectList(Model.Territories, "Id", "Name"))"></select>
+        </div>}}
             @if (Model.Zones == null)
             {
-<div class="col-xs-12 col-sm-6 col-md-6 col-lg-2 selectFilter" style="display:inline-block">
-    <label class="control-label">Zone</label>
-    <select id="ZoneSelectedId" name="ZoneSelectedId" asp-for="ZoneSelectedId"
-            class="form-select form-select-lg mb-3"
-            asp-items="@(new SelectList(string.Empty, "Id", "Name"))"></select>
-</div> }
-            else
-            {
-<div class="col-xs-12 col-sm-6 col-md-6 col-lg-2 selectFilter" style="display:inline-block">
-    <label class="control-label">Zone</label>
-    <select id="ZoneSelectedId" name="ZoneSelectedId" asp-for="ZoneSelectedId"
-            class="form-select form-select-lg mb-3"
-            asp-items="@(new SelectList(Model.Zones, "Id", "Name"))"></select>
-</div>            }
+        <div class="col-xs-12 col-sm-6 col-md-6 col-lg-2 selectFilter" style="display:inline-block">
+            <label class="control-label">Zone</label>
+            <select id="ZoneSelectedId" name="ZoneSelectedId" asp-for="ZoneSelectedId"
+                    class="form-select form-select-lg mb-3"
+                    asp-items="@(new SelectList(string.Empty, "Id", "Name"))"></select>
+        </div> }
+    else
+    {
+        <div class="col-xs-12 col-sm-6 col-md-6 col-lg-2 selectFilter" style="display:inline-block">
+            <label class="control-label">Zone</label>
+            <select id="ZoneSelectedId" name="ZoneSelectedId" asp-for="ZoneSelectedId"
+                    class="form-select form-select-lg mb-3"
+                    asp-items="@(new SelectList(Model.Zones, "Id", "Name"))"></select>
+        </div>}
 
-            <input type="checkbox" id="SavedOnly" asp-for="SavedOnly" name="SavedOnly" style="margin-left:20px;" />
-            <label class="control-label" style="margin-right:20px;">SavedOnly</label>
+            <div class="col-xs-12 col-sm-6 col-md-6 col-lg-2 selectFilter" style="display:inline-block">
+                <label class="control-label">Saved</label>
+                <select id="PendingSelectedId" name="PendingSelectedId" asp-for="PendingSelectedId"
+                        class="form-select form-select-lg mb-3">
+                    <option value="-1">All</option>
+                    <option value="1">Saved Only</option>
+                    <option value="2">Pend Only</option>
+                </select>
+            </div>
+            @*<input type="checkbox" id="SavedOnly" asp-for="SavedOnly" name="SavedOnly" style="margin-left:20px;" />
+            <label class="control-label" style="margin-right:20px;">SavedOnly</label>*@
             <input type="submit" value="Search" class="btn btn-primary btn-lg searchbtn" />
+           
 
         </div>
 

@@ -280,9 +280,17 @@ namespace PriorityApp.Controllers.CustomerService
                     List<long> customerNumbers = customerModels.Select(c => c.Id).ToList();
                     //orderModels = _orderService.GetOdersByListOfCustomerNumbers(customerNumbers, selectedPriorityDate).Result.ToList();
  
-                        if (Model.orderType == (int)CommanData.OrderCategory.Delivery && Model.SavedOnly == true)
+                        if (Model.orderType == (int)CommanData.OrderCategory.Delivery && Model.PendingSelectedId == 1)
                         {
                             orderModels = _orderService.GetOdersByListOfCustomerNumbers(customerNumbers, selectedPriorityDate).Result.Where(o => o.OrderCategoryId == (int)CommanData.OrderCategory.Delivery && o.Submitted == false && o.SavedBefore == true).ToList();
+                        }
+                        else if (Model.orderType == (int)CommanData.OrderCategory.Delivery && Model.PendingSelectedId == 2)
+                        {
+                            orderModels = _orderService.GetOdersByListOfCustomerNumbers(customerNumbers, selectedPriorityDate).Result.Where(o => o.OrderCategoryId == (int)CommanData.OrderCategory.Delivery && o.Submitted == false && o.SavedBefore == false).ToList();
+                        }
+                        else if (Model.orderType == (int)CommanData.OrderCategory.Delivery && Model.PendingSelectedId == -1)
+                        {
+                            orderModels = _orderService.GetOdersByListOfCustomerNumbers(customerNumbers, selectedPriorityDate).Result.Where(o => o.OrderCategoryId == (int)CommanData.OrderCategory.Delivery && o.Submitted == false).ToList();
                         }
                         else if (Model.orderType == (int)CommanData.OrderCategory.Delivery)
                         {
@@ -333,6 +341,8 @@ namespace PriorityApp.Controllers.CustomerService
                 }
                 else
                 {
+                    Model.Zones = _zoneService.GetListOfZonesByTerritoryId(Model.TerritorySelectedId);
+                    Model.Zones.Insert(0, new ZoneModel { Id = -1, Name = "select Zone" });
                     ViewBag.Error = "There Is No Quota for This Priority Date";
                     if (Model.orderType == (int)CommanData.OrderCategory.Delivery)
                     {
