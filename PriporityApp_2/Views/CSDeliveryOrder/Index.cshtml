@@ -398,8 +398,8 @@ else if (ViewBag.Error != null)
                                     holdAssignedQuantity3 = parseFloat(document.getElementById("total").value);
                                 }
                             });
-                            alert(holdReminingQuantity3);
-                            alert(holdAssignedQuantity3);
+                            //alert(holdReminingQuantity3);
+                            //alert(holdAssignedQuantity3);
                         }
                         else {
                             var orderNumber = document.getElementById("OrderModel_orders_" + checkIndex + "__OrderNumber").value;
@@ -445,12 +445,13 @@ else if (ViewBag.Error != null)
                             async: false,
                             //processData: false,
                             //contentType: false
-                            success: function (data) {
+                   success: function (data) {
+                       //alert("test");
                                 document.getElementById("remaining").value = parseFloat(document.getElementById("remaining").value) + parseFloat(orderModel.PriorityQuantity);
                                 document.getElementById("sum").value = parseFloat(document.getElementById("sum").value) - parseFloat(orderModel.PriorityQuantity);
                                 document.getElementById("total").value = parseFloat(document.getElementById("total").value) - parseFloat(orderModel.PriorityQuantity);
-                                document.getElementById("OrderModel_orders_" + checkIndex + "__SavedBefore").value = "True";
-                                document.getElementById("tr" + checkIndex).style.backgroundColor = "";
+                                document.getElementById("OrderModel_orders_" + index + "__SavedBefore").value = "True";
+                                document.getElementById("tr" + index).style.backgroundColor = "";
                                 holdReminingQuantity3 = parseFloat(document.getElementById("remaining").value);
                                 holdAssignedQuantity3 = parseFloat(document.getElementById("total").value);
                             }
@@ -465,36 +466,45 @@ else if (ViewBag.Error != null)
             checkboxes[index].checked = true;
             if (order == 2)
             {
-                document.getElementById("RBLI" + index).value = 3;
-                var orderModel =
-                {
-                    Id: document.getElementById("OrderModel_orders_" + index + "__Id").value,
-                    PriorityQuantity: document.getElementById("PQ" + index).value,
-                    PriorityId: document.getElementById("RBLI" + index).value,
-                    Comment: document.getElementById("OrderModel_orders_" + index + "__Comment").value,
-                    Truck: document.getElementById("OrderModel_orders_" + index + "__Truck").value,
-                    ItemId: document.getElementById("OrderModel_orders_" + index + "__ItemId").value,
-                    PriorityDate: document.getElementById("SelectedPriorityDate").value,
-                    UserId: document.getElementById("userId").value
-                   
+              
+                var remain = parseFloat(document.getElementById("remaining").value) - parseFloat(document.getElementById("PQ" + index).value);
+                if (remain > 0) {
+                    document.getElementById("RBLI" + index).value = 3;
+                    var orderModel =
+                    {
+                        Id: document.getElementById("OrderModel_orders_" + index + "__Id").value,
+                        PriorityQuantity: document.getElementById("PQ" + index).value,
+                        PriorityId: document.getElementById("RBLI" + index).value,
+                        Comment: document.getElementById("OrderModel_orders_" + index + "__Comment").value,
+                        Truck: document.getElementById("OrderModel_orders_" + index + "__Truck").value,
+                        ItemId: document.getElementById("OrderModel_orders_" + index + "__ItemId").value,
+                        PriorityDate: document.getElementById("SelectedPriorityDate").value,
+                        UserId: document.getElementById("userId").value
+
+                    }
+                    $.ajax({
+                        url: '@Url.Content("~/")' + "PriorityTool/CSDeliveryOrder/SaveOrders2",
+                        data: orderModel,
+                        type: "POST",
+                        async: false,
+                        //processData: false,
+                        //contentType: false
+                        success: function (data) {
+                            document.getElementById("remaining").value = parseFloat(document.getElementById("remaining").value) - parseFloat(orderModel.PriorityQuantity);
+                            document.getElementById("sum").value = parseFloat(document.getElementById("sum").value) + parseFloat(orderModel.PriorityQuantity);
+                            document.getElementById("total").value = parseFloat(document.getElementById("total").value) + parseFloat(orderModel.PriorityQuantity);
+                            document.getElementById("OrderModel_orders_" + index + "__SavedBefore").value = "True";
+                            document.getElementById("tr" + index).style.backgroundColor = "lawngreen";
+                            holdReminingQuantity3 = parseFloat(document.getElementById("remaining").value);
+                            holdAssignedQuantity3 = parseFloat(document.getElementById("total").value);
+                        }
+                    });
                 }
-                $.ajax({
-                            url: '@Url.Content("~/")' + "PriorityTool/CSDeliveryOrder/SaveOrders2",
-                            data: orderModel,
-                            type: "POST",
-                            async: false,
-                            //processData: false,
-                            //contentType: false
-                            success: function (data) {
-                                document.getElementById("remaining").value = parseFloat(document.getElementById("remaining").value) - parseFloat(orderModel.PriorityQuantity);
-                                document.getElementById("sum").value = parseFloat(document.getElementById("sum").value) + parseFloat(orderModel.PriorityQuantity);
-                                document.getElementById("total").value = parseFloat(document.getElementById("total").value) + parseFloat(orderModel.PriorityQuantity);
-                                document.getElementById("OrderModel_orders_" + checkIndex + "__SavedBefore").value = "True";
-                                document.getElementById("tr" + checkIndex).style.backgroundColor = "lawngreen";
-                                holdReminingQuantity3 = parseFloat(document.getElementById("remaining").value);
-                                holdAssignedQuantity3 = parseFloat(document.getElementById("total").value);
-                            }
-                        });
+                else
+                {
+                    alert("you donot have enough quantity");
+                }
+
 
             }
         }
