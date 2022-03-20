@@ -1,0 +1,174 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@model PriorityApp.Service.Models.NewDataModel
+
+@{ ViewData["Title"] = "Home Page";
+    Layout = "~/Views/Shared/NiceAdmin/_CSLayout.cshtml";
+}
+<style>
+
+    table {
+        margin-bottom: 20px;
+    }
+
+    .selectFilter {
+        margin-left: 10px;
+        width: 200px;
+        height: 40px;
+        border-radius: 5px;
+    }
+
+    .searchbtn {
+        margin: 20px 20px 20px 20px;
+        border-radius: 10px;
+        width: 100px;
+    }
+</style>
+
+<script src="~/DataTable/jquery-3.5.1.js"></script>
+<script src="~/DataTable/jquery.dataTables.min.js"></script>
+<link rel="stylesheet" href="~/DataTable/jquery.dataTables.min.css">
+<script src="/lib/jquery/dist/jquery.js"></script>
+@if (ViewBag.Message != null)
+{
+    <div style="background-color: #00e600; height: 60px; box-shadow: 5px; margin: 0px 20px 20px 50px; text-align:center; font-size:x-large">@ViewBag.Message</div> }
+else if (ViewBag.Error != null)
+{
+
+    <div style="background-color: #ff3333; height: 60px; box-shadow: 5px; margin: 0px 20px 20px 50px; text-align: center; font-size: x-large">@ViewBag.Error</div>///////////////////////////////*@ <!--<div class="modal">--> <!-- Modal content -->
+
+}
+
+<h2>Add New Data</h2>
+
+<form asp-action="CheckForUnExistData" asp-controller="CSDeliveryOrder">
+
+    <div class="form-row">
+        <div class="col-xs-12 col-sm-6 col-md-2 col-lg-6">
+            <label class="control-label" style="font-weight:bold">Search for New:</label>
+            <select id="newDataId" name="newDataId" asp-for="newDataId" class="selectFilter">
+                <option value="1">Customer</option>
+                <option value="2">Product</option>
+            </select>
+
+            <input type="submit" value="search" class="btn btn-primary searchbtn" />
+
+        </div>
+    </div>
+
+</form>
+
+@if (Model != null && Model.Customers != null && Model.newDataId == 1)
+{
+    @if (Model.Customers.Count > 0)
+    {
+        <form asp-controller="CSDeliveryOrder" asp-action="AddNewCustomers" method="post">
+            <table class="display table table-striped" style="text-align: center;  width:100%" id="example">
+                <thead class="table-dark">
+                    <tr>
+                        <th> Customer Number</th>
+                        <th> Customer Name </th>
+                        <th>Customer State</th>
+                        <th> Customer Zone</th>
+                        <th>Cutomer Type</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (int index = 0; index
+                 < Model.Customers.Count; index++)
+                    {
+                        <tr>
+                            <td>
+                                @Html.DisplayFor(model => model.Customers[index].Id)
+                                <input class="form-check-input" asp-for="Customers[index].Id" type="hidden" />
+
+
+                            </td>
+                            <td>
+                                <input class="form-check-input" asp-for="Customers[index].CustomerName" type="text" style="width:250px; height:30px" />
+
+                            </td>
+                            <td>
+                                <select id="Customers[@index].ZoneId" name="Customers[@index].ZoneId" asp-for="Customers[index].ZoneId"
+                                        class="form-select" asp-items="@(new SelectList(Model.States, "Id", "Name"))"></select>
+                            </td>
+                            <td>
+                                <select id="Customers[@index].ZoneId" name="Customers[@index].ZoneId" asp-for="Customers[index].ZoneId"
+                                        class="form-select"
+                                        asp-items="@(new SelectList(Model.Zones, "Id", "Name"))"></select>
+                            </td>
+
+                            <td>
+                                <select id="Customers[@index].CustomerType" name="Customers[@index].CustomerType" asp-for="Customers[index].CustomerType"
+                                        class="form-select">
+                                    <option value="1">Distributor</option>
+                                    <option value="2">Contractor</option>
+                                </select>
+                            </td>
+                        </tr>
+                    }
+
+                </tbody>
+            </table>
+            <input type="submit" value="Save" class="btn btn-primary btn-lg searchbtn" style="margin:auto" />
+        </form>
+    }
+}
+
+
+@if (Model != null && Model.Items!= null && Model.newDataId == 2)
+{
+    @if (Model.Items.Count > 0)
+    {
+        <form asp-controller="CSDeliveryOrder" asp-action="AddNewItems" method="post">
+            <table class="display table table-striped" style="text-align: center;  width:100%" id="example">
+                <thead class="table-dark">
+                    <tr>
+                        <th> Item Number</th>
+                        <th> Item Name </th>
+                        <th>Item Type</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (int index = 0; index < Model.Items.Count; index++)
+                    {
+                        <tr>
+                            <td>
+                                @Html.DisplayFor(model => model.Items[index].Id)
+                                <input class="form-check-input" asp-for="Items[index].Id" type="hidden" />
+                            </td>
+                            <td>
+                                <input class="form-check-input" asp-for="Items[index].Name" type="text" style="width:250px; height:30px" />
+                            </td>
+
+                            <td>
+                                <select id="Items[@index].type" name="Items[@index].type" asp-for="Items[index].type"
+                                        class="form-select">
+                                    <option value="1">Bags</option>
+                                    <option value="2">Bulk</option>
+                                </select>
+                            </td>
+                        </tr>
+                    }
+
+                </tbody>
+            </table>
+            <input type="submit" value="Save" class="btn btn-primary btn-lg searchbtn" style="margin:auto" />
+        </form>
+    }
+}
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
+
+<script language="javascript">
+    var today = new Date();
+    var dd = String(today.getDate()).padStart(2, '0');
+    var mm = String(today.getMonth() + 1).padStart(2, '0');
+    var yyyy = today.getFullYear();
+
+    today = yyyy + '-' + mm + '-' + dd;
+    $('#SelectedPriorityDate').attr('min', today);
+</script>

@@ -351,6 +351,7 @@ namespace PriorityApp.Controllers.CustomerService
             catch (Exception e)
 
             {
+                _logger.LogError(e.ToString());
                 return RedirectToAction("ERROR404");
             }
         }

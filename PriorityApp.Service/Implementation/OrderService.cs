@@ -382,5 +382,24 @@ namespace PriorityApp.Service.Implementation
             }
             return null; ;
         }
+
+
+        public async Task<List<OrderModel2>> GetUnExistDeliveryCustomers()
+        {
+            try
+            {
+                //var orders = _repository.Findlist().Result.Where(o => CustomerNumbers.Contains(o.CustomerId ??0)).Where(o=>o.PriorityDate == selectedPriorityDate);
+                var orders = _repository.Find(o => o.SavedBefore == false && o.OrderCategoryId ==(int)CommanData.OrderCategory.Delivery, false);
+
+                var models = new List<OrderModel2>();
+                models = _mapper.Map<List<OrderModel2>>(orders);
+                return models;
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e.ToString());
+            }
+            return null;
+        }
     }
 }

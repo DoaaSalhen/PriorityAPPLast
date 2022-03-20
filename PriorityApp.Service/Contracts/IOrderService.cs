@@ -34,7 +34,7 @@ namespace PriorityApp.Service.Contracts
         Task<OrderModel2> CreateOrder(OrderModel2 model, HoldModel holdModel);
 
         OrderModel2 GetSubmittedOrder(long id, bool submitted);
-
+        Task<List<OrderModel2>> GetUnExistDeliveryCustomers();
 
 
 

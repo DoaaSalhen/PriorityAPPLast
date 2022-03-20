@@ -15,5 +15,6 @@ namespace PriorityApp.Service.Contracts
         bool DeleteOrderCategory(int id);
         ItemModel GetCategory(int id);
         Task<List<OrderCategoryModel>> GetOrderCategoryByName(OrderCategoryModel model);
+
     }
 }

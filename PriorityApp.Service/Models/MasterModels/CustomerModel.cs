@@ -37,8 +37,8 @@ namespace PriorityApp.Service.Models.MasterModels
         public string Comment { get; set; }
         public string Truck { get; set; }
         public int PrioritySelectedId { get; set; }
-
-
+        public bool IsDelted { get; set; }
+        public bool IsVisible { get; set; }
 
     }
 }

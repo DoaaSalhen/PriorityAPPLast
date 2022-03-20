@@ -391,7 +391,10 @@ namespace PriorityApp.Controllers.CustomerService
             return Json(false);
 
         }
-        public async Task<JsonResult> SaveOrders2(OrderDetails orderModel)
+
+        [HttpPost]
+        public  async Task<bool> SaveOrders2(OrderDetails orderModel)
+        
         {
             AspNetUser applicationUser = await _userManager.GetUserAsync(User);
             try
@@ -399,113 +402,115 @@ namespace PriorityApp.Controllers.CustomerService
                 bool updateOrderResult = false;
                 int SavedOrderCount = 0;
                 bool AllOrdersSaved = true;
+                //foreach (var orderModel in checkedOrders)
+                //{
+                    HoldModel DBholdModel = _holdService.GetHold(orderModel.PriorityDate, orderModel.UserId);
+                    OrderModel2 updateModel = _orderService.GetOrder((long)orderModel.Id);
+                    if (updateModel.SavedBefore == true)
+                    {
+                        float changeRate = (float)orderModel.PriorityQuantity - (float)updateModel.PriorityQuantity;
 
-                HoldModel DBholdModel = _holdService.GetHold(orderModel.PriorityDate, orderModel.UserId);
-                OrderModel2 updateModel = _orderService.GetOrder((long)orderModel.Id);
-                if (updateModel.SavedBefore == true)
-                {
-                    float changeRate = (float)orderModel.PriorityQuantity - (float)updateModel.PriorityQuantity;
+                        if (orderModel.PriorityId == (int)CommanData.Priorities.Norm && updateModel.PriorityId == (int)CommanData.Priorities.Norm)
+                        {
+                            DBholdModel.ReminingQuantity = DBholdModel.ReminingQuantity - changeRate;
 
-                    if (orderModel.PriorityId == (int)CommanData.Priorities.Norm && updateModel.PriorityId == (int)CommanData.Priorities.Norm)
-                    {
-                        DBholdModel.ReminingQuantity = DBholdModel.ReminingQuantity - changeRate;
+                        }
+                        else if (orderModel.PriorityId == (int)CommanData.Priorities.Norm && updateModel.PriorityId == (int)CommanData.Priorities.Extra)
+                        {
+                            DBholdModel.ReminingQuantity = (float)DBholdModel.ReminingQuantity - (float)orderModel.PriorityQuantity - changeRate;
+                            DBholdModel.ExtraQuantity = (float)DBholdModel.ExtraQuantity - (float)orderModel.PriorityQuantity + changeRate;
+                        }
+                        else if (orderModel.PriorityId == (int)CommanData.Priorities.Extra && updateModel.PriorityId == (int)CommanData.Priorities.Norm)
+                        {
+                            DBholdModel.ReminingQuantity = (float)DBholdModel.ReminingQuantity + (float)updateModel.PriorityQuantity - changeRate;
+                            DBholdModel.ExtraQuantity = (float)DBholdModel.ExtraQuantity + (float)updateModel.PriorityQuantity + changeRate;
+                        }
 
-                    }
-                    else if (orderModel.PriorityId == (int)CommanData.Priorities.Norm && updateModel.PriorityId == (int)CommanData.Priorities.Extra)
-                    {
-                        DBholdModel.ReminingQuantity = (float)DBholdModel.ReminingQuantity - (float)orderModel.PriorityQuantity - changeRate;
-                        DBholdModel.ExtraQuantity = (float)DBholdModel.ExtraQuantity - (float)orderModel.PriorityQuantity + changeRate;
-                    }
-                    else if (orderModel.PriorityId == (int)CommanData.Priorities.Extra && updateModel.PriorityId == (int)CommanData.Priorities.Norm)
-                    {
-                        DBholdModel.ReminingQuantity = (float)DBholdModel.ReminingQuantity + (float)updateModel.PriorityQuantity - changeRate;
-                        DBholdModel.ExtraQuantity = (float)DBholdModel.ExtraQuantity + (float)updateModel.PriorityQuantity + changeRate;
+                        else if (orderModel.PriorityId == (int)CommanData.Priorities.Extra && updateModel.PriorityId == (int)CommanData.Priorities.Extra)
+                        {
+                            DBholdModel.ExtraQuantity = DBholdModel.ExtraQuantity + changeRate;
+
+                        }
+                        else if (orderModel.PriorityId == (int)CommanData.Priorities.No && updateModel.PriorityId == (int)CommanData.Priorities.Norm)
+                        {
+                            DBholdModel.ReminingQuantity = (float)DBholdModel.ReminingQuantity + (float)updateModel.PriorityQuantity;
+                        }
+                        else if (orderModel.PriorityId == (int)CommanData.Priorities.No && updateModel.PriorityId == (int)CommanData.Priorities.Extra)
+                        {
+                            DBholdModel.ExtraQuantity = (float)DBholdModel.ExtraQuantity - (float)updateModel.PriorityQuantity;
+                        }
+                        else if (orderModel.PriorityId == (int)CommanData.Priorities.Norm && updateModel.PriorityId == (int)CommanData.Priorities.No)
+                        {
+                            DBholdModel.ReminingQuantity = (float)DBholdModel.ReminingQuantity - (float)updateModel.PriorityQuantity - changeRate;
+                        }
+                        else if (orderModel.PriorityId == (int)CommanData.Priorities.Extra && updateModel.PriorityId == (int)CommanData.Priorities.No)
+                        {
+                            DBholdModel.ExtraQuantity = (float)DBholdModel.ExtraQuantity + (float)updateModel.PriorityQuantity + changeRate;
+                        }
                     }
 
-                    else if (orderModel.PriorityId == (int)CommanData.Priorities.Extra && updateModel.PriorityId == (int)CommanData.Priorities.Extra)
+                    else if (updateModel.SavedBefore == false && (orderModel.PriorityId == (int)CommanData.Priorities.Norm))
                     {
-                        DBholdModel.ExtraQuantity = DBholdModel.ExtraQuantity + changeRate;
-
-                    }
-                    else if (orderModel.PriorityId == (int)CommanData.Priorities.No && updateModel.PriorityId == (int)CommanData.Priorities.Norm)
-                    {
-                        DBholdModel.ReminingQuantity = (float)DBholdModel.ReminingQuantity + (float)updateModel.PriorityQuantity;
-                    }
-                    else if (orderModel.PriorityId == (int)CommanData.Priorities.No && updateModel.PriorityId == (int)CommanData.Priorities.Extra)
-                    {
-                        DBholdModel.ExtraQuantity = (float)DBholdModel.ExtraQuantity - (float)updateModel.PriorityQuantity;
-                    }
-                    else if (orderModel.PriorityId == (int)CommanData.Priorities.Norm && updateModel.PriorityId == (int)CommanData.Priorities.No)
-                    {
-                        DBholdModel.ReminingQuantity = (float)DBholdModel.ReminingQuantity - (float)updateModel.PriorityQuantity - changeRate;
-                    }
-                    else if (orderModel.PriorityId == (int)CommanData.Priorities.Extra && updateModel.PriorityId == (int)CommanData.Priorities.No)
-                    {
-                        DBholdModel.ExtraQuantity = (float)DBholdModel.ExtraQuantity + (float)updateModel.PriorityQuantity + changeRate;
-                    }
-                }
-
-                else if (updateModel.SavedBefore == false && (orderModel.PriorityId == (int)CommanData.Priorities.Norm))
-                {
-                    DBholdModel.ReminingQuantity = (float)DBholdModel.ReminingQuantity - (float)orderModel.PriorityQuantity;
-
-                }
-                else if (updateModel.SavedBefore == false && (orderModel.PriorityId == (int)CommanData.Priorities.Extra))
-                {
-                    DBholdModel.ExtraQuantity = (float)DBholdModel.ExtraQuantity + (float)orderModel.PriorityQuantity;
-
-                }
-                if (DBholdModel.ReminingQuantity > 0)
-                {
-                    if (orderModel.PriorityId != (int)CommanData.Priorities.No)
-                    {
-                        DBholdModel.TempReminingQuantity = DBholdModel.ReminingQuantity;
-                        updateModel.ItemId = orderModel.ItemId;
-                        updateModel.PriorityId = orderModel.PriorityId;
-                        updateModel.PriorityQuantity = orderModel.PriorityQuantity;
-                        updateModel.SavedBefore = true;
-                        updateModel.WHSavedID = applicationUser.Id;
-                        updateModel.Comment = orderModel.Comment;
-                        updateModel.Truck = orderModel.Truck;
-                        updateModel.OrderCategoryId = (int)CommanData.OrderCategory.Delivery;
-                    }
-                    else if (updateModel.SavedBefore == true && orderModel.PriorityId == (int)CommanData.Priorities.No)
-                    {
-                        DBholdModel.TempReminingQuantity = DBholdModel.ReminingQuantity;
-                        updateModel.PriorityId = orderModel.PriorityId;
-                        updateModel.SavedBefore = false;
-                        updateModel.Truck = "";
-                        updateModel.WHSavedID = applicationUser.Id;
-                        updateModel.PriorityQuantity = 0;
-                        updateModel.ItemId = orderModel.ItemId;
-                        updateModel.OrderCategoryId = (int)CommanData.OrderCategory.Delivery;
-                        updateModel.Comment = "";
+                        DBholdModel.ReminingQuantity = (float)DBholdModel.ReminingQuantity - (float)orderModel.PriorityQuantity;
 
                     }
-                    updateOrderResult = _orderService.UpdateOrder2(updateModel, DBholdModel).Result;
-                    if (updateOrderResult == true)
+                    else if (updateModel.SavedBefore == false && (orderModel.PriorityId == (int)CommanData.Priorities.Extra))
                     {
-                        SavedOrderCount = SavedOrderCount + 1;
+                        DBholdModel.ExtraQuantity = (float)DBholdModel.ExtraQuantity + (float)orderModel.PriorityQuantity;
+
+                    }
+                    if (DBholdModel.ReminingQuantity > 0)
+                    {
+                        if (orderModel.PriorityId != (int)CommanData.Priorities.No)
+                        {
+                            DBholdModel.TempReminingQuantity = DBholdModel.ReminingQuantity;
+                            updateModel.ItemId = orderModel.ItemId;
+                            updateModel.PriorityId = orderModel.PriorityId;
+                            updateModel.PriorityQuantity = orderModel.PriorityQuantity;
+                            updateModel.SavedBefore = true;
+                            updateModel.WHSavedID = applicationUser.Id;
+                            updateModel.Comment = orderModel.Comment;
+                            updateModel.Truck = orderModel.Truck;
+                            updateModel.OrderCategoryId = (int)CommanData.OrderCategory.Delivery;
+                        }
+                        else if (updateModel.SavedBefore == true && orderModel.PriorityId == (int)CommanData.Priorities.No)
+                        {
+                            DBholdModel.TempReminingQuantity = DBholdModel.ReminingQuantity;
+                            updateModel.PriorityId = orderModel.PriorityId;
+                            updateModel.SavedBefore = false;
+                            updateModel.Truck = "";
+                            updateModel.WHSavedID = applicationUser.Id;
+                            updateModel.PriorityQuantity = 0;
+                            updateModel.ItemId = orderModel.ItemId;
+                            updateModel.OrderCategoryId = (int)CommanData.OrderCategory.Delivery;
+                            updateModel.Comment = "";
+
+                        }
+                        updateOrderResult = _orderService.UpdateOrder2(updateModel, DBholdModel).Result;
+                        if (updateOrderResult == true)
+                        {
+                            SavedOrderCount = SavedOrderCount + 1;
+                        }
+                        else
+                        {
+                            AllOrdersSaved = false;
+                        }
+                        updateOrderResult = false;
                     }
                     else
                     {
-                        AllOrdersSaved = false;
+                        ViewBag.Error = " you do not have enough quantity";
+                        return false;
                     }
-                    updateOrderResult = false;
-                }
-                else
-                {
-                    ViewBag.Error = " you do not have enough quantity";
-                    return Json(false);
-                }
-
+                //}
+                return true;
             }
             catch (Exception e)
             {
-                return Json(false);
+                return false;
 
             }
-            return Json(true);
+            
         }
 
         [HttpPost]
@@ -1257,6 +1262,127 @@ namespace PriorityApp.Controllers.CustomerService
                 return RedirectToAction("ERROR404");
             }
 
+        }
+
+        public ActionResult CheckForUnExistData()
+        {
+            return View("CheckForUnExistData");
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult CheckForUnExistData(int newDataId)
+        {
+            try
+            {
+                NewDataModel Model = new NewDataModel();
+                Model.newDataId = 1;
+                if(newDataId == 1)
+                {
+                    Model.States = _stateService.GetAllStates().Result;
+                    Model.Zones = _zoneService.GetAllZones().Result.OrderBy(z => z.Name).ToList();
+                    List<CustomerModel> customerModels = _deliveryCustomerService.GetAllDeliveryCustomer().Result.ToList();
+                    List<long> customerIds = customerModels.Select(c => c.Id).ToList();
+                    List<OrderModel2> orders = _orderService.GetUnExistDeliveryCustomers().Result.ToList();
+                    List<OrderModel2> unCustomerOrder =orders.Where(o => customerIds.Contains(o.CustomerId)==false).ToList();
+                    List<CustomerModel> unexistCustomers = new List<CustomerModel>();
+                    foreach(var order in unCustomerOrder)
+                    {
+                        if(order.Customer == null)
+                        {
+                            CustomerModel customer = new CustomerModel();
+                            customer.Id = order.CustomerId;
+                            unexistCustomers.Add(customer);
+                        }
+                    }
+                    Model.Customers = unexistCustomers.Distinct<CustomerModel>().OrderBy(c=>c.Id).ToList();
+                }
+                else if(newDataId == 2)
+                {
+                    List<ItemModel> itemModels = _itemService.GetAllItems().Result.ToList();
+                    List<long> itemIds = itemModels.Select(i => i.Id).ToList();
+                    List<OrderModel2> orders = _orderService.GetUnExistDeliveryCustomers().Result.ToList();
+                    List<OrderModel2> unItemOrder = orders.Where(o => itemIds.Contains((long)o.ItemId) == false).ToList();
+                    List<ItemModel> unexistItems = new List<ItemModel>();
+                    foreach (var order in unItemOrder)
+                    {
+                        if (order.Item == null)
+                        {
+                            ItemModel item = new ItemModel();
+                            item.Id = (long)order.ItemId;
+                            unexistItems.Add(item);
+                        }
+                    }
+                    Model.Items = unexistItems.Distinct<ItemModel>().OrderBy(i=>i.Id).ToList();
+                }
+                return View("CheckForUnExistData",Model);
+            }
+            catch
+            {
+                return View();
+            }
+        }
+
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult AddNewCustomers(NewDataModel Model)
+        {
+            try
+            {
+                int addedCustomersCount = 0;
+               foreach(CustomerModel customer in Model.Customers)
+                {
+                    customer.CreatedDate = DateTime.Today;
+                    customer.UpdatedDate = DateTime.Today;
+                    customer.IsDelted = false;
+                    customer.IsVisible = true;
+
+                    if (_deliveryCustomerService.CreateDeliveryCustomer(customer).Result)
+                    {
+                        addedCustomersCount = addedCustomersCount + 1;
+                    }
+                }
+                ViewBag.Message = "Successful Process, " + addedCustomersCount + " New Customers have Added";
+            }
+            catch(Exception e)
+            {
+                _logger.LogError(e.ToString());
+                ViewBag.Error = "Failed Process";
+
+            }
+            return View("CheckForUnExistData");
+        }
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult AddNewItems(NewDataModel Model)
+        {
+            try
+            {
+                int addedItemsCount = 0;
+                foreach (ItemModel item in Model.Items)
+                {
+                    item.CreatedDate = DateTime.Today;
+                    item.UpdatedDate = DateTime.Today;
+                    item.IsDelted = false;
+                    item.IsVisible = true;
+                    if (_itemService.CreateItem(item).Result)
+                    {
+                        addedItemsCount = addedItemsCount + 1;
+                    }
+                }
+                ViewBag.Message = "Successful Process, " + addedItemsCount + " New Items have Added";
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e.ToString());
+                ViewBag.Error = "Failed Process";
+
+            }
+            return View("CheckForUnExistData");
         }
 
         // GET: CSDeliveryOrderController/Details/5

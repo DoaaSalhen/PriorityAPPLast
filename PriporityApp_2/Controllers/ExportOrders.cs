@@ -97,7 +97,7 @@ namespace PriorityApp.Controllers
 
                 MemoryStream memoryStream = _excelService.ExportToExcel(orders);
 
-                return File(memoryStream.ToArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Grid.xlsx");
+                return File(memoryStream.ToArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "ExportOrders.xlsx");
             }
             catch
             {

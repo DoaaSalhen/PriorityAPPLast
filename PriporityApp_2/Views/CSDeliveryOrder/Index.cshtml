@@ -173,9 +173,9 @@ else if (ViewBag.Error != null)
         {
             if (savedBefore == true && SavedValuesArray[index] == undefined) {
                 if (savedPriorityId == 3) {
-                    holdReminingQuantity3 = holdReminingQuantity3 + savedPriorityQuantity;
+                    holdReminingQuantity3 = parseFloat(holdReminingQuantity3) + savedPriorityQuantity;
                     tempholdReminingQuantity3 = tempholdReminingQuantity3 + savedPriorityQuantity;
-                    holdAssignedQuantity3 = holdAssignedQuantity3 - savedPriorityQuantity;
+                    holdAssignedQuantity3 = parseFloat(holdAssignedQuantity3) - savedPriorityQuantity;
                     tempholdAssignedQuantity3 = tempholdAssignedQuantity3 - savedPriorityQuantity;
                 }
                 if (savedPriorityId == 4) {
@@ -215,7 +215,7 @@ else if (ViewBag.Error != null)
             else
             {
 
-                var Details =
+                var orderModel =
                 {
                     Id: document.getElementById("OrderModel_orders_" + index + "__Id").value,
                     PriorityQuantity: document.getElementById("PQ" + index).value,
@@ -226,27 +226,32 @@ else if (ViewBag.Error != null)
                     PriorityDate: document.getElementById("SelectedPriorityDate").value,
                     UserId: document.getElementById("userId").value
                 }
-                var url = '@Url.Content("~/")' + "PriorityTool/CSDeliveryOrder/SaveOrders2";
-                $.getJSON(url, Details, function (data)
-                {
-                    if (document.getElementById("RBLI" + index).value == 3) {
-                        document.getElementById("tr" + index).style.backgroundColor = "lawngreen";
-                        document.getElementById("OrderModel_orders_" + index + "__SavedBefore").value = "True";
-                        checkboxes[index].checked = true;
-                    }
-                    else if (document.getElementById("RBLI" + index).value == 4) {
-                        document.getElementById("tr" + index).style.backgroundColor = " #ff4d4d";
-                        document.getElementById("OrderModel_orders_" + index + "__SavedBefore").value = "True";
-                        checkboxes[index].checked = true;
+                        $.ajax({
+                            url: '@Url.Content("~/")' + "PriorityTool/CSDeliveryOrder/SaveOrders2",
+                            data: orderModel,
+                            type: "POST",
+                            async: false,
+                            //processData: false,
+                            //contentType: false
+                            success: function (data) {
 
-                    }
-                    else if (document.getElementById("RBLI" + index).value == 2)
-                    {
-                        document.getElementById("tr" + index).style.backgroundColor = "";
-                        document.getElementById("OrderModel_orders_" + index + "__SavedBefore").value = "False";
-                        checkboxes[index].checked = false;
+                                if (document.getElementById("RBLI" + index).value == 3) {
+                                    document.getElementById("tr" + index).style.backgroundColor = "lawngreen";
+                                    document.getElementById("OrderModel_orders_" + index + "__SavedBefore").value = "True";
+                                    checkboxes[index].checked = true;
+                                }
+                                else if (document.getElementById("RBLI" + index).value == 4) {
+                                    document.getElementById("tr" + index).style.backgroundColor = " #ff4d4d";
+                                    document.getElementById("OrderModel_orders_" + index + "__SavedBefore").value = "True";
+                                    checkboxes[index].checked = true;
 
-                    }
+                                }
+                                else if (document.getElementById("RBLI" + index).value == 2) {
+                                    document.getElementById("tr" + index).style.backgroundColor = "";
+                                    document.getElementById("OrderModel_orders_" + index + "__SavedBefore").value = "False";
+                                    checkboxes[index].checked = false;
+                                }
+                            }
 
                 });
             }
@@ -327,8 +332,7 @@ else if (ViewBag.Error != null)
 
     function checkAllSelectedOrders(e)
     {
-        if (e.checked)
-        {
+        if (e.checked) {
             var elements = document.getElementsByClassName("Orders");
             var checkboxes = document.getElementsByClassName('CheckDeliveryOrders');
             var shownElements = [];
@@ -350,100 +354,80 @@ else if (ViewBag.Error != null)
                         //alert(eleIndex);
                     }
 
+                }
             }
-        }
-        var checkboxes = document.getElementsByClassName('CheckDeliveryOrders');
-        for (var checkIndex = 1; checkIndex < checkboxes.length; checkIndex++)
-        {
-            var saved = document.getElementById("OrderModel_orders_" + checkIndex + "__SavedBefore").value;
-            if (checkboxes[checkIndex].checked && saved == "False")
-            {
-                var remaining = parseFloat(document.getElementById("remaining").value);
-                var PriorityQuantity = parseFloat(document.getElementById("PQ" + checkIndex).value);
-               alert(checkIndex);
-               // alert(PriorityQuantity);
-                alert(remaining);
-                if (remaining >= PriorityQuantity)
-                {
-                    if (saved == "False")
-                    {
-                        var order = document.getElementById("RBLI" + checkIndex).value = 3;
-                        var Details =
-                        {
-                            Id: document.getElementById("OrderModel_orders_" + checkIndex + "__Id").value,
-                            PriorityQuantity: document.getElementById("PQ" + checkIndex).value,
-                            PriorityId: document.getElementById("RBLI" + checkIndex).value,
-                            Comment: document.getElementById("OrderModel_orders_" + checkIndex + "__Comment").value,
-                            Truck: document.getElementById("OrderModel_orders_" + checkIndex + "__Truck").value,
-                            ItemId: document.getElementById("OrderModel_orders_" + checkIndex + "__ItemId").value,
-                            PriorityDate: document.getElementById("SelectedPriorityDate").value,
-                            UserId: document.getElementById("userId").value
+            let checkboxes1 = document.getElementsByClassName('CheckDeliveryOrders');
+            var checkedOrders = new Array();
+            var promises = [];
+            for (let checkIndex = 1; checkIndex < checkboxes1.length; checkIndex++) {
+                let saved = document.getElementById("OrderModel_orders_" + checkIndex + "__SavedBefore").value;
+                if (checkboxes[checkIndex].checked && saved == "False") {
+                    let remaining = parseFloat(document.getElementById("remaining").value);
+                    let PriorityQuantity = parseFloat(document.getElementById("PQ" + checkIndex).value);
+                    //alert(checkIndex);
+                    // alert(PriorityQuantity);
+                    //alert(remaining);
+                    if (remaining >= PriorityQuantity) {
+                        if (saved == "False") {
+                            let order = document.getElementById("RBLI" + checkIndex).value = 3;
+                            var orderModel =
+                            {
+                                Id: document.getElementById("OrderModel_orders_" + checkIndex + "__Id").value,
+                                PriorityQuantity: document.getElementById("PQ" + checkIndex).value,
+                                PriorityId: document.getElementById("RBLI" + checkIndex).value,
+                                Comment: document.getElementById("OrderModel_orders_" + checkIndex + "__Comment").value,
+                                Truck: document.getElementById("OrderModel_orders_" + checkIndex + "__Truck").value,
+                                ItemId: document.getElementById("OrderModel_orders_" + checkIndex + "__ItemId").value,
+                                PriorityDate: document.getElementById("SelectedPriorityDate").value,
+                                UserId: document.getElementById("userId").value
+                            }
+                            $.ajax({
+                                url: '@Url.Content("~/")' + "PriorityTool/CSDeliveryOrder/SaveOrders2",
+                                data: orderModel,
+                                type: "POST",
+                                async: false,
+                                //processData: false,
+                                //contentType: false
+                                success: function (data) {
+                                    document.getElementById("remaining").value = parseFloat(document.getElementById("remaining").value) - parseFloat(orderModel.PriorityQuantity);
+                                    document.getElementById("sum").value = parseFloat(document.getElementById("sum").value) + parseFloat(orderModel.PriorityQuantity);
+                                    document.getElementById("total").value = parseFloat(document.getElementById("total").value) + parseFloat(orderModel.PriorityQuantity);
+                                    document.getElementById("OrderModel_orders_" + checkIndex + "__SavedBefore").value = "True";
+                                    document.getElementById("tr" + checkIndex).style.backgroundColor = "lawngreen";
+                                    holdReminingQuantity3 = parseFloat(document.getElementById("remaining").value);
+                                    holdAssignedQuantity3 = parseFloat(document.getElementById("total").value);
+                                }
+                            });
+                            alert(holdReminingQuantity3);
+                            alert(holdAssignedQuantity3);
                         }
-                        var url = '@Url.Content("~/")' + "PriorityTool/CSDeliveryOrder/SaveOrders2";
-                        $.getJSON(url, Details, function (data)
-                        {
+                        else {
+                            var orderNumber = document.getElementById("OrderModel_orders_" + checkIndex + "__OrderNumber").value;
+                            alert("Order number " + orderNumber + " has saved before");
+                        }
 
-                        });
-                        document.getElementById("remaining").value = parseFloat(document.getElementById("remaining").value) - parseFloat(Details.PriorityQuantity);
-                        document.getElementById("sum").value = parseFloat(document.getElementById("sum").value) + parseFloat(Details.PriorityQuantity);
-                        document.getElementById("total").value = parseFloat(document.getElementById("total").value) + parseFloat(Details.PriorityQuantity);
-                        document.getElementById("OrderModel_orders_" + checkIndex + "__SavedBefore").value = "True";
-                        document.getElementById("tr" + checkIndex).style.backgroundColor = "lawngreen";
-                        //alert(document.getElementById("OrderModel_orders_" + checkIndex + "__SavedBefore").value);
                     }
-                    else
-                    {
-                        var orderNumber = document.getElementById("OrderModel_orders_" + checkIndex + "__OrderNumber").value;
-                        alert("Oder number " + orderNumber +" has saved before");
+                    else {
+                        alert("you do not have enough quantity");
+                        break;
                     }
 
                 }
-                else
-                {
-                    alert("you do not have enough quantity");
-                    break;
-
-                }
-
             }
+
         }
-
-     }
-        //for (var ShownIndex = 0; ShownIndex < shownElements.length; ShownIndex++)
-        //{
-        //    alert(ShownIndex);
-        //}
-         //checkboxes[eleIndex].checked = !checkboxes[eleIndex].checked;
-
-
-        //var checkboxes = document.getElementsByClassName('CheckDeliveryOrders');
-        //for (var checkbox of checkboxes) {
-
-        //    checkbox.checked = !checkbox.checked;
-        //}
-        //var shownElementsCount = 0;
-        //var shownElements = document.getElementsByClassName("CheckDeliveryOrders");
-        //for (var i = 0; i < shownElements.length; i++)
-        //{
-        //    if (shownElements[i].checked)
-        //    {
-        //        shownElementsCount = shownElementsCount + 1;
-
-        //    }
-        //}
-        //alert(shownElements.length);
-        //alert(shownElementsCount);
     }
     function unSaveOrder(index)
     {
         var checkboxes = document.getElementsByClassName('CheckDeliveryOrders');
-        if (!checkboxes[index].checked) {
+        if (!checkboxes[index].checked)
+        {
             var order = document.getElementById("RBLI" + index).value;
             checkboxes[index].checked = false;
             if (order == 3) {
                 document.getElementById("RBLI" + index).value = 2;
 
-                var Details =
+                var orderModel =
                 {
                     Id: document.getElementById("OrderModel_orders_" + index + "__Id").value,
                     PriorityQuantity: document.getElementById("PQ" + index).value,
@@ -454,24 +438,35 @@ else if (ViewBag.Error != null)
                     PriorityDate: document.getElementById("SelectedPriorityDate").value,
                     UserId: document.getElementById("userId").value
                 }
-                var url = '@Url.Content("~/")' + "PriorityTool/CSDeliveryOrder/SaveOrders2";
-                $.getJSON(url, Details, function (data) {
-                    document.getElementById("remaining").value = parseFloat(document.getElementById("remaining").value) + parseFloat(Details.PriorityQuantity);
-                    document.getElementById("sum").value = parseFloat(document.getElementById("sum").value) - parseFloat(Details.PriorityQuantity);
-                    document.getElementById("total").value = parseFloat(document.getElementById("total").value) - parseFloat(Details.PriorityQuantity);
-                    document.getElementById("OrderModel_orders_" + index + "__SavedBefore").value = "False";
-                    document.getElementById("tr" + index).style.backgroundColor = "";
-                });
+               $.ajax({
+                            url: '@Url.Content("~/")' + "PriorityTool/CSDeliveryOrder/SaveOrders2",
+                            data: orderModel,
+                            type: "POST",
+                            async: false,
+                            //processData: false,
+                            //contentType: false
+                            success: function (data) {
+                                document.getElementById("remaining").value = parseFloat(document.getElementById("remaining").value) + parseFloat(orderModel.PriorityQuantity);
+                                document.getElementById("sum").value = parseFloat(document.getElementById("sum").value) - parseFloat(orderModel.PriorityQuantity);
+                                document.getElementById("total").value = parseFloat(document.getElementById("total").value) - parseFloat(orderModel.PriorityQuantity);
+                                document.getElementById("OrderModel_orders_" + checkIndex + "__SavedBefore").value = "True";
+                                document.getElementById("tr" + checkIndex).style.backgroundColor = "";
+                                holdReminingQuantity3 = parseFloat(document.getElementById("remaining").value);
+                                holdAssignedQuantity3 = parseFloat(document.getElementById("total").value);
+                            }
+                        });
 
             }
 
         }
-        else {
+        else
+        {
             var order = document.getElementById("RBLI" + index).value;
             checkboxes[index].checked = true;
-            if (order == 2) {
+            if (order == 2)
+            {
                 document.getElementById("RBLI" + index).value = 3;
-                var Details =
+                var orderModel =
                 {
                     Id: document.getElementById("OrderModel_orders_" + index + "__Id").value,
                     PriorityQuantity: document.getElementById("PQ" + index).value,
@@ -481,15 +476,25 @@ else if (ViewBag.Error != null)
                     ItemId: document.getElementById("OrderModel_orders_" + index + "__ItemId").value,
                     PriorityDate: document.getElementById("SelectedPriorityDate").value,
                     UserId: document.getElementById("userId").value
+                   
                 }
-                var url = '@Url.Content("~/")' + "PriorityTool/CSDeliveryOrder/SaveOrders2";
-                $.getJSON(url, Details, function (data) {
-                    document.getElementById("remaining").value = parseFloat(document.getElementById("remaining").value) - parseFloat(Details.PriorityQuantity);
-                    document.getElementById("sum").value = parseFloat(document.getElementById("sum").value) + parseFloat(Details.PriorityQuantity);
-                    document.getElementById("total").value = parseFloat(document.getElementById("total").value) + parseFloat(Details.PriorityQuantity);
-                    document.getElementById("OrderModel_orders_" + index + "__SavedBefore").value = "True";
-                    document.getElementById("tr" + index).style.backgroundColor = "lawngreen";
-                });
+                $.ajax({
+                            url: '@Url.Content("~/")' + "PriorityTool/CSDeliveryOrder/SaveOrders2",
+                            data: orderModel,
+                            type: "POST",
+                            async: false,
+                            //processData: false,
+                            //contentType: false
+                            success: function (data) {
+                                document.getElementById("remaining").value = parseFloat(document.getElementById("remaining").value) - parseFloat(orderModel.PriorityQuantity);
+                                document.getElementById("sum").value = parseFloat(document.getElementById("sum").value) + parseFloat(orderModel.PriorityQuantity);
+                                document.getElementById("total").value = parseFloat(document.getElementById("total").value) + parseFloat(orderModel.PriorityQuantity);
+                                document.getElementById("OrderModel_orders_" + checkIndex + "__SavedBefore").value = "True";
+                                document.getElementById("tr" + checkIndex).style.backgroundColor = "lawngreen";
+                                holdReminingQuantity3 = parseFloat(document.getElementById("remaining").value);
+                                holdAssignedQuantity3 = parseFloat(document.getElementById("total").value);
+                            }
+                        });
 
             }
         }
@@ -996,9 +1001,9 @@ else if (ViewBag.Error != null)
     <div class="form-group" style="margin-top:20px">
         <input type="submit" value="Save" asp-action="SaveDeliveryOrders" class="btn btn-primary btn-lg searchbtn" style="margin:auto" />
     </div>
-    <div class="form-group" style="margin-top:40px">
+    @*<div class="form-group" style="margin-top:40px">
         <input type="submit" value="Submit" asp-action="SubmitOrders" class="btn btn-primary btn-lg searchbtn" style="margin:auto" />
-    </div>
+    </div>*@
 </form>
 
 

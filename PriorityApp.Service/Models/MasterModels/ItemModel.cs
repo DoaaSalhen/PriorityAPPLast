@@ -7,7 +7,7 @@ namespace PriorityApp.Service.Models.MasterModels
 {
     public class ItemModel
     {
-        public int Id { get; set; }
+        public long Id { get; set; }
         [Required]
         public string Name { get; set; }
         [Required]
