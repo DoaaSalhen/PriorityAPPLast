@@ -92,7 +92,7 @@ namespace PriorityApp.Controllers
         // GET: DispatchController
         public async Task<ActionResult> Index()
         {
-            AspNetUser applicationUser =  _userManager.GetUserAsync(User).Result;
+            AspNetUser applicationUser = _userManager.GetUserAsync(User).Result;
             var subRegionModels = _regionService.GetAllISubRegions().Result;
             subRegionModels.Insert(0, new SubRegionModel { Id = -2, Name = "All" });
             geoFilterModel.SubRegions = subRegionModels;
@@ -109,9 +109,10 @@ namespace PriorityApp.Controllers
             geoFilterModel.SelectedPriorityDate = DateTime.Today;
             geoFilterModel.ToSelectedPriorityDate = DateTime.Today;
             geoFilterModel.DispatchCases = dispatchCaseModels;
-            userNotificationModels =  _userNotificationService.GetAllUnseenNotificationsForUser(applicationUser.Id);
+            userNotificationModels = _userNotificationService.GetAllUnseenNotificationsForUser(applicationUser.Id);
+
             geoFilterModel.userNotificationModels = userNotificationModels;
-            if(geoFilterModel.userNotificationModels.Count > 0)
+            if (geoFilterModel.userNotificationModels.Count > 0)
             {
                 geoFilterModel.LastSubmitNotificationId = userNotificationModels.Max(u => u.submitNotificationId);
 
@@ -288,7 +289,37 @@ namespace PriorityApp.Controllers
             }
         }
 
+        public async Task<JsonResult> updateSeenNotification(long id)
+        {
+            try
+            {
+                bool updateResult = false;
+                AspNetUser applicationUser = _userManager.GetUserAsync(User).Result;
+                List<UserNotificationModel> userNotificationModels = new List<UserNotificationModel>();
 
+                userNotificationModels = _userNotificationService.GetUserNotification(applicationUser.Id, id);
+                userNotificationModels.ForEach(u => u.Seen = true);
+                foreach (var userNotificationModel in userNotificationModels)
+                {
+                    updateResult = await _userNotificationService.UpdateUserNotification(userNotificationModel);
+
+                }
+                if (updateResult)
+                {
+                    return Json(true);
+                }
+                else
+                {
+                    return Json(false);
+                }
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e.ToString());
+            }
+            return Json(false);
+
+        }
 
 
 

@@ -4,7 +4,7 @@
 
 // Write your JavaScript code.
 "use strict";
-var connection = new signalR.HubConnectionBuilder().withUrl("/NotificationHub").build();
+var connection = new signalR.HubConnectionBuilder().withUrl("/PriorityTool/NotificationHub").build();
 connection.on("SubmitNotification", (Message, count, id) => {
     var notificationCount = parseInt(document.getElementById("notificationbg").textContent) + count;
     document.getElementById("notificationbg").value = notificationCount;
@@ -66,5 +66,5 @@ connection.on("SubmitNotification", (Message, count, id) => {
     //document.getElementById("articleList").appendChild(div);
 });
 connection.start().catch(function (err) {
-    return console.error(err.toString());
+    //return console.error(err.toString());
 });

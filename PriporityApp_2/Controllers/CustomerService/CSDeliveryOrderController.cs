@@ -1215,37 +1215,37 @@ namespace PriorityApp.Controllers.CustomerService
             return null;
 
         }
-        public async Task<JsonResult> updateSeenNotification(long id)
-        {
-            try
-            {
-                bool updateResult = false;
-                AspNetUser applicationUser = _userManager.GetUserAsync(User).Result;
-                List<UserNotificationModel> userNotificationModels = new List<UserNotificationModel>();
+        //public async Task<JsonResult> updateSeenNotification(long id)
+        //{
+        //    try
+        //    {
+        //        bool updateResult = false;
+        //        AspNetUser applicationUser = _userManager.GetUserAsync(User).Result;
+        //        List<UserNotificationModel> userNotificationModels = new List<UserNotificationModel>();
 
-                userNotificationModels = _userNotificationService.GetUserNotification(applicationUser.Id, id);
-                userNotificationModels.ForEach(u => u.Seen = true);
-                foreach (var userNotificationModel in userNotificationModels)
-                {
-                    updateResult = await _userNotificationService.UpdateUserNotification(userNotificationModel);
+        //        userNotificationModels = _userNotificationService.GetUserNotification(applicationUser.Id, id);
+        //        userNotificationModels.ForEach(u => u.Seen = true);
+        //        foreach (var userNotificationModel in userNotificationModels)
+        //        {
+        //            updateResult = await _userNotificationService.UpdateUserNotification(userNotificationModel);
 
-                }
-                if (updateResult)
-                {
-                    return Json(true);
-                }
-                else
-                {
-                    return Json(false);
-                }
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e.ToString());
-            }
-            return Json(false);
+        //        }
+        //        if (updateResult)
+        //        {
+        //            return Json(true);
+        //        }
+        //        else
+        //        {
+        //            return Json(false);
+        //        }
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        _logger.LogError(e.ToString());
+        //    }
+        //    return Json(false);
 
-        }
+        //}
 
 
         public async Task<IActionResult> Send(string toAddress)

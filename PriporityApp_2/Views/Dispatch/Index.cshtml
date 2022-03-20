@@ -44,12 +44,14 @@
 @if (Model.userNotificationModels != null)
 {
 <script>
-                    window.onload = function (e) {
-                        for (var i = 1; i <= @Model.userNotificationModels.Count; i++) {
+    window.onload = function (e) {
+        if (@Model.userNotificationModels.Count > 0) { 
 
-                            addNotificationToMenu(i, "There are new submitted orders");
-                        }
-
+                for (var i = 0; i < @Model.userNotificationModels.Count; i++)
+                {
+                  addNotificationToMenu(1, "There are new submitted orders", @Model.LastSubmitNotificationId);
+                }
+        }
                     }
 
 </script>            }

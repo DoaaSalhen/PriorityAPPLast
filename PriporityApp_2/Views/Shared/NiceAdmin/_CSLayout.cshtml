@@ -512,12 +512,15 @@
     <script>
         $(document).ready(function () {
 
-            $('#notificationGroup').click(function () {
+            $('#notificationbg').click(function () {
 
                 document.getElementById("notificationbg").innerText = 0;
-            var ddlsource = "#notificationId";
-            var url = '@Url.Content("~/")' + "CSDeliveryOrder/updateSeenNotification";
-            $.getJSON(url, { id: $(ddlsource).val() }, function (data) {
+                var ddlsource = "#notificationId";
+                //alert($(ddlsource).val());
+                //var url = '@Url.Content("~/")' + "PriorityTool/Dispatch/StateFilter";
+                var url = '@Url.Content("~/")' + "PriorityTool/Dispatch/updateSeenNotification";
+                //alert(url);
+                $.getJSON(url, { id: $(ddlsource).val() }, function (data) {
                     });
                 });
 
