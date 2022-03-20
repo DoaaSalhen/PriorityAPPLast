@@ -511,7 +511,16 @@ else if (ViewBag.Error != null)
 
     }
 </script>
-
+<script>
+    $(document).ready(function () {
+        $(window).keydown(function (event) {
+            if (event.keyCode == 13) {
+                event.preventDefault();
+                return false;
+            }
+        });
+    });
+</script>
 <script>
     //function sortTable(e) {
     //    var n = e.value;
