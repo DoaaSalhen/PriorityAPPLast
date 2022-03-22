@@ -469,7 +469,7 @@ namespace PriorityApp.Controllers.CustomerService
                         DBholdModel.ExtraQuantity = (float)DBholdModel.ExtraQuantity + (float)orderModel.PriorityQuantity;
 
                     }
-                    if (DBholdModel.ReminingQuantity > 0)
+                    if (DBholdModel.ReminingQuantity >= 0)
                     {
                         if (orderModel.PriorityId != (int)CommanData.Priorities.No)
                         {

@@ -177,7 +177,7 @@ else if (ViewBag.Error != null)
 
             if (savedBefore == true && SavedValuesArray[index] == undefined) {
                 if (savedPriorityId == 3) {
-                    alert("test");
+                    //alert("test");
                     holdReminingQuantity3 = parseFloat(holdReminingQuantity3) + savedPriorityQuantity;
                     tempholdReminingQuantity3 = tempholdReminingQuantity3 + savedPriorityQuantity;
                     holdAssignedQuantity3 = parseFloat(holdAssignedQuantity3) - savedPriorityQuantity;
@@ -343,7 +343,7 @@ else if (ViewBag.Error != null)
             var checkboxes = document.getElementsByClassName('CheckDeliveryOrders');
             var shownElements = [];
             var shownCount = 0;
-            for (var eleIndex = 1; eleIndex < elements.length ; eleIndex++)
+            for (var eleIndex = 0; eleIndex < elements.length ; eleIndex++)
             {
                 //alert(document.getElementById("OrderModel_orders_" + eleIndex + "__SavedBefore"));
 
@@ -365,7 +365,7 @@ else if (ViewBag.Error != null)
             let checkboxes1 = document.getElementsByClassName('CheckDeliveryOrders');
             var checkedOrders = new Array();
             var promises = [];
-            for (let checkIndex = 1; checkIndex < checkboxes1.length; checkIndex++) {
+            for (let checkIndex = 0; checkIndex < checkboxes1.length; checkIndex++) {
                 let saved = document.getElementById("OrderModel_orders_" + checkIndex + "__SavedBefore").value;
                 if (checkboxes[checkIndex].checked && saved == "False") {
                     let remaining = parseFloat(document.getElementById("remaining").value);
@@ -402,7 +402,7 @@ else if (ViewBag.Error != null)
                                     document.getElementById("tr" + checkIndex).style.backgroundColor = "lawngreen";
                                     holdReminingQuantity3 = parseFloat(document.getElementById("remaining").value);
                                     holdAssignedQuantity3 = parseFloat(document.getElementById("total").value);
-                                    alert(document.getElementById("OrderModel_orders_" + checkIndex + "__SavedBefore").value);
+                                    //alert(document.getElementById("OrderModel_orders_" + checkIndex + "__SavedBefore").value);
                                 }
                             });
                             //alert(holdReminingQuantity3);
