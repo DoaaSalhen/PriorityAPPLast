@@ -401,5 +401,22 @@ namespace PriorityApp.Service.Implementation
             }
             return null;
         }
+
+        public async Task<List<OrderModel2>> getPODNamesForCustomer(long customerNumber, DateTime priorityDate)
+        {
+            try
+            {
+                List<Order> orders =  _repository.Find(o => o.CustomerId == customerNumber && o.PriorityDate == priorityDate).ToList();
+                var models = new List<OrderModel2>();
+                models = _mapper.Map<List<OrderModel2>>(orders);
+                return models;
+
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e.ToString());
+            }
+            return null;
+        }
     }
 }

@@ -27,3 +27,14 @@ else if (ViewBag.Error != null)
 <form asp-action="DownloadQuotaTemplate">
     <input type="submit" value="Download Template" class="btn btn-link" style="margin-bottom:40px" />
 </form>
+<hr />
+<h2 style="margin-top:40px;margin-bottom:40px">Transfer Today Hold Quota</h2>
+<form asp-action="TransferYesterdayRemaining" asp-controller="Hold" method="post" enctype="multipart/form-data">
+    <div class="form-row">
+        <div class="col-xs-12 col-sm-6 col-md-6 col-lg-4 selectFilter" style="display:inline-block">
+            <label class="control-label" style="margin-right:10px; font-weight:bold">Transfer To Date:- </label><input type="date" id="TransferDate" name="TransferDate" style="height:50px" />
+        </div>
+    </div>
+    <input type="submit" value="Transfer" class="btn btn-success" style="margin-bottom:40px; margin-left:170px; margin-top:30px" />
+
+</form>

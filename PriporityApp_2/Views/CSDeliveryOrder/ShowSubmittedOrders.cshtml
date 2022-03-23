@@ -194,8 +194,8 @@ else if (ViewBag.Error != null)
         <div class="form-row">
             <div class="col-xs-15 col-sm-6 col-md-6 col-lg-6 selectFilter" style="display:inline-block">
                 <label class="control-label" style="display:block">Priority Date</label>
-                <label class="control-label" style="margin-right:10px">From</label><input type="date" id="SelectedPriorityDate" asp-for="SelectedPriorityDate" onchange="toFromDateCompare()" />
-                <label class="control-label" style="margin-left:40px; margin-right:10px">To</label><input type="date" id="ToSelectedPriorityDate" asp-for="ToSelectedPriorityDate" onchange="toFromDateCompare()" />
+                <label class="control-label" style="margin-right:10px">From</label><input type="date" id="SelectedPriorityDate" asp-for="SelectedPriorityDate" onblur="toFromDateCompare()" />
+                <label class="control-label" style="margin-left:40px; margin-right:10px">To</label><input type="date" id="ToSelectedPriorityDate" asp-for="ToSelectedPriorityDate" onblur="toFromDateCompare()" />
                 <input type="hidden" asp-for="orderType" value=1 />
             </div>
 

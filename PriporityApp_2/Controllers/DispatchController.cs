@@ -33,6 +33,7 @@ namespace PriorityApp.Controllers
         private readonly IDeliveryCustomerService _deliveryCustomerService;
         private readonly IItemService _itemService;
         private readonly IUserNotificationService _userNotificationService;
+        private readonly IOrderCategoryService _orderCategoryService;
         private readonly UserManager<AspNetUser> _userManager;
         private readonly IExcelService _excelService;
         private readonly ILogger<DispatchController> _logger;
@@ -53,7 +54,8 @@ namespace PriorityApp.Controllers
                                IExcelService excelService,
                                IHubContext<NotificationHub> hub,
                                ILogger<DispatchController> logger,
-                               IUserNotificationService userNotificationService)
+                               IUserNotificationService userNotificationService,
+                               IOrderCategoryService orderCategoryService)
         {
             _regionService = regionService;
             _stateService = stateService;
@@ -66,6 +68,7 @@ namespace PriorityApp.Controllers
             _excelService = excelService;
             _logger = logger;
             _userNotificationService = userNotificationService;
+            _orderCategoryService = orderCategoryService;
         }
 
         List<ItemModel> itemModels = new List<ItemModel>();
@@ -109,6 +112,8 @@ namespace PriorityApp.Controllers
             geoFilterModel.SelectedPriorityDate = DateTime.Today;
             geoFilterModel.ToSelectedPriorityDate = DateTime.Today;
             geoFilterModel.DispatchCases = dispatchCaseModels;
+            geoFilterModel.orderCategoryModels = _orderCategoryService.GetAllOrderCategories().Result.ToList();
+            geoFilterModel.orderCategoryModels.Insert(0, new OrderCategoryModel { Id = -1, Name = "All" });
             userNotificationModels = _userNotificationService.GetAllUnseenNotificationsForUser(applicationUser.Id);
 
             geoFilterModel.userNotificationModels = userNotificationModels;
@@ -189,9 +194,17 @@ namespace PriorityApp.Controllers
                 {
                     orderModels = orderModels.Where(o => o.Dispatched == false).ToList();
                 }
-                Model.ordersQuantitySum = (float) orderModels.Sum(o => o.PriorityQuantity);
                 Model.OrderModel = new OrderModel();
-                Model.OrderModel.orders = orderModels;
+                if(Model.orderType != -1)
+                {
+                    Model.OrderModel.orders = orderModels.Where(o=>o.OrderCategoryId == Model.orderType).ToList();
+
+                }
+                else
+                {
+                    Model.OrderModel.orders = orderModels;
+                }
+                Model.ordersQuantitySum = (float)Model.OrderModel.orders.Sum(o => o.PriorityQuantity);
                 Model.Customers = customerModels;
                 Model.SubRegions = _regionService.GetAllISubRegions().Result;
                 Model.SubRegions.Insert(0, new SubRegionModel { Id = -2, Name = "All" });
@@ -203,6 +216,9 @@ namespace PriorityApp.Controllers
                 Model.Items = itemModels;
                 Model.ItemSelectedId = -1; Model.DispatchCases = dispatchCaseModels;
                 Model.FilterColoumns = filterColoumns;
+                Model.orderCategoryModels = _orderCategoryService.GetAllOrderCategories().Result.ToList();
+                Model.orderCategoryModels.Insert(0, new OrderCategoryModel { Id = -1, Name = "All" });
+                Model.ToSelectedPriorityDate = Model.SelectedPriorityDate;
                 return View("Index", Model);
             }
             catch

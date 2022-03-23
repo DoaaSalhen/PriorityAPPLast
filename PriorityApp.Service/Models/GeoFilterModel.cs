@@ -48,11 +48,11 @@ namespace PriorityApp.Service.Models
         public int PendingSelectedId { get; set; }
         public bool SavedOnly { get; set; }
         public bool PendingOnly { get; set; }
-
-
         public List<SortingModel> FilterColoumns;
-
-
+        public List<CustomerModel> ordersCustomers { get; set; }
+        public List<string> CustomersPODNames { get; set; }
+        public long OrderCustomerId { get; set; }
+        public List<OrderCategoryModel> orderCategoryModels { get; set; }
 
     }
 }

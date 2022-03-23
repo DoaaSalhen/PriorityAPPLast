@@ -210,6 +210,35 @@ namespace PriorityApp.Controllers.CustomerService
             }
             return Json(new SelectList(stateModels, "Id", "Name"));
         }
+        
+        //[HttpPost]
+        public async Task<JsonResult> PODFilter(long id, DateTime priorityDate)
+        {
+            List<OrderModel2> orderModels = new List<OrderModel2>();
+            List<SearchPODData> PODNames = new List<SearchPODData>();
+            if (id == -1)
+            {
+                PODNames = null;
+            }
+            else
+            {
+                orderModels = _orderService.getPODNamesForCustomer(id, priorityDate).Result.ToList();
+                foreach (var order in orderModels)
+                {
+                    SearchPODData PODData = new SearchPODData
+                    {
+                        PODName = order.PODName,
+                        PODNumber = order.PODNumber
+                    };
+                    PODNames.Add(PODData);
+                }
+                var PODGroups = PODNames.GroupBy(p => p.PODNumber).ToList();
+                PODNames = PODGroups.Select(g => g.First()).ToList();
+                PODNames.Insert(0, new SearchPODData { PODNumber = "All", PODName = "All" });
+            }
+            return Json(new SelectList(PODNames, "PODNumber", "PODName"));
+
+        }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -314,7 +343,11 @@ namespace PriorityApp.Controllers.CustomerService
 
                     Model.OrderModel = new OrderModel();
                     Model.OrderModel.orders = orderModels.OrderBy(o => o.Customer.CustomerName).ToList();
-                    Model.Customers = customerModels;
+                     var orderModelCustomers= orderModels.Select(o => o.Customer).ToList();
+                     var cutomersGroups = orderModelCustomers.GroupBy(c => c.Id);
+                     Model.ordersCustomers = cutomersGroups.Select(g => g.First()).ToList();
+                    Model.ordersCustomers.Insert(0, new CustomerModel { Id = -1, CustomerName = "select customer" });
+                    //Model.ordersCustomers
                     //Model.Priorities = _priorityService.GetAllPriorities().Result.ToList();
                     //TerritoryModel territoryModel = _territoryService.GetTerritory(Model.TerritorySelectedId);
                     //Model.HoldModel = _holdService.GetHold(Model.SelectedPriorityDate.Date, territoryModel.userId);
@@ -882,7 +915,7 @@ namespace PriorityApp.Controllers.CustomerService
                         }
                     }
                     //List<SubmitNotificationModel> submitNotificationModels = _submitNotificationService.GetUnseenNotifications();
-                    await _hub.Clients.All.SendAsync("SubmitNotification", "you have New submitted  orders", 1, NewsubmitNotificationModel.Id);
+                    await _hub.Clients.All.SendAsync("SubmitNotification", "you have New "+ status +" submitted  orders", 1, NewsubmitNotificationModel.Id);
                     //var testMail = await Send("doaa.abdel.ext@cemex.com");
                     return RedirectToAction("Index");
                 }
@@ -1100,7 +1133,7 @@ namespace PriorityApp.Controllers.CustomerService
                     Model.Territories.Insert(0, new TerritoryModel { Id = -2, Name = "All" });
                     }
                     Model.FilterColoumns = filterColoumns;
-
+                    Model.ToSelectedPriorityDate = Model.SelectedPriorityDate;
                 //}
                 //else
                 //{
@@ -1305,7 +1338,9 @@ namespace PriorityApp.Controllers.CustomerService
                             unexistCustomers.Add(customer);
                         }
                     }
-                    Model.Customers = unexistCustomers.Distinct<CustomerModel>().OrderBy(c=>c.Id).ToList();
+                    var unexistCustomersGroup = unexistCustomers.GroupBy(u => u.Id).ToList();
+                    Model.Customers = unexistCustomersGroup.Select(g => g.First()).ToList();
+                    Model.Customers = Model.Customers.OrderBy(c=>c.CustomerName).ToList();
                 }
                 else if(newDataId == 2)
                 {
@@ -1323,7 +1358,9 @@ namespace PriorityApp.Controllers.CustomerService
                             unexistItems.Add(item);
                         }
                     }
-                    Model.Items = unexistItems.Distinct<ItemModel>().OrderBy(i=>i.Id).ToList();
+                    var unexistItemsGroup = unexistItems.GroupBy(i => i.Id).ToList();
+                    Model.Items = unexistItemsGroup.Select(g => g.First()).ToList();
+                    Model.Items = Model.Items.OrderBy(i => i.Name).ToList();
                 }
                 return View("CheckForUnExistData",Model);
             }
@@ -1332,8 +1369,6 @@ namespace PriorityApp.Controllers.CustomerService
                 return View();
             }
         }
-
-
 
         [HttpPost]
         [ValidateAntiForgeryToken]

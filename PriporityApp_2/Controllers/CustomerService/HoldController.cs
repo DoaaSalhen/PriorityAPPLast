@@ -122,7 +122,7 @@ namespace PriorityApp.Controllers.CustomerService
         [Authorize(Roles = "SuperAdmin, Admin, CustomerService")]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult TransferYesterdayRemaining()
+        public ActionResult TransferYesterdayRemaining(DateTime TransferDate)
         {
             try
             {
@@ -134,7 +134,7 @@ namespace PriorityApp.Controllers.CustomerService
                 {
                     if(!todayHold.RemainingTranferred)
                     {
-                        var tomorrowHold = _holdService.GetLastHoldByUserIdAndPriorityDate(todayHold.userId, DateTime.Today.AddDays(1));
+                        var tomorrowHold = _holdService.GetLastHoldByUserIdAndPriorityDate(todayHold.userId, TransferDate);
                         if (tomorrowHold != null)
                         {
                             tomorrowHold.QuotaQuantity = tomorrowHold.QuotaQuantity + todayHold.ReminingQuantity;

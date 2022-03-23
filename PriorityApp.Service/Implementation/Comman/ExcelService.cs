@@ -32,7 +32,7 @@ namespace PriorityApp.Service.Implementation.Comman
             try
             {
                 DataTable dt = new DataTable("Grid");
-                dt.Columns.AddRange(new DataColumn[21] { new DataColumn("Order Type"),
+                dt.Columns.AddRange(new DataColumn[22] { new DataColumn("Order Type"),
                                             new DataColumn("Priority Date"),
                                             new DataColumn("Area"),
                                             new DataColumn("Territory"),
@@ -42,6 +42,7 @@ namespace PriorityApp.Service.Implementation.Comman
                                             new DataColumn("Ty"),
                                             new DataColumn("Line"),
                                             new DataColumn("Item"),
+                                            new DataColumn("POD Number"),
                                             new DataColumn("POD Alfa Name"),
                                             new DataColumn("Address"),
                                             new DataColumn("Zone"),
@@ -59,11 +60,11 @@ namespace PriorityApp.Service.Implementation.Comman
                 {
                     DateTime date = (DateTime) order.SubmitTime;
                     
-                    dt.Rows.Add(order.OrderCategory.Name,order.PriorityDate,order.Customer.zone.Territory.state.Name, order.Customer.zone.Territory.Name, order.Customer.Id, 
+                    dt.Rows.Add(order.OrderCategory.Name,order.PriorityDate,order.Customer.zone.Territory.state.Name, order.Customer.zone.Territory.Name, order.CustomerId, 
                         order.Customer.CustomerName, order.OrderNumber,order.OrderDocument, order.LineID,
-                        order.ItemId, order.PODName, order.PODZoneAddress,
+                        order.ItemId, order.PODNumber , order.PODName, order.PODZoneAddress,
                         order.PODZoneName, order.PODZoneState, order.PriorityQuantity,
-                        order.Priority.Name, order.Comment, order.Comment, order.Status, date.Date.ToString("dd-MM-yyyy"), date.ToShortTimeString());
+                        order.Priority.Name, order.Comment, order.Truck, order.Status, date.Date.ToString("dd-MM-yyyy"), date.ToShortTimeString());
                 }
 
                 using (XLWorkbook wb = new XLWorkbook())

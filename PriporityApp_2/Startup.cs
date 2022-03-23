@@ -124,7 +124,14 @@ namespace PriporityApp_2
             services.AddMvc().AddRazorPagesOptions(options => {
                 options.Conventions.AddAreaPageRoute("Identity", "/Account/Login", "");
             }).SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
-           
+            services.AddCors(options =>
+            {
+                options.AddPolicy("CorsPolicy",
+                    builder => builder.WithOrigins("http://20.86.97.165/PriorityTool")
+                    .AllowAnyMethod()
+                    .AllowAnyHeader()
+                    .AllowCredentials());
+            });
             services.AddSignalR();
             services.Configure<FormOptions>(options =>
             {
@@ -156,7 +163,6 @@ namespace PriporityApp_2
            app.UseRouting();
             app.UseAuthentication();
             app.UseAuthorization();
-           
             app.UseMvc();
 
             app.UseEndpoints(endpoints =>
@@ -165,7 +171,7 @@ namespace PriporityApp_2
                     name: "default",
                     pattern: "{PriorityTool}/{controller=Item}/{action=Index}/{id?}");
                 endpoints.MapRazorPages();
-                endpoints.MapHub<NotificationHub>("PriorityTool/NotificationHub");
+                endpoints.MapHub<NotificationHub>("/NotificationHub");
 
             });
 

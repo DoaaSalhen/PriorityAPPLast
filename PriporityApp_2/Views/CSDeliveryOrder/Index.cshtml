@@ -153,6 +153,32 @@ else if (ViewBag.Error != null)
         });
 
 
+        $('#OrderCustomerId').change(function () {
+            var ddlsource = "#OrderCustomerId";
+            var PODItems = '';
+            var searchPODData =
+            {
+                customerNumber: $(ddlsource).val(),
+                priorityDate: document.getElementById("SelectedPriorityDate").value
+            }
+            if ($(ddlsource).val() != -1)
+            {
+                var url = '@Url.Content("~/")' + "PriorityTool/CSDeliveryOrder/PODFilter";
+                $.getJSON(url, { id: $(ddlsource).val(), priorityDate: document.getElementById("SelectedPriorityDate").value }, function (data)
+               {
+                   $('#PODSelectedId').empty();
+                    $.each(data, function (i, POD) {
+                        PODItems += "<option value='" + POD.value + "'>" + POD.text + "</option>";
+                    });
+                   $('#PODSelectedId').html(PODItems);
+                });
+            }
+            else
+            {
+                $('#PODSelectedId').html(PODItems);
+            }
+        });
+
     });
     var AssignedValuesArray = [];
     var SavedValuesArray = [];
@@ -425,14 +451,15 @@ else if (ViewBag.Error != null)
 
         }
     }
-    function unSaveOrder(index)
+    function unSaveOrder(e, index)
     {
         var checkboxes = document.getElementsByClassName('CheckDeliveryOrders');
-        if (!checkboxes[index].checked)
+        if (e.checked == false)
         {
             var order = document.getElementById("RBLI" + index).value;
-            checkboxes[index].checked = false;
-            if (order == 3) {
+            e.checked = false;
+            if (order == 3)
+            {
                 document.getElementById("RBLI" + index).value = 2;
 
                 var orderModel =
@@ -462,6 +489,7 @@ else if (ViewBag.Error != null)
                                 document.getElementById("tr" + index).style.backgroundColor = "";
                                 holdReminingQuantity3 = parseFloat(document.getElementById("remaining").value);
                                 holdAssignedQuantity3 = parseFloat(document.getElementById("total").value);
+                                e.value = false;
                             }
                         });
 
@@ -471,7 +499,7 @@ else if (ViewBag.Error != null)
         else
         {
             var order = document.getElementById("RBLI" + index).value;
-            checkboxes[index].checked = true;
+            e.checked = true;
             if (order == 2)
             {
 
@@ -505,6 +533,8 @@ else if (ViewBag.Error != null)
                             document.getElementById("tr" + index).style.backgroundColor = "lawngreen";
                             holdReminingQuantity3 = parseFloat(document.getElementById("remaining").value);
                             holdAssignedQuantity3 = parseFloat(document.getElementById("total").value);
+                            e.value = true;
+
                         }
                     });
                 }
@@ -634,7 +664,36 @@ else if (ViewBag.Error != null)
             return $.isNumeric(valA) && $.isNumeric(valB) ? valA - valB : valA.toString().localeCompare(valB)
         }
     }
-    function getCellValue(row, index) { return $(row).children('td').eq(index).text() }
+    function getCellValue(row, index) {
+        return $(row).children('td').eq(index).text()
+    }
+
+
+    function filterPOD() {
+        // Variables
+        let PODDrobDown, table, rows, cells, POD, filter;
+        PODDrobDown = document.getElementById("PODSelectedId");
+        table = document.getElementById("example");
+        rows = table.getElementsByTagName("tr");
+        filter = PODDrobDown.value;
+        // Loops through rows and hides those with countries that don't match the filter
+        for (let idx = 1; idx < rows.length; idx++)
+        {
+            // `for...of` loops through the NodeList
+            cells = rows[idx].getElementsByTagName("td");
+            POD = cells[4] || null; // gets the 2nd `td` or nothing
+
+            // if the filter is set to 'All', or this is the header row, or 2nd `td` text matches filter
+            if (filter === "All"  || (filter == POD.textContent.trim()))
+            {
+                rows[idx].style.display = ""; // shows this row
+            }
+            else
+            {
+                rows[idx].style.display = "none"; // hides this row
+            }
+        }
+    }
 </script>
 
 
@@ -704,7 +763,7 @@ else if (ViewBag.Error != null)
                         <select id="SubRegionSelectedId" name="SubRegionSelectedId" asp-for="SubRegionSelectedId"
                                 class="form-select form-select-lg mb-3"
                                 asp-items="@(new SelectList(Model.SubRegions, "Id", "Name"))"></select>
-                    </div>  }
+                    </div>}
                 @if (Model.States == null)
                 {
                     <div class="col-xs-12 col-sm-6 col-md-6 col-lg-2 selectFilter" style="display:inline-block">
@@ -720,7 +779,7 @@ else if (ViewBag.Error != null)
                         <select id="StateSelectedId" name="StateSelectedId" asp-for="StateSelectedId"
                                 class="form-select form-select-lg mb-3"
                                 asp-items="@(new SelectList(Model.States, "Id", "Name"))"></select>
-                    </div>  }
+                    </div>}
 
                 @if (Model.Territories == null)
                 {
@@ -766,6 +825,7 @@ else if (ViewBag.Error != null)
                     <option value="2">Pend Only</option>
                 </select>
             </div>
+
             @*<input type="checkbox" id="SavedOnly" asp-for="SavedOnly" name="SavedOnly" style="margin-left:20px;" />
                 <label class="control-label" style="margin-right:20px;">SavedOnly</label>*@
             <input type="submit" value="Search" class="btn btn-primary btn-lg searchbtn" />
@@ -775,10 +835,37 @@ else if (ViewBag.Error != null)
 
 
     </div>
+    <div style="width:2000px"><div style="margin-bottom:10px; font-weight:bold">Filter By</div>
+    @if (Model.ordersCustomers != null)
+    {
+        <div class="col-xs-12 col-sm-6 col-md-6 col-lg-2 selectFilter" style="display:inline-block; margin-top:-500px; margin-left:20px;">
+            <label class="control-label">Customers</label>
+            <select id="OrderCustomerId" name="OrderCustomerId" asp-for="OrderCustomerId"
+                    class="form-select form-select-lg mb-3"
+                    asp-items="@(new SelectList(Model.ordersCustomers, "Id", "CustomerName"))"></select>
+        </div>
+
+        <div class="col-xs-12 col-sm-6 col-md-6 col-lg-2 selectFilter" style="display:inline-block">
+            <label class="control-label">POD Name</label>
+            <select id="PODSelectedId" name="PODSelectedId"
+                    class="form-select form-select-lg mb-3"
+                    asp-items="@(new SelectList(string.Empty))" onchange="filterPOD()"></select>
+        </div>
+    }
+    @if (Model.CustomersPODNames != null)
+    {
+        <div class="col-xs-12 col-sm-6 col-md-6 col-lg-2 selectFilter" style="display:inline-block">
+            <label class="control-label">POD Name</label>
+            <select id="PODSelectedId" name="PODSelectedId"
+                    class="form-select form-select-lg mb-3"
+                    asp-items="@(new SelectList(Model.CustomersPODNames))" onchange="filterPOD()"></select>
+        </div>
+    }
+    </div>
     @if (Model.FilterColoumns == null)
     {
         <div class="col-xs-12 col-sm-6 col-md-6 col-lg-2 selectFilter" style="display:inline-block">
-            <label class="control-label">Sort by</label>
+            <label class="control-label" style="font-weight: bold">Sort By</label>
             <select multiple id="sortingDD" name="sortingDD"
                     class="form-select form-select-lg mb-3"
                     asp-items="@(new SelectList(string.Empty, "ID", "Name","Type"))"></select>
@@ -786,11 +873,16 @@ else if (ViewBag.Error != null)
     else
     {
         <div class="col-xs-12 col-sm-6 col-md-6 col-lg-2 selectFilter" style="display:inline-block">
-            <label class="control-label">Sort by</label>
+            <label class="control-label" style="font-weight: bold">Sort by</label>
             <select multiple id="sortingDD" name="sortingDD"
                     class="form-select form-select-lg mb-3"
                     asp-items="@(new SelectList(Model.FilterColoumns, "ID", "Name", "Type"))" onclick="sorting(this.value)"></select>
         </div>}
+
+
+
+
+
 
 </form>
 
@@ -846,7 +938,7 @@ else if (ViewBag.Error != null)
                             else
                             {
                                 <td class="skip-filter">
-                                    <input type="checkbox" id="dispatchedCheckListId" class="CheckDeliveryOrders" asp-for="OrderModel.orders[index].SavedBefore" onchange="unSaveOrder(@index)" value="@Model.OrderModel.orders[index].SavedBefore" />
+                                    <input type="checkbox" id="dispatchedCheckListId" class="CheckDeliveryOrders" asp-for="OrderModel.orders[index].SavedBefore" onchange="unSaveOrder(this, @index)" value="@Model.OrderModel.orders[index].SavedBefore" />
                                 </td>
 }
                             <td>

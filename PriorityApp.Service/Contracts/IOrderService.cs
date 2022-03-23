@@ -36,6 +36,7 @@ namespace PriorityApp.Service.Contracts
         OrderModel2 GetSubmittedOrder(long id, bool submitted);
         Task<List<OrderModel2>> GetUnExistDeliveryCustomers();
 
+        Task<List<OrderModel2>> getPODNamesForCustomer(long customerNumber, DateTime priorityDate);
 
 
 
