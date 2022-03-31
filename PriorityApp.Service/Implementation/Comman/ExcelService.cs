@@ -59,12 +59,23 @@ namespace PriorityApp.Service.Implementation.Comman
                 foreach (var order in models)
                 {
                     DateTime date = (DateTime) order.SubmitTime;
-                    
-                    dt.Rows.Add(order.OrderCategory.Name,order.PriorityDate,order.Customer.zone.Territory.state.Name, order.Customer.zone.Territory.Name, order.CustomerId, 
-                        order.Customer.CustomerName, order.OrderNumber,order.OrderDocument, order.LineID,
-                        order.ItemId, order.PODNumber , order.PODName, order.PODZoneAddress,
-                        order.PODZoneName, order.PODZoneState, order.PriorityQuantity,
-                        order.Priority.Name, order.Comment, order.Truck, order.Status, date.Date.ToString("dd-MM-yyyy"), date.ToShortTimeString());
+
+                    if (order.OrderCategoryId == 1)
+                    {
+                        dt.Rows.Add(order.OrderCategory.Name, order.PriorityDate, order.Customer.zone.Territory.state.Name, order.Customer.zone.Territory.Name, order.CustomerId,
+                      order.Customer.CustomerName, order.OrderNumber, order.OrderDocument, order.LineID,
+                      order.ItemId, order.PODNumber, order.PODName.Trim(), order.PODZoneAddress.Trim(),
+                      order.PODZoneName.Trim(), order.PODZoneState.Trim(), order.PriorityQuantity,
+                      order.Priority.Name, order.Comment, order.Truck, order.Status, date.Date.ToString("dd-MM-yyyy"), date.ToShortTimeString());
+                    }
+                    else
+                    {
+                        dt.Rows.Add(order.OrderCategory.Name, order.PriorityDate, order.Customer.zone.Territory.state.Name, order.Customer.zone.Territory.Name, order.CustomerId,
+                      order.Customer.CustomerName, order.OrderNumber, order.OrderDocument, order.LineID,
+                      order.ItemId, order.PODNumber, order.PODName, order.PODZoneAddress,
+                      order.PODZoneName, order.PODZoneState, order.PriorityQuantity,
+                      order.Priority.Name, order.Comment, order.Truck, order.Status, date.Date.ToString("dd-MM-yyyy"), date.ToShortTimeString());
+                    }
                 }
 
                 using (XLWorkbook wb = new XLWorkbook())

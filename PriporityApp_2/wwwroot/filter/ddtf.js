@@ -119,7 +119,7 @@ $.fn.ddTableFilter.defaultOptions = {
   emptyText:'--Empty--',
   sortOpt:true,
   debug:false,
-  minOptions:2
+  minOptions:1
 }
 
 })(jQuery);

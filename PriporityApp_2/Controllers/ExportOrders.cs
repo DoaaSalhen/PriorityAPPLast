@@ -5,6 +5,7 @@ using PriorityApp.Service.Contracts;
 using PriorityApp.Service.Contracts.Comman;
 using PriorityApp.Service.Models;
 using PriorityApp.Service.Models.MasterModels;
+using PriporityApp_2.Controllers;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -13,7 +14,7 @@ using System.Threading.Tasks;
 
 namespace PriorityApp.Controllers
 {
-    public class ExportOrders : Controller
+    public class ExportOrders : BaseController
     {
         private readonly IExcelService _excelService;
 

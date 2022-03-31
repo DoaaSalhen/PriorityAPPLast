@@ -137,7 +137,7 @@ namespace PriorityApp.Service.Implementation.CustomerService
 
                         sqlBulkCopy.ColumnMappings.Add("SDSHAN", "PODNumber");            //11
                         sqlBulkCopy.ColumnMappings.Add("ABALPH01", "PODName");             //12
-                        sqlBulkCopy.ColumnMappings.Add("ABAC08", "PODZoneName");        //13
+                        sqlBulkCopy.ColumnMappings.Add("DRDL01", "PODZoneName");        //13
                         sqlBulkCopy.ColumnMappings.Add("STATE_D01", "PODZoneState");      //16
                         sqlBulkCopy.ColumnMappings.Add("ALADD1", "PODZoneAddress");      //20
                         sqlBulkCopy.ColumnMappings.Add("QNTY", "OrderQuantity");                 //17
@@ -165,7 +165,17 @@ namespace PriorityApp.Service.Implementation.CustomerService
             {
                 // var orders = _repository.Findlist().Result.GroupBy(x => x.OrderNumber).Where(x => x.Count() > 1).Select(x => x.Where(x => x.SavedBefore == false && x.OrderCategoryId == (int)CommanData.OrderCategory.Delivery)).ToList();
                 //var orders = _repository.Findlist().Result.Where(x => x.SavedBefore == false && x.OrderCategoryId == (int)CommanData.OrderCategory.Delivery).GroupBy(x => x.OrderNumber).Where(x => x.Count() > 1).ToList();
-                var orders2 = _repository.Findlist().Result.Where(x=>x.OrderCategoryId == (int)CommanData.OrderCategory.Delivery).GroupBy(x => x.OrderNumber).Where(x => x.Count() > 1).ToList();
+                var unSavedOrders2 = _repository.Findlist().Result.Where(x => x.OrderCategoryId == (int)CommanData.OrderCategory.Delivery && x.SavedBefore == false).GroupBy(x => new { x.OrderNumber, x.PriorityDate }).Where(x => x.Count() > 1).ToList();
+                foreach (var unSavedOrders2Group in unSavedOrders2)
+                {
+                    var x = unSavedOrders2Group.ToList();
+                    for (int Oindex = 1; Oindex < x.Count; Oindex++)
+                    {
+                        _repository.DeleteById(x[Oindex].Id);
+
+                    }
+                }
+                var orders2 = _repository.Findlist().Result.Where(x => x.OrderCategoryId == (int)CommanData.OrderCategory.Delivery).GroupBy(x => x.OrderNumber).Where(x => x.Count() > 1).ToList();
                 foreach (var order2 in orders2)
                 {
                     float OriginalQuantity = 0;
@@ -174,47 +184,51 @@ namespace PriorityApp.Service.Implementation.CustomerService
                     Order mainOrder = new Order();
                     foreach (var order in order2.ToList())
                     {
-                            if (order.SavedBefore == false)
+                        if (order.SavedBefore == false)
+                        {
+                            var SavedOrder = _repository.Find(o => o.OrderNumber == order.OrderNumber && o.SavedBefore == true);
+                            if (SavedOrder.Any())
                             {
                                 _repository.DeleteById(order.Id);
                             }
-                            else if(order.SavedBefore == true)
-                            {
-                                priorityQuantitySum = priorityQuantitySum + (float)order.PriorityQuantity;
-                                OriginalQuantity = (float) order.OrginalQuantity;
-                                mainOrder = order;
-                                order.OrderQuantity = order.PriorityQuantity;
-                                _orderRepository.Update(order);
-                            }
+                        }
+                        else if (order.SavedBefore == true)
+                        {
+                            priorityQuantitySum = priorityQuantitySum + (float)order.PriorityQuantity;
+                            OriginalQuantity = (float)order.OrginalQuantity;
+                            mainOrder = order;
+                            order.OrderQuantity = order.PriorityQuantity;
+                            _orderRepository.Update(order);
+                        }
                     }
-                            if(priorityQuantitySum < OriginalQuantity)
-                            {
-                                partialOrder.OrderNumber = mainOrder.OrderNumber;
-                                partialOrder.CustomerId = mainOrder.CustomerId;
-                                partialOrder.ItemId = mainOrder.ItemId;
-                                partialOrder.OrderCategoryId = mainOrder.OrderCategoryId;
-                                partialOrder.OrderDate = mainOrder.OrderDate;
-                                partialOrder.OrderDocument = mainOrder.OrderDocument;
-                                partialOrder.OrginalQuantity = mainOrder.OrginalQuantity;
-                                partialOrder.PODName = mainOrder.PODName;
-                                partialOrder.PODNumber = mainOrder.PODNumber;
-                                partialOrder.PODZoneAddress = mainOrder.PODZoneAddress;
-                                partialOrder.PODZoneName = mainOrder.PODZoneName;
-                                partialOrder.PODZoneState = mainOrder.PODZoneState;
-                                partialOrder.PriorityDate = DateTime.Today;
-                                partialOrder.PriorityId = (int)CommanData.Priorities.No;
-                                partialOrder.SavedBefore = false;
-                                partialOrder.Submitted = false;
-                                partialOrder.LineID = mainOrder.LineID;
-                                partialOrder.Dispatched = false;
-                                partialOrder.OrderQuantity = OriginalQuantity - priorityQuantitySum;
-                                var newOrder = _orderRepository.Add(partialOrder);
-                                if (newOrder == null)
-                                {
-                                    return false;
-                                }
+                    if (priorityQuantitySum < OriginalQuantity)
+                    {
+                        partialOrder.OrderNumber = mainOrder.OrderNumber;
+                        partialOrder.CustomerId = mainOrder.CustomerId;
+                        partialOrder.ItemId = mainOrder.ItemId;
+                        partialOrder.OrderCategoryId = mainOrder.OrderCategoryId;
+                        partialOrder.OrderDate = mainOrder.OrderDate;
+                        partialOrder.OrderDocument = mainOrder.OrderDocument;
+                        partialOrder.OrginalQuantity = mainOrder.OrginalQuantity;
+                        partialOrder.PODName = mainOrder.PODName;
+                        partialOrder.PODNumber = mainOrder.PODNumber;
+                        partialOrder.PODZoneAddress = mainOrder.PODZoneAddress;
+                        partialOrder.PODZoneName = mainOrder.PODZoneName;
+                        partialOrder.PODZoneState = mainOrder.PODZoneState;
+                        partialOrder.PriorityDate = DateTime.Today;
+                        partialOrder.PriorityId = (int)CommanData.Priorities.No;
+                        partialOrder.SavedBefore = false;
+                        partialOrder.Submitted = false;
+                        partialOrder.LineID = mainOrder.LineID;
+                        partialOrder.Dispatched = false;
+                        partialOrder.OrderQuantity = OriginalQuantity - priorityQuantitySum;
+                        var newOrder = _orderRepository.Add(partialOrder);
+                        if (newOrder == null)
+                        {
+                            return false;
+                        }
                     }
-                            
+
                 }
                 return true;
             }
@@ -287,6 +301,9 @@ namespace PriorityApp.Service.Implementation.CustomerService
                 foreach (DataRow row in dt.Rows)
                 {
                     var customerNumber = row[21];
+                    string PODZone = row["DRDL01"].ToString().Trim();
+                    string[] PODZoneArr = PODZone.Split(",");
+                    row["DRDL01"] = PODZoneArr[0];
                     if (customerNumber.ToString() != "")
                     {
                         row["OrderCategoryId"] = (int)CommanData.OrderCategory.Delivery;

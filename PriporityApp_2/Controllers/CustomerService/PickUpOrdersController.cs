@@ -413,6 +413,8 @@ namespace PriorityApp.Controllers.CustomerService
                                     if(customer.PrioritySelectedId == (int) CommanData.Priorities.Norm)
                                     {
                                         hold.ReminingQuantity = hold.ReminingQuantity - (int)item.Quantity;
+                                        hold.TempReminingQuantity = hold.ReminingQuantity;
+
                                     }
                                     else if(customer.PrioritySelectedId == (int) CommanData.Priorities.Extra)
                                     {

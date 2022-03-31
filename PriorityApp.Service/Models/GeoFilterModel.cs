@@ -53,6 +53,7 @@ namespace PriorityApp.Service.Models
         public List<string> CustomersPODNames { get; set; }
         public long OrderCustomerId { get; set; }
         public List<OrderCategoryModel> orderCategoryModels { get; set; }
+        public List<int> SelectedTypeIds { get; set; }
 
     }
 }

@@ -113,7 +113,7 @@ namespace PriorityApp.Controllers.CustomerService
                     warehouseOrderModel.SelectedPriorityDate = DateTime.Today;
                     warehouseOrderModel.HoldModel = _holdService.GetLastHoldByUserIdAndPriorityDate(applicationUser.Id, warehouseOrderModel.SelectedPriorityDate);
                 }
-                
+
                 return View(warehouseOrderModel);
             }
             catch (Exception e)
@@ -196,8 +196,8 @@ namespace PriorityApp.Controllers.CustomerService
             {
                 return RedirectToAction("ERROR404");
             }
-            
-            
+
+
         }
 
         [HttpPost]
@@ -221,7 +221,7 @@ namespace PriorityApp.Controllers.CustomerService
                     List<TerritoryModel> territoryModels = null;
 
                     territoryModels = _territoryService.GetTerritoryByUserId(applicationUser.Id);
-                     hold = _holdService.GetHold(model.SelectedPriorityDate, territoryModels.First().userId);
+                    hold = _holdService.GetHold(model.SelectedPriorityDate, territoryModels.First().userId);
 
 
                 }
@@ -236,15 +236,15 @@ namespace PriorityApp.Controllers.CustomerService
                 }
                 if (hold != null)
                 {
-                     Message = "there is an error";
+                    Message = "there is an error";
                     orderModel2.OrderNumber = 0;
                     orderModel2.PriorityDate = model.HoldModel.PriorityDate;
                     orderModel2.WHSavedID = applicationUser.Id;
                     orderModel2.SavedBefore = true;
                     orderModel2.Submitted = false;
                     orderModel2.OrderCategoryId = (int)CommanData.OrderCategory.Warehouse;
-                    foreach (var warehouseOrder in model.WarehouseModel2.Where(w=>w.PrioritySelectedId !=(int) CommanData.Priorities.No))
-                     {
+                    foreach (var warehouseOrder in model.WarehouseModel2.Where(w => w.PrioritySelectedId != (int)CommanData.Priorities.No))
+                    {
                         orderModel2.PriorityId = warehouseOrder.PrioritySelectedId;
                         orderModel2.Comment = warehouseOrder.Comment;
                         orderModel2.CustomerId = warehouseOrder.WarehouseSelectedId;
@@ -253,7 +253,7 @@ namespace PriorityApp.Controllers.CustomerService
                             if (warehouseOrder.PrioritySelectedId == (int)CommanData.Priorities.Norm)
                             {
                                 totalQuantity = warehouseOrder.itemModels.Sum(w => w.Quantity);
-                                if (totalQuantity >= hold.ReminingQuantity)
+                                if (totalQuantity > hold.ReminingQuantity)
                                 {
                                     enoughQuantity = false;
                                 }
@@ -308,7 +308,7 @@ namespace PriorityApp.Controllers.CustomerService
                             if (warehouseOrder.PrioritySelectedId == (int)CommanData.Priorities.Norm)
                             {
                                 totalQuantity = warehouseOrder.itemModels.Sum(w => w.Quantity);
-                                if (totalQuantity >= hold.ReminingQuantity)
+                                if (totalQuantity > hold.ReminingQuantity)
                                 {
                                     enoughQuantity = false;
                                 }
@@ -357,17 +357,17 @@ namespace PriorityApp.Controllers.CustomerService
 
                             }
                         }
-                        
+
                     }
 
                 }
                 return RedirectToAction("AssignWarehouseOrder");
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 return RedirectToAction("ERROR404");
             }
-           // return View("AssignWarehouseOrder");
+            // return View("AssignWarehouseOrder");
         }
         //public async Task<IActionResult> Send(string toAddress)
         //{
@@ -449,26 +449,26 @@ namespace PriorityApp.Controllers.CustomerService
                 DateTime selectedPriorityDate = Model.SelectedPriorityDate.Date;
                 AspNetUser applicationUser = await _userManager.GetUserAsync(User);
                 List<string> roles = (List<string>)_userManager.GetRolesAsync(applicationUser).Result;
-                if(!roles.Contains("Sales"))
+                if (!roles.Contains("Sales"))
                 {
-                     userId = _territoryService.GetTerritory(Model.TerritorySelectedId).userId;
+                    userId = _territoryService.GetTerritory(Model.TerritorySelectedId).userId;
                 }
                 else
                 {
-                     userId = applicationUser.Id;
+                    userId = applicationUser.Id;
                 }
-                HoldModel hold= _holdService.GetLastHoldByUserIdAndPriorityDate(userId, Model.SelectedPriorityDate);
-                List <WarehouseOrderHoldModel> warehouseOrderHoldModels = _warehouseOrderHoldService.GetWarehouseOrderHold(userId, Model.SelectedPriorityDate).ToList();
+                HoldModel hold = _holdService.GetLastHoldByUserIdAndPriorityDate(userId, Model.SelectedPriorityDate);
+                List<WarehouseOrderHoldModel> warehouseOrderHoldModels = _warehouseOrderHoldService.GetWarehouseOrderHold(userId, Model.SelectedPriorityDate).ToList();
                 if (Model.ViewCase == "edit")
                 {
                     foreach (var warehouseOrderHoldModel in warehouseOrderHoldModels)
                     {
                         var order = _orderService.GetOrder(warehouseOrderHoldModel.OrderId);
-                        if(order.Submitted== false)
+                        if (order.Submitted == false)
                         {
                             warehouseOrderHoldModel.Order = _orderService.GetOrder(warehouseOrderHoldModel.OrderId);
                         }
-                        
+
                     }
                     warehouseOrderHoldModels = warehouseOrderHoldModels.Where(WH => WH.Order != null).ToList();
                 }
@@ -501,7 +501,7 @@ namespace PriorityApp.Controllers.CustomerService
                 Model.Territories.Insert(0, new TerritoryModel { Id = -1, Name = "Select Territory" });
                 Model.Items = _itemService.GetItemsByType("Bags").Result;
 
-                if(Model.ViewCase == "Show")
+                if (Model.ViewCase == "Show")
                 {
                     return View("ShowSubmittedWarehouseOrder", Model);
                 }
@@ -511,7 +511,7 @@ namespace PriorityApp.Controllers.CustomerService
 
                 }
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 return RedirectToAction("ERROR404");
             }
@@ -534,7 +534,7 @@ namespace PriorityApp.Controllers.CustomerService
                     HoldModel DBholdModel = _holdService.GetHold(Model.HoldModel.PriorityDate, Model.HoldModel.userId);
                     OrderModel2 updateModel = _orderService.GetOrder((long)warehouseModel.Order.Id);
                     if (updateModel.Submitted == false && ((warehouseModel.Order.PriorityId != updateModel.PriorityId) || (warehouseModel.Order.PriorityQuantity != updateModel.PriorityQuantity)))
-                      {
+                    {
                         if (warehouseModel.Order.SavedBefore == true)
                         {
                             float changeRate = (float)warehouseModel.Order.PriorityQuantity - (float)updateModel.PriorityQuantity;
@@ -553,7 +553,7 @@ namespace PriorityApp.Controllers.CustomerService
                             else if (warehouseModel.Order.PriorityId == (int)CommanData.Priorities.Extra && updateModel.PriorityId == (int)CommanData.Priorities.Norm)
                             {
                                 DBholdModel.ReminingQuantity = (float)DBholdModel.ReminingQuantity + (float)updateModel.PriorityQuantity - changeRate;
-                                DBholdModel.ExtraQuantity = (float)DBholdModel.ExtraQuantity + (float)updateModel.PriorityQuantity + changeRate; 
+                                DBholdModel.ExtraQuantity = (float)DBholdModel.ExtraQuantity + (float)updateModel.PriorityQuantity + changeRate;
 
                             }
                             else if (warehouseModel.Order.PriorityId == (int)CommanData.Priorities.Extra && updateModel.PriorityId == (int)CommanData.Priorities.Extra)
@@ -561,7 +561,7 @@ namespace PriorityApp.Controllers.CustomerService
                                 DBholdModel.ExtraQuantity = DBholdModel.ExtraQuantity + changeRate;
 
                             }
-                            else if (warehouseModel.Order.PriorityId== (int)CommanData.Priorities.No && updateModel.PriorityId == (int)CommanData.Priorities.Norm)
+                            else if (warehouseModel.Order.PriorityId == (int)CommanData.Priorities.No && updateModel.PriorityId == (int)CommanData.Priorities.Norm)
                             {
                                 DBholdModel.ReminingQuantity = (float)DBholdModel.ReminingQuantity + (float)updateModel.PriorityQuantity - changeRate;
                             }
@@ -586,33 +586,41 @@ namespace PriorityApp.Controllers.CustomerService
                     }
                     if (warehouseModel.Order.PriorityId != (int)CommanData.Priorities.No)
                     {
-                        DBholdModel.TempReminingQuantity = DBholdModel.ReminingQuantity;
-                        updateModel.ItemId = warehouseModel.Order.ItemId;
-                        updateModel.PriorityId = warehouseModel.Order.PriorityId;
-                        updateModel.PriorityQuantity = warehouseModel.Order.PriorityQuantity;
-                        updateModel.SavedBefore = true;
-                        updateModel.WHSavedID = applicationUser.Id;
-                        updateModel.Comment = warehouseModel.Order.Comment;
-                        updateModel.Truck = warehouseModel.Order.Truck;
-                        updateModel.OrderCategoryId = (int)CommanData.OrderCategory.Warehouse;
+                        if (DBholdModel.ReminingQuantity >= 0)
+                        {
+                            DBholdModel.TempReminingQuantity = DBholdModel.ReminingQuantity;
+                            updateModel.ItemId = warehouseModel.Order.ItemId;
+                            updateModel.PriorityId = warehouseModel.Order.PriorityId;
+                            updateModel.PriorityQuantity = warehouseModel.Order.PriorityQuantity;
+                            updateModel.SavedBefore = true;
+                            updateModel.WHSavedID = applicationUser.Id;
+                            updateModel.Comment = warehouseModel.Order.Comment;
+                            updateModel.Truck = warehouseModel.Order.Truck;
+                            updateModel.OrderCategoryId = (int)CommanData.OrderCategory.Warehouse;
+                            updateOrderResult = _orderService.UpdateOrder2(updateModel, DBholdModel).Result;
+
+                        }
+
                     }
                     else if (updateModel.SavedBefore == true && warehouseModel.Order.PriorityId == (int)CommanData.Priorities.No)
                     {
+                        if (DBholdModel.ReminingQuantity >= 0)
+                        {
+                            DBholdModel.TempReminingQuantity = DBholdModel.ReminingQuantity;
+                            updateModel.PriorityId = warehouseModel.Order.PriorityId;
+                            updateModel.SavedBefore = false;
+                            updateModel.Truck = "";
+                            updateModel.WHSavedID = applicationUser.Id;
+                            updateModel.PriorityQuantity = 0;
+                            updateModel.ItemId = warehouseModel.Order.ItemId;
+                            updateModel.OrderCategoryId = (int)CommanData.OrderCategory.Warehouse;
+                            updateModel.Comment = "";
+                            updateOrderResult = _orderService.UpdateOrder2(updateModel, DBholdModel).Result;
 
-                        updateModel.PriorityId = warehouseModel.Order.PriorityId;
-                        updateModel.SavedBefore = false;
-                        updateModel.Truck = "";
-                        updateModel.WHSavedID = applicationUser.Id;
-                        updateModel.PriorityQuantity = 0;
-                        updateModel.ItemId = warehouseModel.Order.ItemId;
-                        updateModel.OrderCategoryId = (int)CommanData.OrderCategory.Warehouse;
-                        updateModel.Comment = "";
-
+                        }
 
                     }
 
-
-                    updateOrderResult = _orderService.UpdateOrder2(updateModel, DBholdModel).Result;
                     if (updateOrderResult == true)
                     {
                         SavedOrderCount = SavedOrderCount + 1;

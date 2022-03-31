@@ -504,7 +504,8 @@ else if (ViewBag.Error != null)
             {
 
                 var remain = parseFloat(document.getElementById("remaining").value) - parseFloat(document.getElementById("PQ" + index).value);
-                if (remain > 0) {
+                var PQ = document.getElementById("PQ" + index).value;
+                if (remain >= PQ) {
                     document.getElementById("RBLI" + index).value = 3;
                     var orderModel =
                     {

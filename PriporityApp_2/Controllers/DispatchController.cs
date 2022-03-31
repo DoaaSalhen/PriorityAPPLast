@@ -113,7 +113,6 @@ namespace PriorityApp.Controllers
             geoFilterModel.ToSelectedPriorityDate = DateTime.Today;
             geoFilterModel.DispatchCases = dispatchCaseModels;
             geoFilterModel.orderCategoryModels = _orderCategoryService.GetAllOrderCategories().Result.ToList();
-            geoFilterModel.orderCategoryModels.Insert(0, new OrderCategoryModel { Id = -1, Name = "All" });
             userNotificationModels = _userNotificationService.GetAllUnseenNotificationsForUser(applicationUser.Id);
 
             geoFilterModel.userNotificationModels = userNotificationModels;
@@ -195,10 +194,19 @@ namespace PriorityApp.Controllers
                     orderModels = orderModels.Where(o => o.Dispatched == false).ToList();
                 }
                 Model.OrderModel = new OrderModel();
-                if(Model.orderType != -1)
-                {
-                    Model.OrderModel.orders = orderModels.Where(o=>o.OrderCategoryId == Model.orderType).ToList();
+                //if(Model.orderType != -1)
+                //{
+                //    Model.OrderModel.orders = orderModels.Where(o=>o.OrderCategoryId == Model.orderType).ToList();
 
+                //}
+                //else
+                //{
+                //    Model.OrderModel.orders = orderModels;
+                //}
+                if (Model.SelectedTypeIds != null)
+                {
+
+                    Model.OrderModel.orders = orderModels.Where(o => Model.SelectedTypeIds.Contains((int)o.OrderCategoryId) == true).ToList();
                 }
                 else
                 {
@@ -217,7 +225,6 @@ namespace PriorityApp.Controllers
                 Model.ItemSelectedId = -1; Model.DispatchCases = dispatchCaseModels;
                 Model.FilterColoumns = filterColoumns;
                 Model.orderCategoryModels = _orderCategoryService.GetAllOrderCategories().Result.ToList();
-                Model.orderCategoryModels.Insert(0, new OrderCategoryModel { Id = -1, Name = "All" });
                 Model.ToSelectedPriorityDate = Model.SelectedPriorityDate;
                 return View("Index", Model);
             }
