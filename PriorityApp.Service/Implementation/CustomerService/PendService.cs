@@ -322,11 +322,15 @@ namespace PriorityApp.Service.Implementation.CustomerService
                         {
                             row.Delete();
                         }
-                        if (customerNumber.ToString().Contains("P"))
+                        if(row.RowState != DataRowState.Deleted)
                         {
-                            customerNumber = customerNumber.ToString().Replace("P", "1");
-                            row["SDPA8"] = Convert.ToInt64(customerNumber);
+                            if (customerNumber.ToString().Contains("P"))
+                            {
+                                customerNumber = customerNumber.ToString().Replace("P", "1");
+                                row["SDPA8"] = Convert.ToInt64(customerNumber);
+                            }
                         }
+                        
                     }
                 }
                 ////////////////////////////// replace ZoneCode by zoneId
