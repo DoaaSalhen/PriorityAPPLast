@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Repository.EntityFramework;
 
 namespace Repository.EntityFramework.Migrations
 {
     [DbContext(typeof(APPDBContext))]
-    partial class APPDBContextModelSnapshot : ModelSnapshot
+    [Migration("20220331061006_add-coloumn-RemainingTranferredFrom-to-holds-table")]
+    partial class addcoloumnRemainingTranferredFromtoholdstable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -70,7 +72,7 @@ namespace Repository.EntityFramework.Migrations
                     b.Property<bool>("RemainingTranferred")
                         .HasColumnType("bit");
 
-                    b.Property<DateTime?>("RemainingTranferredFrom")
+                    b.Property<DateTime>("RemainingTranferredFrom")
                         .HasColumnType("datetime2");
 
                     b.Property<float>("ReminingQuantity")

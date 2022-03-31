@@ -129,37 +129,48 @@ namespace PriorityApp.Controllers.CustomerService
                 bool transferredResult = false;
                 int TransferredCount = 0;
                 List<HoldModel> TodayHolds = new List<HoldModel>();
-                TodayHolds = _holdService.GetHoldBypriorityDate(DateTime.Today);
-                foreach(var todayHold in TodayHolds)
+                if(TransferDate > DateTime.Today)
                 {
-                    if(!todayHold.RemainingTranferred)
+                    TodayHolds = _holdService.GetHoldBypriorityDate(DateTime.Today);
+                    foreach (var todayHold in TodayHolds)
                     {
-                        var tomorrowHold = _holdService.GetLastHoldByUserIdAndPriorityDate(todayHold.userId, TransferDate);
-                        if (tomorrowHold != null)
+                        if (!todayHold.RemainingTranferred)
                         {
-                            tomorrowHold.QuotaQuantity = tomorrowHold.QuotaQuantity + todayHold.ReminingQuantity;
-                            tomorrowHold.ReminingQuantity = tomorrowHold.ReminingQuantity + todayHold.ReminingQuantity;
-                            tomorrowHold.TempReminingQuantity = tomorrowHold.ReminingQuantity;
-                            todayHold.RemainingTranferred = true;
-                            todayHold.ReminingQuantity = 0;
-                            transferredResult = _holdService.Update2Holds(todayHold, tomorrowHold).Result;
-                            
-                            if (Convert.ToBoolean(transferredResult))
+                            var tomorrowHold = _holdService.GetLastHoldByUserIdAndPriorityDate(todayHold.userId, TransferDate);
+                            if (tomorrowHold != null)
                             {
-                                TransferredCount = TransferredCount + 1;
+                                tomorrowHold.QuotaQuantity = tomorrowHold.QuotaQuantity + todayHold.ReminingQuantity;
+                                tomorrowHold.ReminingQuantity = tomorrowHold.ReminingQuantity + todayHold.ReminingQuantity;
+                                tomorrowHold.TempReminingQuantity = tomorrowHold.ReminingQuantity;
+                                tomorrowHold.RemainingTranferredFrom = todayHold.PriorityDate;
+                                todayHold.RemainingTranferred = true;
+                                todayHold.ReminingQuantity = 0;
+                                transferredResult = _holdService.Update2Holds(todayHold, tomorrowHold).Result;
+
+                                if (Convert.ToBoolean(transferredResult))
+                                {
+                                    TransferredCount = TransferredCount + 1;
+                                }
                             }
                         }
+
+                    }
+                    if (TransferredCount > 0)
+                    {
+                        ViewBag.Message = "Sucessful Process, you have transferred " + TransferredCount + " Today Remaining Quota to Tomorrow Quota";
+                    }
+                    else
+                    {
+                        ViewBag.Error = "No transferring";
                     }
 
                 }
-                if(TransferredCount > 0)
-                {
-                    ViewBag.Message = "Sucessful Process, you have transferred " + TransferredCount + " Today Remaining Quota to Tomorrow Quota";
-                }
                 else
                 {
-                    ViewBag.Message = "No transferring";
+                    ViewBag.Error = "Please, You Must transfer hold to Date Greater than Today Date";
+
                 }
+
                 return View("Create");
             }
             catch(Exception e)
@@ -200,16 +211,15 @@ namespace PriorityApp.Controllers.CustomerService
             try
             {
                 List<HoldModel> Todaymodels = _holdService.GetHoldBypriorityDate(model.PriorityDate);
-                List<HoldModel> Yeasterdaymodels = _holdService.GetHoldBypriorityDate(model.PriorityDate.AddDays(-1));
-                List<string> userIds = Yeasterdaymodels.Select(y => y.userId).ToList();
-                Todaymodels.ForEach(h => h.UserName = _userManager.FindByIdAsync(h.userId).Result.UserName);
-                foreach(var Todaymodel in Todaymodels)
-                {
-                    if(userIds.Contains(Todaymodel.userId))
+                    Todaymodels.ForEach(h => h.UserName = _userManager.FindByIdAsync(h.userId).Result.UserName);
+                    foreach (var Todaymodel in Todaymodels)
                     {
-                        Todaymodel.YeasterdayReminingQuantity = Yeasterdaymodels.Where(y => y.userId == Todaymodel.userId).First().TempReminingQuantity;
+                        if (Todaymodel.RemainingTranferredFrom != null)
+                        {
+                            HoldModel Yeasterdaymodel = _holdService.GetLastHoldByUserIdAndPriorityDate(Todaymodel.userId ,Todaymodel.RemainingTranferredFrom);
+                            Todaymodel.YeasterdayReminingQuantity = Yeasterdaymodel.TempReminingQuantity;
+                        }
                     }
-                }
                 memoryStream = _excelService.ExportQuotaToExcel(Todaymodels);
                 return File(memoryStream.ToArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "TodayQuota.xlsx");
             }

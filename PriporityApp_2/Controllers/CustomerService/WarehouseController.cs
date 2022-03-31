@@ -267,7 +267,7 @@ namespace PriorityApp.Controllers.CustomerService
                                         orderModel2.ItemId = item.Id;
                                         orderModel2.PriorityQuantity = item.Quantity;
                                         hold.ReminingQuantity = hold.ReminingQuantity - item.Quantity;
-                                        hold.TempReminingQuantity = hold.TempReminingQuantity - item.Quantity;
+                                        hold.TempReminingQuantity = hold.ReminingQuantity;
                                         OrderModel2 newOrderModel = await _orderService.CreateOrder(orderModel2, hold);
                                         submitOderCount = newOrderModel != null ? submitOderCount++ : submitOderCount;
                                         warehouseOrderHoldModel.OrderId = newOrderModel.Id;
@@ -322,7 +322,7 @@ namespace PriorityApp.Controllers.CustomerService
                                         orderModel2.ItemId = item.Id;
                                         orderModel2.PriorityQuantity = item.Quantity;
                                         hold.ReminingQuantity = hold.ReminingQuantity - item.Quantity;
-                                        hold.TempReminingQuantity = hold.TempReminingQuantity - item.Quantity;
+                                        hold.TempReminingQuantity = hold.ReminingQuantity;
                                         OrderModel2 newOrderModel = await _orderService.CreateOrder(orderModel2, hold);
                                         submitOderCount = newOrderModel != null ? submitOderCount++ : submitOderCount;
                                         warehouseOrderHoldModel.OrderId = newOrderModel.Id;
@@ -516,8 +516,6 @@ namespace PriorityApp.Controllers.CustomerService
                 return RedirectToAction("ERROR404");
             }
         }
-
-
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> EditOrders(WarehouseOrderModel Model)
@@ -528,7 +526,6 @@ namespace PriorityApp.Controllers.CustomerService
                 bool updateOrderResult = false;
                 int SavedOrderCount = 0;
                 bool AllOrdersSaved = true;
-
                 foreach (var warehouseModel in Model.warehouseOrderHoldModels)
                 {
                     HoldModel DBholdModel = _holdService.GetHold(Model.HoldModel.PriorityDate, Model.HoldModel.userId);
@@ -598,7 +595,6 @@ namespace PriorityApp.Controllers.CustomerService
                             updateModel.Truck = warehouseModel.Order.Truck;
                             updateModel.OrderCategoryId = (int)CommanData.OrderCategory.Warehouse;
                             updateOrderResult = _orderService.UpdateOrder2(updateModel, DBholdModel).Result;
-
                         }
 
                     }
@@ -616,7 +612,6 @@ namespace PriorityApp.Controllers.CustomerService
                             updateModel.OrderCategoryId = (int)CommanData.OrderCategory.Warehouse;
                             updateModel.Comment = "";
                             updateOrderResult = _orderService.UpdateOrder2(updateModel, DBholdModel).Result;
-
                         }
 
                     }

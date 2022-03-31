@@ -1,6 +1,7 @@
-﻿
-@{ ViewData["Title"] = "Create";
-    Layout = "~/Views/Shared/NiceAdmin/_CSLayout.cshtml"; }
+﻿@{ ViewData["Title"] = "Create";
+    Layout = "~/Views/Shared/NiceAdmin/_CSLayout.cshtml"; 
+}
+<script src="~/DataTable/jquery-3.5.1.js"></script>
 
 @if (ViewBag.Message != null)
 {
@@ -8,6 +9,7 @@
 else if (ViewBag.Error != null)
 {
 <div style="background-color: #ff3333; height: 60px; box-shadow: 5px; margin: 0px 20px 20px 50px; text-align: center; font-size: x-large">@ViewBag.Error</div>            }
+
 <h2>Upload Quota File</h2>
 
 <div class="text-center uploadOrdersDiv">
@@ -38,3 +40,12 @@ else if (ViewBag.Error != null)
     <input type="submit" value="Transfer" class="btn btn-success" style="margin-bottom:40px; margin-left:170px; margin-top:30px" />
 
 </form>
+
+<script language="javascript">
+var today = new Date();
+    var dd = String(today.getDate()).padStart(2, '0');
+    var mm = String(today.getMonth() + 1).padStart(2, '0');
+    var yyyy = today.getFullYear();
+
+    today = yyyy + '-' + mm + '-' + dd;
+    $('#TransferDate').attr('min', today);</script>

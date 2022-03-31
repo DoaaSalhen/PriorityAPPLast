@@ -41,6 +41,6 @@ namespace PriorityApp.Service.Models
         public bool RemainingTranferred { get; set; }
 
         public float YeasterdayReminingQuantity { get; set; }
-
+        public DateTime? RemainingTranferredFrom { get; set; }
     }
 }
